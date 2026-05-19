@@ -21,7 +21,7 @@ public class PlayerController : MonoBehaviour
     public void OnMove(InputValue value)
     {
         moveInput = value.Get<Vector2>();
-        
+
         // Điều khiển Animation nếu có thiết lập tham số "isMoving" ở bài trước
         if (anim != null)
         {
@@ -31,18 +31,38 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
-        Vector3 move = new Vector3(moveInput.x, 0f, moveInput.y);
-        if (move.sqrMagnitude < 0.001f) return;
+        // 1. Tạo vector hướng di chuyển từ Input mặt phẳng phẳng (X, Z)
+        Vector3 moveDirection = new Vector3(moveInput.x, 0f, moveInput.y);
 
         if (useRigidbody && rb != null)
         {
-            rb.MovePosition(rb.position + move * moveSpeed * Time.deltaTime);
+            // 1. Chỉ ĐỌC vận tốc vật lý hiện tại ĐÚNG 1 LẦN duy nhất ra biến tạm
+            Vector3 currentVelocity = rb.velocity;
+
+            if (moveDirection.sqrMagnitude > 0.001f)
+            {
+                // 2. Tính toán trên biến tạm
+                Vector3 targetVelocity = moveDirection.normalized * moveSpeed;
+                targetVelocity.y = currentVelocity.y; // Lấy trục Y từ biến tạm đã đọc phía trên
+
+                // 3. GHI lại vào Rigidbody
+                rb.velocity = targetVelocity;
+
+                transform.forward = moveDirection.normalized;
+            }
+            else
+            {
+                // Khi đứng yên: Giữ nguyên Y cũ từ biến tạm, triệt tiêu X và Z
+                rb.velocity = new Vector3(0f, currentVelocity.y, 0f);
+            }
         }
         else
         {
-            transform.Translate(move * moveSpeed * Time.deltaTime, Space.World);
-        }
+            // Nếu không dùng Rigidbody (Chế độ di chuyển thường bằng Translate)
+            if (moveDirection.sqrMagnitude < 0.001f) return;
 
-        transform.forward = move.normalized;
+            transform.Translate(moveDirection * moveSpeed * Time.deltaTime, Space.World);
+            transform.forward = moveDirection.normalized;
+        }
     }
 }
