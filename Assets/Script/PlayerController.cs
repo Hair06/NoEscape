@@ -37,7 +37,7 @@ public class PlayerController : MonoBehaviour
         if (useRigidbody && rb != null)
         {
             // 1. Chỉ ĐỌC vận tốc vật lý hiện tại ĐÚNG 1 LẦN duy nhất ra biến tạm
-            Vector3 currentVelocity = rb.velocity;
+            Vector3 currentVelocity = rb.linearVelocity;
 
             if (moveDirection.sqrMagnitude > 0.001f)
             {
@@ -46,14 +46,14 @@ public class PlayerController : MonoBehaviour
                 targetVelocity.y = currentVelocity.y; // Lấy trục Y từ biến tạm đã đọc phía trên
 
                 // 3. GHI lại vào Rigidbody
-                rb.velocity = targetVelocity;
+                rb.linearVelocity = targetVelocity;
 
                 transform.forward = moveDirection.normalized;
             }
             else
             {
                 // Khi đứng yên: Giữ nguyên Y cũ từ biến tạm, triệt tiêu X và Z
-                rb.velocity = new Vector3(0f, currentVelocity.y, 0f);
+                rb.linearVelocity = new Vector3(0f, currentVelocity.y, 0f);
             }
         }
         else
