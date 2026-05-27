@@ -5,8 +5,8 @@ using ThunderWire.Editors;
 
 namespace UHFPS.Editors
 {
-    [CustomEditor(typeof(FlashlightItem))]
-    public class FlashlightItemEditor : PlayerItemEditor<FlashlightItem>
+    [CustomEditor(typeof(UHFPS.Runtime.FlashlightItem))]
+    public class FlashlightItemEditor : PlayerItemEditor<UHFPS.Runtime.FlashlightItem>
     {
         public override void OnInspectorGUI()
         {

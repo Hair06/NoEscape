@@ -19,7 +19,7 @@ public class EmptyFrameInteract : MonoBehaviour
     private void Update()
     {
         // Nếu Player đang đứng trong vùng và nhấn phím E
-        if (isPlayerInside && Input.GetKeyDown(KeyCode.E))
+        if (isPlayerInside && GameInputBridge.GetKeyDown(KeyCode.E))
         {
             // Ẩn Text Prompt ngay khi mở bảng UI Mini-game để đỡ vướng màn hình
             if (promptCanvasObject != null) promptCanvasObject.SetActive(false);

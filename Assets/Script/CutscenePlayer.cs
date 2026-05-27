@@ -25,7 +25,7 @@ public class CutscenePlayer : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space) || Input.GetMouseButtonDown(0))
+        if (GameInputBridge.GetKeyDown(KeyCode.Space) || GameInputBridge.GetMouseButtonDown(0))
         {
             nextFrameRequested = true;
         }
