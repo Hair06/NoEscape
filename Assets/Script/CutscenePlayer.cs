@@ -1,124 +1,124 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using System.Collections;
+using UnityEngine.SceneManagement;
 
 public class CutscenePlayer : MonoBehaviour
 {
     public Image imageA;
     public Image imageB;
-
     public TextMeshProUGUI dialogueText;
 
     public CutsceneFrame[] frames;
-    public float typeSpeed = 0.04f;
 
-    public float fadeDuration = 1f;
+    public float fadeDuration = 0.8f;
+    public float typeSpeed = 0.035f;
+    public string nextSceneName = "map";
 
-    int currentFrame = 0;
-    bool waitingInput = false;
+    private bool nextFrameRequested = false;
 
-    private void Start()
+    void Start()
     {
-        StartCoroutine(StartCutscene());
+        StartCoroutine(PlayCutscene());
     }
 
-    private void Update()
+    void Update()
     {
-        if(waitingInput)
+        if (Input.GetKeyDown(KeyCode.Space) || Input.GetMouseButtonDown(0))
         {
-            if(Input.GetMouseButtonDown(0)
-               || Input.GetKeyDown(KeyCode.Space))
-            {
-                waitingInput = false;
-            }
+            nextFrameRequested = true;
         }
     }
 
-    IEnumerator StartCutscene()
-{
-    imageA.sprite = frames[0].image;
-
-    yield return StartCoroutine(
-        TypeDialogue(frames[0].dialogue));
-
-    yield return new WaitForSeconds(
-        frames[0].waitTime);
-
-    for(int i = 1; i < frames.Length; i++)
+    IEnumerator PlayCutscene()
     {
-        yield return StartCoroutine(
-            CrossFade(frames[i]));
+        if (frames.Length == 0)
+        {
+            EndCutscene();
+            yield break;
+        }
+
+        imageA.sprite = frames[0].image;
+        SetImageAlpha(imageA, 1);
+        SetImageAlpha(imageB, 0);
+
+        yield return ShowFrame(frames[0]);
+
+        for (int i = 1; i < frames.Length; i++)
+        {
+            yield return CrossFade(frames[i]);
+            yield return ShowFrame(frames[i]);
+        }
+
+        EndCutscene();
     }
 
-    EndCutscene();
-}
-
-    IEnumerator WaitForInput()
+    IEnumerator ShowFrame(CutsceneFrame frame)
     {
-        waitingInput = true;
+        nextFrameRequested = false;
+        dialogueText.text = "";
 
-        yield return new WaitUntil(() => waitingInput == false);
+        foreach (char c in frame.dialogue)
+        {
+            if (nextFrameRequested)
+            {
+                dialogueText.text = frame.dialogue;
+                nextFrameRequested = false;
+                break;
+            }
+
+            dialogueText.text += c;
+            yield return new WaitForSeconds(typeSpeed);
+        }
+
+        float timer = 0;
+
+        while (timer < frame.waitTime)
+        {
+            if (nextFrameRequested)
+            {
+                nextFrameRequested = false;
+                yield break;
+            }
+
+            timer += Time.deltaTime;
+            yield return null;
+        }
     }
 
     IEnumerator CrossFade(CutsceneFrame frame)
     {
         imageB.sprite = frame.image;
+        SetImageAlpha(imageB, 0);
 
-        Color b = imageB.color;
-        b.a = 0;
-        imageB.color = b;
+        float timer = 0;
 
-        float t = 0;
-
-        while(t < fadeDuration)
+        while (timer < fadeDuration)
         {
-            t += Time.deltaTime;
+            timer += Time.deltaTime;
+            float t = timer / fadeDuration;
 
-            float alpha = t / fadeDuration;
-
-            Color a = imageA.color;
-            a.a = 1 - alpha;
-            imageA.color = a;
-
-            b.a = alpha;
-            imageB.color = b;
+            SetImageAlpha(imageA, 1 - t);
+            SetImageAlpha(imageB, t);
 
             yield return null;
         }
 
         imageA.sprite = frame.image;
-
-        Color resetA = imageA.color;
-        resetA.a = 1;
-        imageA.color = resetA;
-
-        b.a = 0;
-        imageB.color = b;
-
-        yield return StartCoroutine(
-        TypeDialogue(frame.dialogue));
-
-        yield return new WaitForSeconds(
-            frame.waitTime);
+        SetImageAlpha(imageA, 1);
+        SetImageAlpha(imageB, 0);
     }
-    IEnumerator TypeDialogue(string text)
-{
-    dialogueText.text = "";
-
-    foreach(char letter in text)
-    {
-        dialogueText.text += letter;
-
-        yield return new WaitForSeconds(typeSpeed);
-    }
-}
 
     void EndCutscene()
     {
-        Debug.Log("Cutscene End");
+        SceneManager.LoadScene(nextSceneName);
+    }
 
-        // chuyển scene gameplay
-        // SceneManager.LoadScene("Gameplay");
+    void SetImageAlpha(Image img, float alpha)
+    {
+        Color c = img.color;
+        c.a = alpha;
+        img.color = c;
     }
 }
