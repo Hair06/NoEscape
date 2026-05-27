@@ -121573,7 +121573,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   promptCanvasObject: {fileID: 1594492753}
   promptText: {fileID: 490554649}
-  messageToShow: "Nh\u1EA5n [E] \u0111\u1EC3 ti\u1EBFn h\xE0nh phong \u1EA5n"
+  messageToShow: E
 --- !u!65 &935269471
 BoxCollider:
   m_ObjectHideFlags: 0
