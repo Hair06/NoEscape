@@ -13,7 +13,7 @@ public class PlayerInteraction : MonoBehaviour
         if (currentInteractable != null)
         {
             // Bấm E để tương tác
-            if (Input.GetKeyDown(KeyCode.E))
+            if (GameInputBridge.GetKeyDown(KeyCode.E))
             {
                 currentInteractable.Interact();
                 

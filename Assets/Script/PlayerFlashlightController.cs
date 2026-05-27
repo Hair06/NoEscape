@@ -22,7 +22,7 @@ public class PlayerFlashlightController : MonoBehaviour
         if (!hasFlashlight) return;
 
         // Nhấn phím F (hoặc đổi thành KeyCode.Mouse0 nếu muốn dùng chuột trái) để bật/tắt
-        if (Input.GetKeyDown(KeyCode.F))
+        if (GameInputBridge.GetKeyDown(KeyCode.F))
         {
             ToggleFlashlight();
         }
