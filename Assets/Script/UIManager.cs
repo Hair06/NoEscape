@@ -20,4 +20,10 @@ public class UIManager : MonoBehaviour
     {
         SceneManager.LoadScene("map");
     }
+       public void ExitGame()
+    {
+        Application.Quit();
+
+        Debug.Log("Game Closed");
+    }
 }
