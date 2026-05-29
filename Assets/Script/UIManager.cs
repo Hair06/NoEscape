@@ -18,7 +18,7 @@ public class UIManager : MonoBehaviour
     
       public void PlayGame()
     {
-        SceneManager.LoadScene("map");
+        SceneManager.LoadScene("Cutscene1");
     }
        public void ExitGame()
     {
