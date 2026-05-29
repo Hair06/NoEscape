@@ -8,11 +8,13 @@ public class Chapter1Manager : MonoBehaviour
     public int collectedPieces = 0;
     public int totalPiecesRequired = 4;
 
+    // BIẾN MỚI: Dùng để ghi nhớ xem người chơi đã giải xong mini-game này chưa
+    private bool isPuzzleFinished = false;
+
     [Header("Tham chiếu UI")]
     public GameObject puzzleMiniGameUI; // Kéo Canvas Mini-game vào đây
 
     [Header("Tham chiếu Player Invector")]
-    // SỬA TẠI ĐÂY: Chỉ đích danh Script của Invector để Unity nhận diện được ngay
     public Invector.vCharacterController.vThirdPersonInput playerInputSystem;     
 
     private void Awake()
@@ -24,7 +26,14 @@ public class Chapter1Manager : MonoBehaviour
     // Hàm gọi khi đến gần vị trí nhiệm vụ và ấn E
     public void TryTriggerPuzzle()
     {
-        // Nếu bạn muốn test nhanh không cần nhặt đủ 4 mảnh, hãy tạm thời bỏ điều kiện if này
+        // THÊM KIỂM TRA: Nếu đã hoàn thành nhiệm vụ này rồi thì chặn đứng, không cho hiện lại nữa
+        if (isPuzzleFinished)
+        {
+            Debug.Log("Bạn đã hoàn thành phong ấn bức tranh này rồi, không thể mở lại!");
+            return; 
+        }
+
+        // Kiểm tra số lượng mảnh ghép thu thập
         if (collectedPieces >= totalPiecesRequired)
         {
             OpenPuzzleGame();
@@ -32,7 +41,7 @@ public class Chapter1Manager : MonoBehaviour
         else
         {
             Debug.Log("Chưa tìm đủ số mảnh ảnh nhiệm vụ!");
-            // Để test nhanh tính năng đóng băng, bạn có thể gọi thẳng OpenPuzzleGame(); ở đây luôn
+            // Giữ lại dòng test nhanh của bạn
             OpenPuzzleGame(); 
         }
     }
@@ -43,8 +52,12 @@ public class Chapter1Manager : MonoBehaviour
         {
             puzzleMiniGameUI.SetActive(true); 
 
-            // 1. ĐÓNG BĂNG PLAYER: Tắt toàn bộ hệ thống nhận phím di chuyển và quay chuột
-            if (playerInputSystem != null) playerInputSystem.enabled = false;
+            // 1. ĐÓNG BĂNG PLAYER: Tắt nhận phím và nhả khóa chuột của Invector
+            if (playerInputSystem != null) 
+            {
+
+                playerInputSystem.enabled = false;
+            }
 
             // 2. HIỆN CON TRỎ CHUỘT
             Cursor.lockState = CursorLockMode.None;
@@ -52,17 +65,27 @@ public class Chapter1Manager : MonoBehaviour
         }
     }
 
-    // Hàm gọi khi bấm nút Thoát/Đóng trên UI Mini-game
-    public void ClosePuzzleGame()
+    // THAY ĐỔI: Thêm tham số 'isWin' vào hàm để phân biệt giữa việc bấm nút "Thoát" và việc "Win game"
+    public void ClosePuzzleGame(bool isWin = false)
     {
         if (puzzleMiniGameUI != null)
         {
             puzzleMiniGameUI.SetActive(false); // Ẩn bảng UI đi
 
-            //1. MỞ BĂNG PLAYER: Bật lại điều khiển
-            if (playerInputSystem != null) playerInputSystem.enabled = true;
+            // NẾU LÀ CHIẾN THẮNG: Khóa vĩnh viễn không cho ấn E mở lại nữa
+            if (isWin)
+            {
+                isPuzzleFinished = true;
+                Debug.Log("Chúc mừng! Mini-game đã bị khóa vĩnh viễn vì bạn đã thắng.");
+            }
 
-            // 2. KHÓA LẠI CHUỘT
+            // 1. MỞ BĂNG PLAYER: Bật lại điều khiển và khóa tâm chuột
+            if (playerInputSystem != null) 
+            {
+                playerInputSystem.enabled = true;
+            }
+
+            // 2. KHÓA LẠI CHUỘT THEO CHUẨN UNITY
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
         }
