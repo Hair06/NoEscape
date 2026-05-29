@@ -2,15 +2,39 @@ using UnityEngine;
 
 public class PuzzleManager : MonoBehaviour
 {
-    [SerializeField] private PuzzlePiece[] allPieces; // Kéo cả 4 Object Piece vào danh sách này
-    [SerializeField] private GameObject puzzleUI;      // Kéo chính Puzzle_Canvas vào đây để ẩn khi thắng
+    [SerializeField] private PuzzlePiece[] allPieces;
+    [SerializeField] private GameObject puzzleUI;
+
+    [Header("Cutscene sau khi mở Phong Ấn 1")]
+    [SerializeField] private MapSealCutscenePlayer seal1Cutscene;
+
+    private bool completed;
 
     public void CheckWinCondition()
 {
     foreach (PuzzlePiece piece in allPieces)
     {
-        if (!piece.IsSnapped()) 
-            return; // Nếu có dù chỉ 1 mảnh chưa xong thì chưa thắng
+        if (completed) return;
+
+        foreach (PuzzlePiece piece in allPieces)
+        {
+            if (!piece.IsSnapped()) return;
+        }
+
+        completed = true;
+
+        Debug.Log("Bạn đã giải mã xong bức tranh cổ! Phong ấn 1 đã được mở.");
+
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+        Time.timeScale = 1f;
+
+        puzzleUI.SetActive(false);
+
+        if (seal1Cutscene != null)
+        {
+            seal1Cutscene.PlayCutscene();
+        }
     }
 
     // --- CHÚC MỪNG CHIẾN THẮNG ---
