@@ -201678,7 +201678,6 @@ MonoBehaviour:
   - {fileID: 843777725}
   - {fileID: 336425568}
   puzzleUI: {fileID: 1517797187}
-  seal1Cutscene: {fileID: 1180164971}
 --- !u!114 &1517797189
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -286937,11 +286936,5 @@ SceneRoots:
   - {fileID: 1517797192}
   - {fileID: 1843962386}
   - {fileID: 1838647445}
-  - {fileID: 34513510}
-  - {fileID: 928578874972358538}
-  - {fileID: 153107911}
-  - {fileID: 84063299}
-  - {fileID: 45104166}
-  - {fileID: 491925395}
-  - {fileID: 183661003}
-  - {fileID: 1405142098}
+  - {fileID: 1180164970}
+  - {fileID: 1551546614}
