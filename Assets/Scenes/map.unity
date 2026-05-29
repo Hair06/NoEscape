@@ -201678,6 +201678,7 @@ MonoBehaviour:
   - {fileID: 843777725}
   - {fileID: 336425568}
   puzzleUI: {fileID: 1517797187}
+  seal1Cutscene: {fileID: 1180164971}
 --- !u!114 &1517797189
 MonoBehaviour:
   m_ObjectHideFlags: 0
