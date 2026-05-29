@@ -1,10 +1,10 @@
 using UnityEngine;
-using TMPro; // Sử dụng nếu bạn có TextMeshPro để hiện chữ UI
+using TMPro;
 
 public class PlayerInteraction : MonoBehaviour
 {
     public float interactRange = 2f;
-    [SerializeField] private TextMeshProUGUI promptText; // Kéo Text UI vào đây (nếu có)
+    [SerializeField] private TextMeshProUGUI promptText;
 
     private IInteractable currentInteractable;
 
@@ -12,21 +12,16 @@ public class PlayerInteraction : MonoBehaviour
     {
         if (currentInteractable != null)
         {
-            // Bấm E để tương tác
             if (GameInputBridge.GetKeyDown(KeyCode.E))
             {
                 currentInteractable.Interact();
-                
-                // Sau khi nhặt (bị hủy), xóa prompt text luôn
-                if (currentInteractable == null || currentInteractable.Equals(null))
-                {
-                    ClearInteractable();
-                }
+                // KHONG goi ClearInteractable() o day nua.
+                // Binh xang se tu roi vung -> OnTriggerExit xoa.
+                // May phat khong bi huy -> bam E nhieu lan van do duoc.
             }
         }
     }
 
-    // Phát hiện khi đi vào vùng của vật phẩm
     private void OnTriggerEnter(Collider other)
     {
         IInteractable interactable = other.GetComponent<IInteractable>();
@@ -41,7 +36,6 @@ public class PlayerInteraction : MonoBehaviour
         }
     }
 
-    // Phát hiện khi đi ra khỏi vùng của vật phẩm
     private void OnTriggerExit(Collider other)
     {
         IInteractable interactable = other.GetComponent<IInteractable>();
