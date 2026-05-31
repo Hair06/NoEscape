@@ -32,6 +32,14 @@ public class AudioManager : MonoBehaviour
         PlayerPrefs.SetFloat("MusicVolume", volume);
     }
 
+    public void StopMusic()
+    {
+        if (musicSource != null)
+        {
+            musicSource.Stop();
+        }
+    }
+
     // SFX
     public void SetSFXVolume(float volume)
     {

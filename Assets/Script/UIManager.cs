@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+
 public class UIManager : MonoBehaviour
 {
     public GameObject settingsPanel;
@@ -15,12 +16,17 @@ public class UIManager : MonoBehaviour
     {
         settingsPanel.SetActive(false);
     }
-    
-      public void PlayGame()
+    public void PlayGame()
     {
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.StopMusic();
+        }
+
         SceneManager.LoadScene("Cutscene1");
     }
-       public void ExitGame()
+
+    public void ExitGame()
     {
         Application.Quit();
 
