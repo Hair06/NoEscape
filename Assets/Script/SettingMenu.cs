@@ -8,22 +8,38 @@ public class SettingsMenu : MonoBehaviour
 
     private void Start()
     {
-        // Load value
-        musicSlider.value = PlayerPrefs.GetFloat("MusicVolume", 1f);
-        sfxSlider.value = PlayerPrefs.GetFloat("SFXVolume", 1f);
+        if (musicSlider != null)
+        {
+            musicSlider.minValue = 0f;
+            musicSlider.maxValue = 1f;
+            musicSlider.wholeNumbers = false;
 
-        // Add listener
-        musicSlider.onValueChanged.AddListener(ChangeMusicVolume);
-        sfxSlider.onValueChanged.AddListener(ChangeSFXVolume);
+            musicSlider.onValueChanged.RemoveAllListeners();
+            musicSlider.value = PlayerPrefs.GetFloat("MusicVolume", 1f);
+            musicSlider.onValueChanged.AddListener(ChangeMusicVolume);
+        }
+
+        if (sfxSlider != null)
+        {
+            sfxSlider.minValue = 0f;
+            sfxSlider.maxValue = 1f;
+            sfxSlider.wholeNumbers = false;
+
+            sfxSlider.onValueChanged.RemoveAllListeners();
+            sfxSlider.value = PlayerPrefs.GetFloat("SFXVolume", 1f);
+            sfxSlider.onValueChanged.AddListener(ChangeSFXVolume);
+        }
     }
 
     public void ChangeMusicVolume(float value)
     {
-        AudioManager.Instance.SetMusicVolume(value);
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.SetMusicVolume(value);
     }
 
     public void ChangeSFXVolume(float value)
     {
-        AudioManager.Instance.SetSFXVolume(value);
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.SetSFXVolume(value);
     }
 }
