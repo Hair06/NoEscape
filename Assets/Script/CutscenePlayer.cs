@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.SceneManagement;
+using UnityEngine.InputSystem;
 
 public class CutscenePlayer : MonoBehaviour
 {
@@ -16,7 +17,14 @@ public class CutscenePlayer : MonoBehaviour
     public float typeSpeed = 0.035f;
     public string nextSceneName = "map";
 
+    [Header("Hold E để skip tới frame 27")]
+    public float holdSkipTime = 2f;
+    public int skipToFrameNumber = 27;
+
     private bool nextFrameRequested = false;
+    private bool skipToFrameRequested = false;
+    private int currentFrameIndex = 0;
+    private float holdTimer = 0f;
 
     void Start()
     {
@@ -29,7 +37,33 @@ public class CutscenePlayer : MonoBehaviour
         {
             nextFrameRequested = true;
         }
+
+        HandleHoldSkip();
     }
+
+    void HandleHoldSkip()
+{
+    if (frames == null || frames.Length == 0) return;
+
+    if (currentFrameIndex >= skipToFrameNumber - 1) return;
+
+    if (Keyboard.current == null) return;
+
+    if (Keyboard.current.eKey.isPressed)
+    {
+        holdTimer += Time.deltaTime;
+
+        if (holdTimer >= holdSkipTime)
+        {
+            skipToFrameRequested = true;
+            holdTimer = 0f;
+        }
+    }
+    else
+    {
+        holdTimer = 0f;
+    }
+}
 
     IEnumerator PlayCutscene()
     {
@@ -43,10 +77,19 @@ public class CutscenePlayer : MonoBehaviour
         SetImageAlpha(imageA, 1);
         SetImageAlpha(imageB, 0);
 
+        currentFrameIndex = 0;
         yield return ShowFrame(frames[0]);
 
         for (int i = 1; i < frames.Length; i++)
         {
+            if (skipToFrameRequested)
+            {
+                i = skipToFrameNumber - 1;
+                skipToFrameRequested = false;
+            }
+
+            currentFrameIndex = i;
+
             yield return CrossFade(frames[i]);
             yield return ShowFrame(frames[i]);
         }
@@ -61,6 +104,11 @@ public class CutscenePlayer : MonoBehaviour
 
         foreach (char c in frame.dialogue)
         {
+            if (skipToFrameRequested)
+            {
+                yield break;
+            }
+
             if (nextFrameRequested)
             {
                 dialogueText.text = frame.dialogue;
@@ -76,6 +124,11 @@ public class CutscenePlayer : MonoBehaviour
 
         while (timer < frame.waitTime)
         {
+            if (skipToFrameRequested)
+            {
+                yield break;
+            }
+
             if (nextFrameRequested)
             {
                 nextFrameRequested = false;
@@ -96,6 +149,11 @@ public class CutscenePlayer : MonoBehaviour
 
         while (timer < fadeDuration)
         {
+            if (skipToFrameRequested)
+            {
+                yield break;
+            }
+
             timer += Time.deltaTime;
             float t = timer / fadeDuration;
 
