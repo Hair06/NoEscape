@@ -553,160 +553,130 @@ MonoBehaviour:
     dialogue: "M\u01B0\u1EDDi n\u0103m tr\u01B0\u1EDBc, t\xF4i l\xE0 m\u1ED9t c\u1EADu
       b\xE9 v\xF4 t\u01B0 h\u1ED3n nhi\xEAn kh\xF4ng c\xF3 b\u1EA5t c\u1EE9 k\u1EC9
       ni\u1EC7m g\xEC v\u1EC1 b\u1ED1 m\u1EB9."
-    waitTime: 3
+    waitTime: 2
   - image: {fileID: 876081018, guid: 43f24e4e486986c4b947d72f2d228b5c, type: 3}
     dialogue: "T\u1EEB \u0111\xF3 \u0111\u1EBFn nay, d\xEC Diva l\xE0 ng\u01B0\u1EDDi
       th\xE2n duy nh\u1EA5t \u1EDF b\xEAn t\xF4i."
-    waitTime: 3
+    waitTime: 2
   - image: {fileID: -402144998, guid: 43f24e4e486986c4b947d72f2d228b5c, type: 3}
     dialogue: "D\xEC lu\xF4n lo cho t\xF4i t\u1EEBng b\u1EEFa \u0103n, t\u1EEBng
       vi\u1EC7c nh\u1ECF trong cu\u1ED9c s\u1ED1ng. T\xF4i xem d\xEC nh\u01B0 m\u1ED9t
       ng\u01B0\u1EDDi m\u1EB9 c\u1EE7a t\xF4i."
-    waitTime: 3
-  - image: {fileID: -752119049, guid: 43f24e4e486986c4b947d72f2d228b5c, type: 3}
-    dialogue: "Nh\u1EEFng ng\xE0y b\xECnh th\u01B0\u1EDDng \u1EA5y t\u1EEBng khi\u1EBFn
-      t\xF4i ngh\u0129 r\u1EB1ng m\u1ECDi chuy\u1EC7n s\u1EBD m\xE3i nh\u01B0 v\u1EADy."
-    waitTime: 3
-  - image: {fileID: -407242717, guid: 43f24e4e486986c4b947d72f2d228b5c, type: 3}
-    dialogue: "D\xF9 kh\xF4ng gi\xE0u c\xF3, ch\xFAng t\xF4i v\u1EABn lu\xF4n c\u1ED1
-      g\u1EAFng s\u1ED1ng th\u1EADt vui v\u1EBB."
-    waitTime: 3
-  - image: {fileID: -339242983, guid: 43f24e4e486986c4b947d72f2d228b5c, type: 3}
-    dialogue: "M\u1ED7i n\u0103m, d\xEC \u0111\u1EC1u chu\u1EA9n b\u1ECB sinh nh\u1EADt
-      cho t\xF4i nh\u01B0 m\u1ED9t truy\u1EC1n th\u1ED1ng kh\xF4ng bao gi\u1EDD thay
-      \u0111\u1ED5i."
-    waitTime: 4
-  - image: {fileID: 820705285, guid: 43f24e4e486986c4b947d72f2d228b5c, type: 3}
-    dialogue: "B\xE0 th\u01B0\u1EDDng n\xF3i r\u1EB1ng tu\u1ED5i m\u1EDBi l\xE0 c\u01A1
-      h\u1ED9i \u0111\u1EC3 b\u1EAFt \u0111\u1EA7u m\u1ED9t h\xE0nh tr\xECnh m\u1EDBi."
-    waitTime: 3
-  - image: {fileID: 1559374151, guid: 43f24e4e486986c4b947d72f2d228b5c, type: 3}
-    dialogue: "Nh\u1EEFng bu\u1ED5i t\u1ED1i y\xEAn b\xECnh b\xEAn nhau l\xE0 kho\u1EA3ng
-      th\u1EDDi gian t\xF4i tr\xE2n tr\u1ECDng nh\u1EA5t."
-    waitTime: 3
+    waitTime: 2
   - image: {fileID: 1437148735, guid: 43f24e4e486986c4b947d72f2d228b5c, type: 3}
     dialogue: "C\xF3 nh\u1EEFng l\xFAc t\xF4i t\u1EF1 h\u1ECFi t\u1EA1i sao tr\u01B0\u1EDBc
       gi\u1EDD d\xEC ch\u1EB3ng bao gi\u1EDD k\u1EC3 g\xEC v\u1EC1 b\u1ED1 m\u1EB9
       c\u1EE7a t\xF4i."
-    waitTime: 3
-  - image: {fileID: -323187969, guid: 43f24e4e486986c4b947d72f2d228b5c, type: 3}
-    dialogue: "B\xE2y gi\u1EDD ngh\u0129 l\u1EA1i... c\xF3 l\u1EBD d\xEC gi\u1EA5u
-      t\xF4i b\u1EDFi v\xEC d\xEC mu\u1ED1n b\u1EA3o v\u1EC7 t\xF4i kh\u1ECFi s\u1EF1
-      th\u1EADt kinh ho\xE0ng v\u1EC1 b\u1ED1 m\u1EB9 t\xF4i."
-    waitTime: 4
+    waitTime: 2
+  - image: {fileID: -752119049, guid: 43f24e4e486986c4b947d72f2d228b5c, type: 3}
+    dialogue: "Nh\u1EEFng ng\xE0y b\xECnh th\u01B0\u1EDDng \u1EA5y t\u1EEBng khi\u1EBFn
+      t\xF4i ngh\u0129 r\u1EB1ng m\u1ECDi chuy\u1EC7n s\u1EBD m\xE3i nh\u01B0 v\u1EADy."
+    waitTime: 2
   - image: {fileID: 18621508, guid: 43f24e4e486986c4b947d72f2d228b5c, type: 3}
     dialogue: "R\u1ED3i m\u1ED9t ng\xE0y, m\u1ECDi th\u1EE9 b\u1EAFt \u0111\u1EA7u
       thay \u0111\u1ED5i."
-    waitTime: 4
+    waitTime: 2
   - image: {fileID: 279068997, guid: 43f24e4e486986c4b947d72f2d228b5c, type: 3}
-    dialogue: "D\xEC th\u01B0\u1EDDng xuy\xEAn ho v\xE0o ban \u0111\xEAm."
-    waitTime: 4
-  - image: {fileID: -321682117, guid: 43f24e4e486986c4b947d72f2d228b5c, type: 3}
-    dialogue: "Ban \u0111\u1EA7u b\xE0 n\xF3i ch\u1EC9 l\xE0 c\u1EA3m l\u1EA1nh th\xF4ng
-      th\u01B0\u1EDDng."
-    waitTime: 3
+    dialogue: "D\xEC th\u01B0\u1EDDng xuy\xEAn ho v\xE0o ban \u0111\xEAm. Ban \u0111\u1EA7u
+      b\xE0 n\xF3i ch\u1EC9 l\xE0 c\u1EA3m l\u1EA1nh th\xF4ng th\u01B0\u1EDDng."
+    waitTime: 2
   - image: {fileID: 1376529332, guid: 43f24e4e486986c4b947d72f2d228b5c, type: 3}
     dialogue: "Nh\u01B0ng nh\u1EEFng h\u1ED9p thu\u1ED1c ng\xE0y c\xE0ng nhi\u1EC1u
       l\xEAn, c\xF2n n\u1EE5 c\u01B0\u1EDDi th\xEC ng\xE0y c\xE0ng \xEDt \u0111i."
-    waitTime: 4
+    waitTime: 2
   - image: {fileID: 1735375703, guid: 43f24e4e486986c4b947d72f2d228b5c, type: 3}
     dialogue: "T\xF4i b\u1EAFt \u0111\u1EA7u nh\u1EADn ra b\xE0 \u0111ang c\u1ED1
       gi\u1EA5u t\xF4i \u0111i\u1EC1u g\xEC \u0111\xF3."
-    waitTime: 4
+    waitTime: 2
   - image: {fileID: -144104581, guid: 43f24e4e486986c4b947d72f2d228b5c, type: 3}
     dialogue: "V\xE0i tu\u1EA7n sau, d\xEC ng\u1EA5t x\u1EC9u v\xE0 t\xF4i \u0111\u01B0a
       b\xE0 nh\u1EADp vi\u1EC7n."
-    waitTime: 4
+    waitTime: 2
   - image: {fileID: -752387339, guid: 43f24e4e486986c4b947d72f2d228b5c, type: 3}
     dialogue: "T\xF4i v\u1EABn nh\u1EDB r\xF5 \xE1nh m\u1EAFt c\u1EE7a v\u1ECB b\xE1c
       s\u0129 h\xF4m \u1EA5y."
-    waitTime: 4
+    waitTime: 2
   - image: {fileID: 515402463, guid: 43f24e4e486986c4b947d72f2d228b5c, type: 3}
     dialogue: "Kh\xF4ng ai n\xF3i g\xEC qu\xE1 nhi\u1EC1u, nh\u01B0ng t\xF4i hi\u1EC3u
       chuy\u1EC7n ch\u1EB3ng h\u1EC1 \u0111\u01A1n gi\u1EA3n."
-    waitTime: 4
+    waitTime: 2
   - image: {fileID: -1967357195, guid: 43f24e4e486986c4b947d72f2d228b5c, type: 3}
     dialogue: "L\u1EA7n \u0111\u1EA7u ti\xEAn trong \u0111\u1EDDi, t\xF4i c\u1EA3m
       th\u1EA5y s\u1EE3 h\xE3i khi ngh\u0129 \u0111\u1EBFn vi\u1EC7c m\u1EA5t \u0111i
       ng\u01B0\u1EDDi th\xE2n cu\u1ED1i c\xF9ng."
-    waitTime: 5
+    waitTime: 3
   - image: {fileID: 879675071, guid: 43f24e4e486986c4b947d72f2d228b5c, type: 3}
     dialogue: "D\xEC ch\u1EC9 l\u1EB7ng l\u1EBD nh\xECn t\xF4i nh\u01B0 mu\u1ED1n
       ghi nh\u1EDB khu\xF4n m\u1EB7t n\xE0y l\u1EA7n cu\u1ED1i."
-    waitTime: 5
-  - image: {fileID: -1147723794, guid: 43f24e4e486986c4b947d72f2d228b5c, type: 3}
-    dialogue: "Nh\u1EEFng ng\xE0y sau \u0111\xF3, d\xEC g\u1EA7n nh\u01B0 kh\xF4ng
-      r\u1EDDi kh\u1ECFi gi\u01B0\u1EDDng b\u1EC7nh."
-    waitTime: 4
+    waitTime: 3
   - image: {fileID: -310666021, guid: 43f24e4e486986c4b947d72f2d228b5c, type: 3}
     dialogue: "Cho \u0111\u1EBFn m\u1ED9t bu\u1ED5i t\u1ED1i, d\xEC g\u1ECDi t\xF4i
       l\u1EA1i v\xE0 \u0111\u01B0a cho t\xF4i m\u1ED9t chi\u1EBFc h\u1ED9p c\u0169."
-    waitTime: 4
+    waitTime: 2
   - image: {fileID: 1443869683, guid: 43f24e4e486986c4b947d72f2d228b5c, type: 3}
     dialogue: "B\xEAn trong l\xE0 m\u1ED9t t\u1EA5m \u1EA3nh gia \u0111\xECnh, m\u1ED9t
       chi\u1EBFc ch\xECa kh\xF3a... v\xE0 m\u1ED9t cu\u1ED1n b\u0103ng cassette \u0111\xE3
       c\u0169."
-    waitTime: 4
+    waitTime: 2
   - image: {fileID: 1461273863, guid: 43f24e4e486986c4b947d72f2d228b5c, type: 3}
-    dialogue: "D\xEC b\u1EA3o r\u1EB1ng m\u1ECDi c\xE2u tr\u1EA3 l\u1EDDi t\xF4i
-      th\u1EAFc m\u1EAFc su\u1ED1t b\u1EA5y l\xE2u nay \u0111\u1EC1u n\u1EB1m trong
-      cu\u1ED1n b\u0103ng \u0111\xF3."
-    waitTime: 4
+    dialogue: "D\xEC b\u1EA3o r\u1EB1ng m\u1ECDi c\xE2u tr\u1EA3 l\u1EDDi v\u1EC1
+      b\u1ED1 m\u1EB9 t\xF4i \u0111\u1EC1u n\u1EB1m trong \u0111\xF3"
+    waitTime: 2
   - image: {fileID: -575623803, guid: 43f24e4e486986c4b947d72f2d228b5c, type: 3}
     dialogue: "\u0110\xEAm h\xF4m \u1EA5y, t\xF4i mang cu\u1ED1n b\u0103ng tr\u1EDF
       v\u1EC1 nh\xE0... m\xE0 kh\xF4ng h\u1EC1 bi\u1EBFt r\u1EB1ng m\xECnh \u0111\xE3
       d\xEDnh v\xE0o m\u1ED9t s\u1EF1 th\u1EADt kinh ho\xE0ng v\xE0 \u0111au th\u01B0\u01A1ng."
-    waitTime: 5
+    waitTime: 4
   - image: {fileID: 1810603911, guid: 3c603c68ccce251418130fcd23784625, type: 3}
     dialogue: "T\xF4i \u0111\xE3 do d\u1EF1 r\u1EA5t l\xE2u tr\u01B0\u1EDBc khi m\u1EDF
       n\xF3.M\u1ED9t ph\u1EA7n trong t\xF4i mu\u1ED1n bi\u1EBFt s\u1EF1 th\u1EADt...
       Nh\u01B0ng ph\u1EA7n c\xF2n l\u1EA1i l\u1EA1i s\u1EE3 h\xE3i nh\u1EEFng g\xEC
       \u0111ang ch\u1EDD ph\xEDa tr\u01B0\u1EDBc."
-    waitTime: 5
+    waitTime: 4
   - image: {fileID: 1126188821, guid: 3c603c68ccce251418130fcd23784625, type: 3}
     dialogue: "Cu\u1ED1i c\xF9ng, t\xF4i v\u1EABn l\xE0m \u0111i\u1EC1u m\xE0 d\xEC
       mong mu\u1ED1n.T\xF4i \u0111\u01B0a cu\u1ED1n b\u0103ng v\xE0o \u0111\u1EA7u
       ph\xE1t v\xE0 nh\u1EA5n n\xFAt PLAY."
-    waitTime: 4
+    waitTime: 3
   - image: {fileID: -647980871, guid: 3c603c68ccce251418130fcd23784625, type: 3}
     dialogue: "Ban \u0111\u1EA7u ch\u1EC9 l\xE0 nh\u1EEFng ti\u1EBFng r\xE8 r\xE8
       quen thu\u1ED9c c\u1EE7a m\u1ED9t chi\u1EBFc TV c\u0169. Kh\xF4ng \xE2m thanh.
       Ch\u1EC9 c\xF3 h\xECnh \u1EA3nh ng\xF4i nh\xE0 l\xFAc \u1EA9n l\xFAc hi\u1EC7n."
-    waitTime: 5
+    waitTime: 4
   - image: {fileID: 1221983314, guid: 3c603c68ccce251418130fcd23784625, type: 3}
     dialogue: "Nh\u01B0ng r\u1ED3i...M\u1ED9t c\u1EA3m gi\xE1c kh\xF3 t\u1EA3 b\u1EAFt
       \u0111\u1EA7u xu\u1EA5t hi\u1EC7n. Tim t\xF4i \u0111\u1EADp nhanh h\u01A1n
       b\xECnh th\u01B0\u1EDDng.Nh\u01B0 th\u1EC3 c\xF3 ai \u0111\xF3 \u0111ang \u0111\u1EE9ng
       ph\xEDa sau l\u01B0ng m\xECnh."
-    waitTime: 5
+    waitTime: 4
   - image: {fileID: -755513450, guid: 3c603c68ccce251418130fcd23784625, type: 3}
     dialogue: "M\xE0n h\xECnh b\u1ED7ng tr\u1EDF n\xEAn s\xE1ng b\u1EA5t th\u01B0\u1EDDng.
       Th\u1EE9 \xE1nh s\xE1ng \u1EA5y khi\u1EBFn t\xF4i kh\xF4ng th\u1EC3 r\u1EDDi
       m\u1EAFt. N\xF3 gi\u1ED1ng nh\u01B0 \u0111ang g\u1ECDi t\xEAn t\xF4i"
-    waitTime: 5
+    waitTime: 4
   - image: {fileID: 1257150700, guid: 3c603c68ccce251418130fcd23784625, type: 3}
     dialogue: "T\xF4i c\u1ED1 g\u1EAFng l\xF9i l\u1EA1i. Nh\u01B0ng c\u01A1 th\u1EC3
       d\u01B0\u1EDDng nh\u01B0 kh\xF4ng c\xF2n nghe theo \xFD mu\u1ED1n n\u1EEFa.
       M\u1ED9t l\u1EF1c v\xF4 h\xECnh \u0111ang k\xE9o t\xF4i ti\u1EBFn v\u1EC1 ph\xEDa
       tr\u01B0\u1EDBc."
-    waitTime: 5
+    waitTime: 4
   - image: {fileID: -257933612, guid: 3c603c68ccce251418130fcd23784625, type: 3}
     dialogue: "Nh\u1EEFng ti\u1EBFng th\xEC th\u1EA7m m\xE9o m\xF3 vang v\u1ECDng
       trong \u0111\u1EA7u t\xF4i. Jay... c\u1EE9u m\u1EB9... m\u1EB9 xin l\u1ED7i
       con...."
-    waitTime: 4
+    waitTime: 3
   - image: {fileID: -1738774865, guid: 3c603c68ccce251418130fcd23784625, type: 3}
     dialogue: "T\xF4i c\u1ED1 g\u1EAFng b\xE1m l\u1EA5y b\u1EA5t c\u1EE9 th\u1EE9
       g\xEC c\xF3 th\u1EC3. Nh\u01B0ng t\u1EA5t c\u1EA3 \u0111\u1EC1u v\xF4 \xEDch.
       Th\u1EE9 \u0111ang k\xE9o t\xF4i \u0111i m\u1EA1nh h\u01A1n m\u1ECDi th\u1EE9
       t\xF4i t\u1EEBng bi\u1EBFt."
-    waitTime: 5
+    waitTime: 4
   - image: {fileID: 635929517, guid: 3c603c68ccce251418130fcd23784625, type: 3}
     dialogue: "M\u1ECDi th\u1EE9 tr\u01B0\u1EDBc m\u1EAFt t\xF4i b\u1ECB nu\u1ED1t
       ch\u1EEDng b\u1EDFi m\u1ED9t m\xE0u tr\u1EAFng v\xF4 t\u1EADn. V\xE0 \u0111\xF3
       l\xE0 kho\u1EA3nh kh\u1EAFc... T\xF4i b\u01B0\u1EDBc v\xE0o v\xF9ng \u0111\u1EA5t
       k\xFD \u1EE9c b\u1ECB nguy\u1EC1n r\u1EE7a."
-    waitTime: 5
+    waitTime: 4
   - image: {fileID: 602341656, guid: 517c44d520fde6442a41c93e57fb1e30, type: 3}
     dialogue: "Kh\xF4ng ph\u1EA3i m\u1ECDi k\xFD \u1EE9c \u0111\u1EC1u n\xEAn \u0111\u01B0\u1EE3c
       nh\u1EDB l\u1EA1i..."
@@ -718,6 +688,8 @@ MonoBehaviour:
   fadeDuration: 0.8
   typeSpeed: 0.04
   nextSceneName: map
+  holdSkipTime: 2
+  skipToFrameNumber: 28
 --- !u!4 &1054741063
 Transform:
   m_ObjectHideFlags: 0
@@ -790,7 +762,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: '[SPACE / CLICK]'
+  m_text: '[SPACE / CLICK]
+
+    [HOLD E TO SKIP]'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
