@@ -8,44 +8,62 @@ public class AudioManager : MonoBehaviour
     public AudioSource musicSource;
     public AudioSource sfxSource;
 
+    [Header("UI Sounds")]
+    public AudioClip buttonClick;
+
     private void Awake()
     {
-        // Singleton
         if (Instance == null)
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
+            LoadVolume();
         }
         else
         {
             Destroy(gameObject);
-            return;
         }
-
-        LoadVolume();
     }
 
-    // MUSIC
     public void SetMusicVolume(float volume)
     {
-        musicSource.volume = volume;
+        volume = Mathf.Clamp01(volume);
+
+        if (musicSource != null)
+            musicSource.volume = volume;
+
         PlayerPrefs.SetFloat("MusicVolume", volume);
+        PlayerPrefs.Save();
     }
 
-    // SFX
     public void SetSFXVolume(float volume)
     {
-        sfxSource.volume = volume;
+        volume = Mathf.Clamp01(volume);
+
+        if (sfxSource != null)
+            sfxSource.volume = volume;
+
         PlayerPrefs.SetFloat("SFXVolume", volume);
+        PlayerPrefs.Save();
     }
 
-    // LOAD
-    void LoadVolume()
+    public void PlayButtonClick()
     {
-        float music = PlayerPrefs.GetFloat("MusicVolume", 1f);
-        float sfx = PlayerPrefs.GetFloat("SFXVolume", 1f);
+        if (sfxSource != null && buttonClick != null)
+        {
+            sfxSource.PlayOneShot(buttonClick);
+        }
+    }
 
-        musicSource.volume = music;
-        sfxSource.volume = sfx;
+    public void StopMusic()
+    {
+        if (musicSource != null)
+            musicSource.Stop();
+    }
+
+    private void LoadVolume()
+    {
+        SetMusicVolume(PlayerPrefs.GetFloat("MusicVolume", 1f));
+        SetSFXVolume(PlayerPrefs.GetFloat("SFXVolume", 1f));
     }
 }
