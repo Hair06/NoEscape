@@ -10,9 +10,11 @@ public class DrawerInteract : MonoBehaviour
     public Vector3 openOffset = new Vector3(0, 0, 0.3f);
     public float speed = 3f;
 
+    // Tự động lấy DoorAudioController trên cùng GameObject
+    private DoorAudioController doorAudio;
+
     private Vector3 closedPos;
     private Vector3 openPos;
-
     private bool playerNear = false;
     private bool isOpen = false;
 
@@ -21,8 +23,9 @@ public class DrawerInteract : MonoBehaviour
         closedPos = drawer.localPosition;
         openPos = closedPos + openOffset;
 
-        if (interactText != null)
-            interactText.SetActive(false);
+        if (interactText != null) interactText.SetActive(false);
+
+        doorAudio = GetComponent<DoorAudioController>();
     }
 
     void Update()
@@ -30,15 +33,13 @@ public class DrawerInteract : MonoBehaviour
         if (playerNear && GameInputBridge.GetKeyDown(KeyCode.E))
         {
             isOpen = !isOpen;
+
+            if (isOpen) doorAudio?.PlayOpen();
+            else doorAudio?.PlayClose();
         }
 
         Vector3 targetPos = isOpen ? openPos : closedPos;
-
-        drawer.localPosition = Vector3.Lerp(
-            drawer.localPosition,
-            targetPos,
-            Time.deltaTime * speed
-        );
+        drawer.localPosition = Vector3.Lerp(drawer.localPosition, targetPos, Time.deltaTime * speed);
     }
 
     private void OnTriggerEnter(Collider other)
@@ -46,9 +47,7 @@ public class DrawerInteract : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             playerNear = true;
-
-            if (interactText != null)
-                interactText.SetActive(true);
+            if (interactText != null) interactText.SetActive(true);
         }
     }
 
@@ -57,9 +56,7 @@ public class DrawerInteract : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             playerNear = false;
-
-            if (interactText != null)
-                interactText.SetActive(false);
+            if (interactText != null) interactText.SetActive(false);
         }
     }
 }
