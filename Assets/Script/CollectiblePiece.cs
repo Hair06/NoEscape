@@ -31,7 +31,7 @@ public class CollectiblePiece : MonoBehaviour
     private void OnEnable()
     {
         // 3. TỰ ĐỘNG KÍCH HOẠT: Dành cho mảnh ẩn giấu (Mảnh 2 ẩn sau con mèo hoặc ngăn kéo)
-        // Khi con mèo/ngăn kéo đẩy ra và gọi SetActive(true), hàm này sẽ lập tức chạy để quét Player
+        // Khi con mèo/ngăn kéo đẩy ra và gọi SetActive(true), hàm này sẽ lập tiếp chạy để quét Player
         CheckIfPlayerIsAlreadyInside();
     }
 
@@ -46,6 +46,13 @@ public class CollectiblePiece : MonoBehaviour
 
     private void CollectThisPiece()
     {
+        // === ĐOẠN CODE LIÊN KẾT MỚI: Tắt đèn Proximity Light trước khi xử lý nhặt ===
+        ProximityLightGlow proximityLight = GetComponent<ProximityLightGlow>();
+        if (proximityLight != null)
+        {
+            proximityLight.TurnOffLightOnPickup(); // Gọi hàm tắt đèn và khóa Update vĩnh viễn
+        }
+
         // Cộng tiến độ nhiệm vụ vào Chapter1Manager toàn cục
         if (Chapter1Manager.Instance != null)
         {
@@ -61,6 +68,8 @@ public class CollectiblePiece : MonoBehaviour
 
         // Ẩn chữ gợi ý và phá hủy Object mảnh ảnh để hoàn thành việc nhặt
         if (promptText != null) promptText.gameObject.SetActive(false);
+        
+        // Phá hủy mảnh giấy (Point Light con nằm trong nó cũng sẽ bị tự động xóa theo sạch sẽ)
         Destroy(gameObject);
     }
 
