@@ -4,11 +4,12 @@ using UnityEngine.UI;
 using TMPro;
 
 [System.Serializable]
+
 public class SealCutsceneFrame
 {
     public Sprite image;
 
-    [TextArea(3, 10)]
+    [TextArea(3,10)]
     public string dialogue;
 
     public float waitTime = 3f;
@@ -21,6 +22,9 @@ public class MapSealCutscenePlayer : MonoBehaviour
     public Image imageB;
     public TextMeshProUGUI dialogueText;
 
+    [Header("Cutscene Root")]
+    public GameObject cutsceneRoot;
+
     [Header("Cutscene Data")]
     public SealCutsceneFrame[] frames;
 
@@ -32,18 +36,22 @@ public class MapSealCutscenePlayer : MonoBehaviour
     public MonoBehaviour[] scriptsToDisable;
     public GameObject[] objectsToHide;
 
+    [Header("After Cutscene Scare")]
+    [SerializeField] private PostCutsceneDashScare afterCutsceneScare;
+    [Header("Scare Delay")]
+    [SerializeField] private float scareDelay = 2f;
+
     private bool nextFrameRequested;
-    public GameObject cutsceneRoot;
     private bool isPlaying;
 
     private void Awake()
-{
-    SetImageAlpha(imageA, 1f);
-    SetImageAlpha(imageB, 0f);
+    {
+        SetImageAlpha(imageA, 1f);
+        SetImageAlpha(imageB, 0f);
 
-    if (cutsceneRoot != null)
-        cutsceneRoot.SetActive(false);
-}
+        if (cutsceneRoot != null)
+            cutsceneRoot.SetActive(false);
+    }
 
     private void Update()
     {
@@ -57,14 +65,14 @@ public class MapSealCutscenePlayer : MonoBehaviour
     }
 
     public void PlayCutscene()
-{
-    if (isPlaying) return;
+    {
+        if (isPlaying) return;
 
-    if (cutsceneRoot != null)
-        cutsceneRoot.SetActive(true);
+        if (cutsceneRoot != null)
+            cutsceneRoot.SetActive(true);
 
-    StartCoroutine(PlayRoutine());
-}
+        StartCoroutine(PlayRoutine());
+    }
 
     private IEnumerator PlayRoutine()
     {
@@ -164,14 +172,20 @@ public class MapSealCutscenePlayer : MonoBehaviour
         if (cutsceneRoot != null)
             cutsceneRoot.SetActive(false);
 
-        // =========================================================================
-        // CODE BỔ SUNG MỚI: Gọi Chapter1Manager để bật lại Input di chuyển cho Player Invector
-        // =========================================================================
         if (Chapter1Manager.Instance != null)
-        {
             Chapter1Manager.Instance.OnCutsceneFinished();
+
+        Debug.Log("Cutscene kết thúc thành công! Trả lại quyền điều khiển cho Player.");
+
+        if (afterCutsceneScare != null)
+{
+        Debug.Log("Jumpscare sẽ chạy sau 2 giây.");
+        StartCoroutine(StartScareAfterDelay());
+}
+        else
+        {
+            Debug.LogWarning("Chưa gán After Cutscene Scare trong MapSealCutscenePlayer.");
         }
-        // =========================================================================
     }
 
     private void DisableGameplay()
@@ -211,5 +225,15 @@ public class MapSealCutscenePlayer : MonoBehaviour
         Color c = img.color;
         c.a = alpha;
         img.color = c;
+    }
+    private IEnumerator StartScareAfterDelay()
+    {
+        yield return new WaitForSeconds(scareDelay);
+
+        if (afterCutsceneScare != null)
+        {
+            Debug.Log("Bắt đầu Ghoul Jumpscare.");
+            afterCutsceneScare.TriggerScare();
+        }
     }
 }
