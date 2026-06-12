@@ -162,7 +162,16 @@ public class MapSealCutscenePlayer : MonoBehaviour
         Cursor.visible = false;
 
         if (cutsceneRoot != null)
-    cutsceneRoot.SetActive(false);
+            cutsceneRoot.SetActive(false);
+
+        // =========================================================================
+        // CODE BỔ SUNG MỚI: Gọi Chapter1Manager để bật lại Input di chuyển cho Player Invector
+        // =========================================================================
+        if (Chapter1Manager.Instance != null)
+        {
+            Chapter1Manager.Instance.OnCutsceneFinished();
+        }
+        // =========================================================================
     }
 
     private void DisableGameplay()

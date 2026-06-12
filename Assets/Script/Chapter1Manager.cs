@@ -21,7 +21,7 @@ public class Chapter1Manager : MonoBehaviour
     [Header("Cấu hình Cutscene Sau Khi Thắng")]
     [Tooltip("Kéo Object chứa Timeline Playable Director làm Cutscene vào đây")]
     [SerializeField] private PlayableDirector victoryCutsceneTimeline; 
-    [Tooltip("Hoặc kéo Object chứa Script/Camera Cutscene thông thường vào đây nếu không dùng Timeline")]
+    [Tooltip("Kéo Object Canvas_Seal1Cutscene (Bức ảnh to đùng đè màn hình) vào đây")]
     [SerializeField] private GameObject victoryCutsceneObject;
 
     private void Awake()
@@ -59,7 +59,6 @@ public class Chapter1Manager : MonoBehaviour
         }
         else
         {
-            // ĐÃ SỬA: Thông báo nhắc nhở và không cho mở game lên nữa
             Debug.Log($"Chưa tìm đủ số mảnh ảnh nhiệm vụ! Tiến độ hiện tại: {collectedPieces}/{totalPiecesRequired}");
         }
     }
@@ -100,19 +99,16 @@ public class Chapter1Manager : MonoBehaviour
                 Cursor.visible = false;
 
                 // 2. KÍCH HOẠT PHIM CUTSCENE
-                // Nếu dùng Timeline (Ưu tiên vì làm game kinh dị rất đẹp và mượt)
                 if (victoryCutsceneTimeline != null)
                 {
                     victoryCutsceneTimeline.Play();
                 }
                 
-                // Nếu dùng Object bật tắt thông thường
                 if (victoryCutsceneObject != null)
                 {
                     victoryCutsceneObject.SetActive(true);
                 }
 
-                // LƯU Ý: Không bật lại playerInputSystem ở đây để Player không di chuyển được trong lúc xem Cutscene
                 return; 
             }
 
@@ -127,11 +123,21 @@ public class Chapter1Manager : MonoBehaviour
         }
     }
 
-    // HÀM MỚI BẮT BUỘC: Gọi hàm này khi đoạn phim Cutscene chạy xong để tiếp tục chơi game
+    // =========================================================================
+    // HÀM SỬA ĐỔI CHÍNH: Chỉ sửa hàm này để tự động ẩn bức ảnh kẹt khi hết Cutscene
+    // =========================================================================
     public void OnCutsceneFinished()
     {
         Debug.Log("🎬 Cutscene kết thúc thành công! Trả lại quyền điều khiển cho Player.");
         
+        // Ép ẩn cái Canvas_Seal1Cutscene đè màn hình đi để người chơi tiếp tục chơi game
+        if (victoryCutsceneObject != null)
+        {
+            victoryCutsceneObject.SetActive(false);
+            Debug.Log("Đã ẩn bức ảnh Cutscene phóng to thành công.");
+        }
+        
+        // Mở khóa cho phép nhân vật Invector tiếp tục đi lại bình thường
         if (playerInputSystem != null) 
         {
             playerInputSystem.enabled = true;
