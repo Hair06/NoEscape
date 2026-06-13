@@ -111138,7 +111138,7 @@ PrefabInstance:
       addedObject: {fileID: 836412068}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: aafa691c44f69114a9be22e64380618a, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 836412072}
+      addedObject: {fileID: 836412074}
     - targetCorrespondingSourceObject: {fileID: -2311304007632297807, guid: aafa691c44f69114a9be22e64380618a, type: 3}
       insertIndex: -1
       addedObject: {fileID: 836412071}
@@ -111270,16 +111270,13 @@ Light:
   m_LightUnit: 1
   m_LuxAtDistance: 1
   m_EnableSpotReflector: 1
---- !u!61 &836412072
-BoxCollider2D:
+--- !u!65 &836412074
+BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 836412066}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Density: 1
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -111288,34 +111285,12 @@ BoxCollider2D:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_ForceSendLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ForceReceiveLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ContactCaptureLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_CallbackLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
   m_IsTrigger: 1
-  m_UsedByEffector: 0
-  m_CompositeOperation: 0
-  m_CompositeOrder: 0
-  m_Offset: {x: -0.110797346, y: 0}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0, y: 0}
-    oldSize: {x: 0, y: 0}
-    newSize: {x: 0, y: 0}
-    adaptiveTilingThreshold: 0
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
-  m_Size: {x: 1, y: 1}
-  m_EdgeRadius: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.781837, y: 0.16639464, z: 0.4500842}
+  m_Center: {x: -0.1090816, y: -0.013486708, z: 0.029330922}
 --- !u!1001 &837025277
 PrefabInstance:
   m_ObjectHideFlags: 0
