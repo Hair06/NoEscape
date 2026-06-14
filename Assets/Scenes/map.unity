@@ -93,7 +93,7 @@ LightmapSettings:
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
-  m_LightingDataAsset: {fileID: 112000000, guid: e002cb26356b7704e902d009d780be14, type: 2}
+  m_LightingDataAsset: {fileID: 112000000, guid: 370b178adaec2aa45a5d5045a0720e22, type: 2}
   m_LightingSettings: {fileID: 4890085278179872738, guid: a1f2d116a2168484cb1cc52fd1d7f567, type: 2}
 --- !u!196 &4
 NavMeshSettings:
@@ -99619,6 +99619,7 @@ GameObject:
   m_Component:
   - component: {fileID: 753904996}
   - component: {fileID: 753904995}
+  - component: {fileID: 753904997}
   m_Layer: 0
   m_Name: RoomLight
   m_TagString: Untagged
@@ -99647,7 +99648,6 @@ MonoBehaviour:
   - {fileID: 1855031014}
   - {fileID: 1870567347}
   - {fileID: 767409762}
-  - {fileID: 1343404715}
   - {fileID: 2063994331}
   - {fileID: 1034937802}
   - {fileID: 1316381830}
@@ -99655,6 +99655,9 @@ MonoBehaviour:
   - {fileID: 392835239}
   - {fileID: 258666619}
   - {fileID: 1072155006}
+  flickerSpeed: 1.4
+  flickerAudio: {fileID: 753904997}
+  flickerClip: {fileID: 8300000, guid: 557dacef56aef9c4b87a4d0e265d6bc6, type: 3}
 --- !u!4 &753904996
 Transform:
   m_ObjectHideFlags: 0
@@ -99670,6 +99673,103 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!82 &753904997
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 753904994}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
+  m_PlayOnAwake: 0
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1001 &754240260
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -258815,9 +258915,21 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: -8957218800462256024, guid: 9ba749448c63bee429c719ec05f16a26, type: 3}
+      propertyPath: Loop
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8957218800462256024, guid: 9ba749448c63bee429c719ec05f16a26, type: 3}
+      propertyPath: m_Volume
+      value: 0.814
+      objectReference: {fileID: 0}
+    - target: {fileID: -8957218800462256024, guid: 9ba749448c63bee429c719ec05f16a26, type: 3}
       propertyPath: m_Resource
       value: 
-      objectReference: {fileID: 8300000, guid: b72e83f5c3956504eaba4db6422e7bb7, type: 3}
+      objectReference: {fileID: 8300000, guid: 36583a4f0c057f64f89fd8859d705490, type: 3}
+    - target: {fileID: -8957218800462256024, guid: 9ba749448c63bee429c719ec05f16a26, type: 3}
+      propertyPath: panLevelCustomCurve.m_Curve.Array.data[0].value
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: -5625253145222135296, guid: 9ba749448c63bee429c719ec05f16a26, type: 3}
       propertyPath: isPowered
       value: 0
