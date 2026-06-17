@@ -3,9 +3,6 @@ using UnityEngine;
 
 public class PostCutsceneDashScare : MonoBehaviour
 {
-    [Header("Theo dõi Cutscene Root")]
-    [SerializeField] private GameObject watchedCutsceneRoot;
-
     [Header("Ghoul Lao Ngang")]
     [SerializeField] private Transform ghoulHolder;
     [SerializeField] private GameObject ghoulVisual;
@@ -13,23 +10,25 @@ public class PostCutsceneDashScare : MonoBehaviour
     [SerializeField] private Transform endPoint;
     [SerializeField] private float dashDuration = 1f;
 
+    [Header("Test nhìn thấy Ghoul")]
+    [SerializeField] private bool testWithJKey = true;
+    [SerializeField] private bool forceVisibleLarge = true;
+    [SerializeField] private Vector3 debugScale = new Vector3(3f, 3f, 3f);
+    [SerializeField] private bool keepGhoulVisibleAfterDash = false;
+
     [Header("Âm thanh")]
     [SerializeField] private AudioClip scareSound;
     [SerializeField] private float volume = 1f;
 
     [Header("Đèn chớp")]
     [SerializeField] private Light[] lightsToFlicker;
+    [SerializeField] private GameObject[] lightObjectsToDisable;
     [SerializeField] private float flickerDuration = 0.4f;
 
     [Header("Khóa điều khiển khi jumpscare")]
     [SerializeField] private MonoBehaviour[] scriptsToDisable;
 
-    [Header("Test")]
-    [SerializeField] private bool testWithJKey = true;
-
-    private bool hasSeenCutsceneActive = false;
-    private bool wasCutsceneActive = false;
-    private bool triggered = false;
+    private bool triggered;
 
     private void Awake()
     {
@@ -43,22 +42,9 @@ public class PostCutsceneDashScare : MonoBehaviour
     private void Update()
     {
         if (testWithJKey && GameInputBridge.GetKeyDown(KeyCode.J))
-{
-    TriggerScare();
-}
-
-        if (triggered) return;
-        if (watchedCutsceneRoot == null) return;
-
-        bool isCutsceneActive = watchedCutsceneRoot.activeInHierarchy;
-
-        if (isCutsceneActive)
-            hasSeenCutsceneActive = true;
-
-        if (hasSeenCutsceneActive && wasCutsceneActive && !isCutsceneActive)
+        {
             TriggerScare();
-
-        wasCutsceneActive = isCutsceneActive;
+        }
     }
 
     public void TriggerScare()
@@ -76,27 +62,60 @@ public class PostCutsceneDashScare : MonoBehaviour
         triggered = true;
         SetGameplayControl(false);
 
+        if (!ValidateReferences())
+        {
+            SetGameplayControl(true);
+            yield break;
+        }
+
+        SetupGhoulAtStartPoint();
+
+        PlaySound();
+
+        yield return StartCoroutine(FlickerLightsAndDash());
+
+        if (!keepGhoulVisibleAfterDash && ghoulVisual != null)
+        {
+            ghoulVisual.SetActive(false);
+            Debug.Log("Ghoul Visual đã tắt sau khi dash.");
+        }
+
+        SetGameplayControl(true);
+    }
+
+    private bool ValidateReferences()
+    {
+        bool valid = true;
+
         if (ghoulHolder == null)
         {
             Debug.LogError("Chưa gán Ghoul Holder.");
-            SetGameplayControl(true);
-            yield break;
+            valid = false;
         }
 
         if (ghoulVisual == null)
         {
             Debug.LogError("Chưa gán Ghoul Visual.");
-            SetGameplayControl(true);
-            yield break;
+            valid = false;
         }
 
-        if (startPoint == null || endPoint == null)
+        if (startPoint == null)
         {
-            Debug.LogError("Chưa gán DashStart hoặc DashEnd.");
-            SetGameplayControl(true);
-            yield break;
+            Debug.LogError("Chưa gán DashStart.");
+            valid = false;
         }
 
+        if (endPoint == null)
+        {
+            Debug.LogError("Chưa gán DashEnd.");
+            valid = false;
+        }
+
+        return valid;
+    }
+
+    private void SetupGhoulAtStartPoint()
+    {
         ghoulHolder.gameObject.SetActive(true);
         ghoulHolder.position = startPoint.position;
 
@@ -104,12 +123,21 @@ public class PostCutsceneDashScare : MonoBehaviour
         lookTarget.y = ghoulHolder.position.y;
         ghoulHolder.LookAt(lookTarget);
 
+        if (forceVisibleLarge)
+            ghoulHolder.localScale = debugScale;
+
         ghoulVisual.SetActive(true);
 
-        Debug.Log("Ghoul Visual đã bật tại: " + ghoulHolder.position);
+        EnableAllRenderers(ghoulVisual);
 
-        PlaySound();
-        StartCoroutine(FlickerLights());
+        Debug.Log("Ghoul Holder Position: " + ghoulHolder.position);
+        Debug.Log("Ghoul Visual Active: " + ghoulVisual.activeInHierarchy);
+        Debug.Log("Distance Start-End: " + Vector3.Distance(startPoint.position, endPoint.position));
+    }
+
+    private IEnumerator FlickerLightsAndDash()
+    {
+        SetLights(false);
 
         float timer = 0f;
 
@@ -123,28 +151,54 @@ public class PostCutsceneDashScare : MonoBehaviour
             yield return null;
         }
 
-        ghoulVisual.SetActive(false);
+        ghoulHolder.position = endPoint.position;
 
-        Debug.Log("Ghoul Visual đã tắt.");
+        yield return new WaitForSecondsRealtime(flickerDuration);
 
-        SetGameplayControl(true);
+        SetLights(true);
     }
 
-    private IEnumerator FlickerLights()
+    private void SetLights(bool state)
     {
-        if (lightsToFlicker == null || lightsToFlicker.Length == 0)
-            yield break;
-
-        foreach (Light l in lightsToFlicker)
+        if (lightsToFlicker != null)
         {
-            if (l != null) l.enabled = false;
+            foreach (Light l in lightsToFlicker)
+            {
+                if (l != null)
+                    l.enabled = state;
+            }
         }
 
-        yield return new WaitForSecondsRealtime(flickerDuration / 2f);
-
-        foreach (Light l in lightsToFlicker)
+        if (lightObjectsToDisable != null)
         {
-            if (l != null) l.enabled = true;
+            foreach (GameObject obj in lightObjectsToDisable)
+            {
+                if (obj != null)
+                    obj.SetActive(state);
+            }
+        }
+
+        Debug.Log(state ? "Đèn đã bật lại." : "Đèn đã tắt.");
+    }
+
+    private void EnableAllRenderers(GameObject target)
+    {
+        Renderer[] renderers = target.GetComponentsInChildren<Renderer>(true);
+
+        Debug.Log("Số Renderer trong Ghoul Visual: " + renderers.Length);
+
+        foreach (Renderer r in renderers)
+        {
+            r.enabled = true;
+            r.gameObject.SetActive(true);
+        }
+
+        SkinnedMeshRenderer[] skinnedRenderers = target.GetComponentsInChildren<SkinnedMeshRenderer>(true);
+
+        foreach (SkinnedMeshRenderer r in skinnedRenderers)
+        {
+            r.enabled = true;
+            r.gameObject.SetActive(true);
         }
     }
 
@@ -165,6 +219,8 @@ public class PostCutsceneDashScare : MonoBehaviour
 
     private void SetGameplayControl(bool enabled)
     {
+        if (scriptsToDisable == null) return;
+
         foreach (MonoBehaviour script in scriptsToDisable)
         {
             if (script != null)

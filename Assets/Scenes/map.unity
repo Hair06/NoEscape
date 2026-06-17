@@ -7861,12 +7861,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2c496fd1ab90a9f4cadc7bf153182ecb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  watchedCutsceneRoot: {fileID: 452722565}
   ghoulHolder: {fileID: 1993194241}
   ghoulVisual: {fileID: 1193556674}
   startPoint: {fileID: 1997137298}
   endPoint: {fileID: 1528573410}
-  dashDuration: 1
+  dashDuration: 3
+  testWithJKey: 1
+  forceVisibleLarge: 1
+  debugScale: {x: 3, y: 3, z: 3}
+  keepGhoulVisibleAfterDash: 0
   scareSound: {fileID: 0}
   volume: 1
   lightsToFlicker:
@@ -7874,10 +7877,10 @@ MonoBehaviour:
   - {fileID: 1542698795}
   - {fileID: 559018622}
   - {fileID: 856717200}
+  lightObjectsToDisable: []
   flickerDuration: 0.4
   scriptsToDisable:
   - {fileID: 1205354178}
-  testWithJKey: 1
 --- !u!4 &54831474
 Transform:
   m_ObjectHideFlags: 0
