@@ -71,6 +71,10 @@ public class CollectiblePiece : MonoBehaviour
         
         // Phá hủy mảnh giấy (Point Light con nằm trong nó cũng sẽ bị tự động xóa theo sạch sẽ)
         Destroy(gameObject);
+        if (QuestManager.Instance != null)
+{
+    QuestManager.Instance.CompleteSubQuest(0);
+}
     }
 
     // --- XỬ LÝ VA CHẠM KHI NGƯỜI CHƠI DI CHUYỂN RA/VÀO VÙNG TRIGGER ---
@@ -139,4 +143,5 @@ public class CollectiblePiece : MonoBehaviour
         Gizmos.color = Color.green;
         Gizmos.DrawWireSphere(transform.position, detectionRadius);
     }
+    
 }

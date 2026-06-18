@@ -31,6 +31,10 @@ public class PuzzleManager : MonoBehaviour
         }
 
         completed = true;
+        if (QuestManager.Instance != null)
+{
+    QuestManager.Instance.CompleteSubQuest(2);
+}
 
         Debug.Log("Bạn đã giải mã xong bức tranh cổ! Phong ấn 1 đã được mở.");
 
@@ -61,5 +65,6 @@ public class PuzzleManager : MonoBehaviour
         {
             seal1Cutscene.PlayCutscene();
         }
+        
     }
 }

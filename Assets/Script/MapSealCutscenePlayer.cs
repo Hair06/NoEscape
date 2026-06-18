@@ -176,12 +176,16 @@ public class MapSealCutscenePlayer : MonoBehaviour
             Chapter1Manager.Instance.OnCutsceneFinished();
 
         Debug.Log("Cutscene kết thúc thành công! Trả lại quyền điều khiển cho Player.");
-
+        if (QuestManager.Instance != null)
+        {
+            QuestManager.Instance.CompleteSubQuest(3);
+            QuestManager.Instance.CompleteCurrentChapter();
+        }
         if (afterCutsceneScare != null)
-{
+        {
         Debug.Log("Jumpscare sẽ chạy sau 2 giây.");
         StartCoroutine(StartScareAfterDelay());
-}
+        }
         else
         {
             Debug.LogWarning("Chưa gán After Cutscene Scare trong MapSealCutscenePlayer.");
