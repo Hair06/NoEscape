@@ -36,7 +36,7 @@ public class PlayerFootstepController : MonoBehaviour
     // PRIVATE STATE
     // ---------------------------------------------------------------
 
-    private PlayerController playerController;  // Tham chiếu để đọc trạng thái di chuyển
+    private Player playerController;  // Tham chiếu để đọc trạng thái di chuyển
     private float stepTimer = 0f;               // Đếm ngược thời gian giữa 2 bước
     private int lastClipIndex = -1;             // Tránh phát cùng 1 clip 2 lần liên tiếp
 
@@ -47,7 +47,7 @@ public class PlayerFootstepController : MonoBehaviour
     private void Awake()
     {
         // Lấy PlayerController trên cùng GameObject
-        playerController = GetComponent<PlayerController>();
+        playerController = GetComponent<Player>();
 
         // Tự tạo AudioSource nếu chưa gán
         if (footstepSource == null)
