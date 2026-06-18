@@ -1,0 +1,184 @@
+using UnityEngine;
+using UnityEngine.InputSystem;
+using TMPro;
+
+public class DiaryRead : MonoBehaviour
+{
+    // 3 trạng thái của chuỗi tương tác
+    private enum State
+    {
+        DrawerClosed,   // ngăn kéo đang đóng
+        DrawerOpen,     // ngăn kéo đã mở, thấy nhật ký
+        ReadingDiary    // đang xem nhật ký to đè màn hình
+    }
+
+    [Header("UI hướng dẫn (TextMeshPro)")]
+    [SerializeField] private TextMeshProUGUI promptText;
+    [SerializeField] private string openDrawerMessage = "Nhấn [E] để mở ngăn kéo";
+    [SerializeField] private string readDiaryMessage = "Nhấn [E] để xem nhật ký";
+    [SerializeField] private string closeDiaryMessage = "Nhấn [E] để đóng nhật ký";
+    [SerializeField] private string peelTapeMessage = "Nhấn [E] để gỡ băng keo";
+
+    [Header("Ngăn kéo trượt ra")]
+    [Tooltip("Kéo Object ngăn kéo (model trượt) vào đây")]
+    [SerializeField] private Transform drawer;
+    [SerializeField] private Vector3 openOffset = new Vector3(0, 0, 0.3f);
+    [SerializeField] private float drawerSpeed = 3f;
+
+    [Header("Tấm ảnh nhật ký to đè màn hình")]
+    [Tooltip("Kéo Panel/Image nhật ký vào đây (lúc đầu để tắt)")]
+    [SerializeField] private GameObject diaryPanel;
+
+    [Header("Mini game băng keo (nối tiếp sau khi đọc nhật ký)")]
+    [SerializeField] private TapePeelPuzzle tapePuzzle;
+
+    [Header("Âm thanh (có thể để trống)")]
+    [SerializeField] private AudioSource drawerAudio;   // tiếng kéo ngăn
+    [SerializeField] private AudioSource pageAudio;     // tiếng lật giấy
+
+    // Biến cho bước sau (mini game băng keo) kiểm tra
+    [HideInInspector] public bool hasReadDiary = false;
+
+    private State currentState = State.DrawerClosed;
+    private bool isPlayerInside = false;
+
+    private Vector3 closedPos;
+    private Vector3 openPos;
+
+    private void Start()
+    {
+        // Lúc đầu ẩn cả chữ hướng dẫn lẫn tấm nhật ký
+        if (promptText != null) promptText.gameObject.SetActive(false);
+        if (diaryPanel != null) diaryPanel.SetActive(false);
+
+        // Ghi nhớ vị trí đóng/mở của ngăn kéo
+        if (drawer != null)
+        {
+            closedPos = drawer.localPosition;
+            openPos = closedPos + openOffset;
+        }
+    }
+
+    private void Update()
+    {
+        // Luôn trượt ngăn kéo mượt về đúng vị trí mục tiêu
+        if (drawer != null)
+        {
+            Vector3 targetPos = (currentState == State.DrawerClosed) ? closedPos : openPos;
+            drawer.localPosition = Vector3.Lerp(drawer.localPosition, targetPos, Time.deltaTime * drawerSpeed);
+        }
+
+        // Nhận phím E
+        if (isPlayerInside
+            && Keyboard.current != null
+            && Keyboard.current.eKey.wasPressedThisFrame)
+        {
+            HandleInteract();
+        }
+    }
+
+    private void HandleInteract()
+    {
+        switch (currentState)
+        {
+            case State.DrawerClosed:
+                OpenDrawer();
+                break;
+            case State.DrawerOpen:
+                // Nếu đã đọc nhật ký rồi -> mở mini game gỡ băng keo
+                if (hasReadDiary && tapePuzzle != null)
+                {
+                    tapePuzzle.OpenPuzzle();
+                    if (promptText != null) promptText.gameObject.SetActive(false);
+                }
+                else
+                {
+                    OpenDiary();
+                }
+                break;
+            case State.ReadingDiary:
+                CloseDiary();
+                break;
+        }
+    }
+
+    private void OpenDrawer()
+    {
+        currentState = State.DrawerOpen;
+        if (drawerAudio != null) drawerAudio.Play();
+
+        // Đổi chữ sang "xem nhật ký"
+        if (promptText != null) promptText.text = readDiaryMessage;
+
+        Debug.Log("Đã mở ngăn kéo. Thấy cuốn nhật ký bên trong.");
+    }
+
+    private void OpenDiary()
+    {
+        currentState = State.ReadingDiary;
+
+        if (diaryPanel != null) diaryPanel.SetActive(true);
+        if (pageAudio != null) pageAudio.Play();
+
+        // Mở chuột để người chơi xem thoải mái
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+
+        // Ẩn chữ hướng dẫn khi đang xem nhật ký
+        if (promptText != null) promptText.gameObject.SetActive(false);
+
+        Debug.Log("Đang đọc nhật ký Kiều Hoa...");
+    }
+
+    private void CloseDiary()
+    {
+        currentState = State.DrawerOpen;
+
+        if (diaryPanel != null) diaryPanel.SetActive(false);
+
+        // Khóa chuột lại để tiếp tục chơi
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+
+        // Đánh dấu đã đọc xong -> mở khóa cho mini game băng keo
+        hasReadDiary = true;
+        Debug.Log("Đã đọc xong nhật ký. Giờ nhấn E để gỡ băng keo.");
+
+        // Sau khi đọc xong, chữ đổi sang "gỡ băng keo"
+        if (promptText != null)
+        {
+            promptText.text = peelTapeMessage;
+            promptText.gameObject.SetActive(true);
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            isPlayerInside = true;
+            if (promptText != null)
+            {
+                promptText.text = GetCurrentPrompt();
+                promptText.gameObject.SetActive(true);
+            }
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            isPlayerInside = false;
+            if (promptText != null) promptText.gameObject.SetActive(false);
+        }
+    }
+
+    // Chọn chữ hướng dẫn đúng theo trạng thái hiện tại
+    private string GetCurrentPrompt()
+    {
+        if (currentState == State.DrawerClosed) return openDrawerMessage;
+        if (hasReadDiary) return peelTapeMessage;
+        return readDiaryMessage;
+    }
+}
