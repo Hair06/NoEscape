@@ -12,8 +12,11 @@ public class TapePeelPuzzle : MonoBehaviour
     [Tooltip("Để trống sẽ tự tìm tất cả TapePiece con bên trong Panel")]
     [SerializeField] private TapePiece[] tapePieces;
 
+    [Header("Rải băng ngẫu nhiên mỗi lần mở?")]
+    [SerializeField] private bool scatterOnOpen = true;
+
     [Header("Khóa camera khi chơi")]
-    [Tooltip("Kéo script FPSCameraFollow (trên Camera) vào đây để khóa lúc gỡ băng")]
+    [Tooltip("Kéo Player (script vThirdPersonInput) vào đây để khóa lúc gỡ băng")]
     [SerializeField] private MonoBehaviour cameraScript;
 
     [Header("Phần thưởng sau khi gỡ hết")]
@@ -23,6 +26,7 @@ public class TapePeelPuzzle : MonoBehaviour
     private int peeledCount = 0;
     private int totalPieces = 0;
     private bool isComplete = false;
+    private bool hasScattered = false;
 
     private void Start()
     {
@@ -51,6 +55,16 @@ public class TapePeelPuzzle : MonoBehaviour
         if (isComplete) return;
 
         if (puzzlePanel != null) puzzlePanel.SetActive(true);
+
+        // Rải băng ngẫu nhiên (chỉ lần đầu mở, để không xáo trộn miếng đã gỡ)
+        if (scatterOnOpen && !hasScattered)
+        {
+            foreach (TapePiece piece in tapePieces)
+            {
+                if (piece != null) piece.ScatterRandom();
+            }
+            hasScattered = true;
+        }
 
         // Mở chuột để người chơi kéo-lột băng keo
         Cursor.lockState = CursorLockMode.None;

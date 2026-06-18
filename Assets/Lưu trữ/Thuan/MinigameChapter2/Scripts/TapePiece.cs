@@ -13,6 +13,12 @@ public class TapePiece : MonoBehaviour,
     [Tooltip("Miếng băng dịch theo chuột bao nhiêu phần (0 = đứng yên, 1 = bám sát chuột)")]
     [SerializeField] private float followAmount = 0.4f;
 
+    [Header("Rải ngẫu nhiên mỗi lần mở")]
+    [Tooltip("Bán kính (pixel) vùng rải quanh tâm Panel")]
+    [SerializeField] private float scatterRadius = 180f;
+    [Tooltip("Góc nghiêng ngẫu nhiên tối đa (độ)")]
+    [SerializeField] private float maxRandomTilt = 35f;
+
     [Header("Âm thanh (có thể để trống)")]
     [SerializeField] private AudioSource peelAudio;   // tiếng xé băng keo
 
@@ -30,10 +36,24 @@ public class TapePiece : MonoBehaviour,
     private void Awake()
     {
         rectTransform = GetComponent<RectTransform>();
-
-        // Cần CanvasGroup để làm mờ dần khi bong
         canvasGroup = GetComponent<CanvasGroup>();
         if (canvasGroup == null) canvasGroup = gameObject.AddComponent<CanvasGroup>();
+    }
+
+    // Manager gọi khi mở mini game: rải miếng băng ra vị trí + góc ngẫu nhiên
+    public void ScatterRandom()
+    {
+        if (isPeeled) return;
+
+        // Vị trí ngẫu nhiên trong vùng tròn quanh tâm Panel
+        float angle = Random.Range(0f, Mathf.PI * 2f);
+        float dist = Random.Range(0f, scatterRadius);
+        Vector2 pos = new Vector2(Mathf.Cos(angle) * dist, Mathf.Sin(angle) * dist);
+        rectTransform.anchoredPosition = pos;
+
+        // Góc nghiêng ngẫu nhiên cho tự nhiên
+        float tilt = Random.Range(-maxRandomTilt, maxRandomTilt);
+        rectTransform.localRotation = Quaternion.Euler(0, 0, tilt);
     }
 
     public void OnPointerDown(PointerEventData eventData)
@@ -49,19 +69,14 @@ public class TapePiece : MonoBehaviour,
     {
         if (isPeeled || !isDragging) return;
 
-        // Quãng kéo từ điểm bắt đầu
         Vector2 dragDelta = eventData.position - startMousePos;
 
         // Miếng băng dịch theo chuột một phần để trông như đang bị bóc
         rectTransform.anchoredPosition = startAnchoredPos + dragDelta * followAmount;
 
-        // Hơi nghiêng miếng băng theo hướng kéo cho sinh động
-        float tilt = Mathf.Clamp(dragDelta.x * 0.05f, -20f, 20f);
-        rectTransform.localRotation = Quaternion.Euler(0, 0, -tilt);
-
         // Mờ dần theo quãng kéo
         float progress = Mathf.Clamp01(dragDelta.magnitude / peelDistance);
-        canvasGroup.alpha = 1f - progress * 0.5f; // mờ tối đa còn 0.5 khi gần bong
+        canvasGroup.alpha = 1f - progress * 0.5f;
 
         // Đủ quãng -> bong ra
         if (dragDelta.magnitude >= peelDistance)
@@ -76,9 +91,8 @@ public class TapePiece : MonoBehaviour,
 
         isDragging = false;
 
-        // Nếu chưa kéo đủ thì miếng băng đàn hồi về chỗ cũ
+        // Chưa kéo đủ -> đàn hồi về chỗ cũ (giữ nguyên góc nghiêng random)
         rectTransform.anchoredPosition = startAnchoredPos;
-        rectTransform.localRotation = Quaternion.identity;
         canvasGroup.alpha = 1f;
     }
 
@@ -89,10 +103,8 @@ public class TapePiece : MonoBehaviour,
 
         if (peelAudio != null) peelAudio.Play();
 
-        // Báo cho quản lý tổng biết một miếng đã được gỡ
         if (manager != null) manager.OnPiecePeeled();
 
-        // Tắt miếng băng (có thể đổi thành animation bay ra nếu muốn)
         gameObject.SetActive(false);
 
         Debug.Log($"{gameObject.name} đã được lột ra.");
