@@ -17,20 +17,23 @@ public class EmptyFrameInteract : MonoBehaviour
     }
 
     private void Update()
+{
+    if (isPlayerInside && GameInputBridge.GetKeyDown(KeyCode.E))
     {
-        // Nếu Player đang đứng trong vùng và nhấn phím E
-        if (isPlayerInside && GameInputBridge.GetKeyDown(KeyCode.E))
-        {
-            // Ẩn Text Prompt ngay khi mở bảng UI Mini-game để đỡ vướng màn hình
-            if (promptCanvasObject != null) promptCanvasObject.SetActive(false);
+        if (promptCanvasObject != null)
+            promptCanvasObject.SetActive(false);
 
-            // Gọi Bộ Quản Lý kích hoạt Mini-game và đóng băng Player
-            if (Chapter1Manager.Instance != null)
-            {
-                Chapter1Manager.Instance.TryTriggerPuzzle();
-            }
+        if (Chapter1Manager.Instance != null)
+        {
+            Chapter1Manager.Instance.TryTriggerPuzzle();
+        }
+
+        if (QuestManager.Instance != null)
+        {
+            QuestManager.Instance.CompleteSubQuest(1);
         }
     }
+}
 
     private void OnTriggerEnter(Collider other)
     {
