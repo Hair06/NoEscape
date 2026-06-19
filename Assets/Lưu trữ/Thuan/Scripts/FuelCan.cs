@@ -6,7 +6,7 @@ public class FuelCan : MonoBehaviour, IInteractable
 
     public string GetInteractPrompt()
     {
-        return "Nhan E de nhat binh xang";
+        return "Nhan E de nhat can xang";
     }
 
     public void Interact()
@@ -14,8 +14,8 @@ public class FuelCan : MonoBehaviour, IInteractable
         if (taken) return;
         taken = true;
 
-        FuelInventory.cansHeld++;
-        Debug.Log("Da nhat xang. Dang cam: " + FuelInventory.cansHeld);
+        FuelInventory.AddCan();
+        Debug.Log($"Da nhat can xang '{name}'. Dang cam: {FuelInventory.cansHeld}");
         Destroy(gameObject);
     }
 }
