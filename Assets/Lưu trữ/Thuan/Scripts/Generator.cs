@@ -4,7 +4,7 @@ using UnityEngine.Events;
 public class Generator : MonoBehaviour, IInteractable
 {
     [Header("Cau hinh nhien lieu")]
-    public int requiredCans = 4;
+    public int requiredCans = 2;
     public int currentFuel = 0;
 
     [Header("Trang thai")]
@@ -19,34 +19,43 @@ public class Generator : MonoBehaviour, IInteractable
 
     public string GetInteractPrompt()
     {
-        if (isPowered) return "";
-        return "Nhan E de do xang (" + currentFuel + "/" + requiredCans + ")";
+        if (isPowered) return "May phat da duoc kich hoat";
+        return "Nhan E de do xang (" + FuelInventory.cansHeld + "/" + requiredCans + ")";
     }
 
     public void Interact()
     {
-        if (isPowered) return;
-
-        if (FuelInventory.cansHeld <= 0)
+        if (isPowered)
         {
-            Debug.Log("Ban khong cam binh xang nao.");
+            Debug.Log("May phat da duoc kich hoat tu truoc.");
             return;
         }
 
-        FuelInventory.cansHeld--;
-        currentFuel++;
-        Debug.Log("Da do xang: " + currentFuel + "/" + requiredCans);
+        if (!FuelInventory.HasCans(requiredCans))
+        {
+            Debug.Log($"Chua du xang de kich hoat may phat. Dang co {FuelInventory.cansHeld}/{requiredCans} can xang.");
+            return;
+        }
 
-        if (currentFuel >= requiredCans)
-            PowerOn();
+        if (!FuelInventory.TryConsumeCans(requiredCans))
+        {
+            Debug.LogWarning("Khong the tru can xang mac du da kiem tra du so luong.");
+            return;
+        }
+
+        currentFuel = requiredCans;
+        Debug.Log("Da do du xang: " + currentFuel + "/" + requiredCans);
+        PowerOn();
     }
 
-    void PowerOn()
+    private void PowerOn()
     {
+        if (isPowered) return;
+
         isPowered = true;
         if (generatorAudio != null) generatorAudio.Play();
         if (exhaustSmoke != null) exhaustSmoke.Play();
-        onPowerOn.Invoke();
-        Debug.Log("Du xang! May phat chay, den bat.");
+        onPowerOn?.Invoke();
+        Debug.Log("Máy phát đã được kích hoạt");
     }
 }
