@@ -9,13 +9,12 @@ public class LockDial : MonoBehaviour
     [SerializeField] private Vector3 rotateAxis = new Vector3(1, 0, 0);
 
     [Header("Số nấc (số chữ số trên vòng)")]
-    [Tooltip("Đếm số chữ số khắc trên vòng. Thường là 10 (0-9).")]
     [SerializeField] private int totalNumbers = 10;
 
     [Header("Căn chỉnh cho khớp số")]
-    [Tooltip("Đảo chiều xoay nếu gõ 4 mà vòng đi sai phía")]
-    [SerializeField] private bool invertDirection = false;
-    [Tooltip("Bù góc gốc (độ). Nếu lúc đầu vòng đang lệch, chỉnh số này cho khớp số 0.")]
+    [Tooltip("Đảo chiều xoay nếu gõ 1 mà vòng đi tới 9")]
+    [SerializeField] private bool invertDirection = true;
+    [Tooltip("Bù góc gốc (độ). Chỉnh cho khớp số 0 ban đầu.")]
     [SerializeField] private float angleOffset = 0f;
 
     [Header("Tốc độ xoay mượt")]
@@ -28,12 +27,26 @@ public class LockDial : MonoBehaviour
     private float anglePerStep;
     private Quaternion baseRotation;
     private Quaternion targetRotation;
+    private bool baseCaptured = false;
 
     private void Awake()
     {
         anglePerStep = 360f / totalNumbers;
+        CaptureBase();
+    }
+
+    // Ghi lại góc gốc hiện tại làm mốc (gọi khi vào chế độ chỉnh để tránh lệch do đổi parent)
+    public void CaptureBase()
+    {
         baseRotation = transform.localRotation;
         targetRotation = baseRotation;
+        baseCaptured = true;
+    }
+
+    private void Update()
+    {
+        if (!baseCaptured) return;
+        transform.localRotation = Quaternion.Slerp(transform.localRotation, targetRotation, Time.deltaTime * rotateSpeed);
     }
 
     public int GetCurrentNumber() => currentNumber;
@@ -48,9 +61,6 @@ public class LockDial : MonoBehaviour
 
         currentNumber = number;
 
-        Debug.Log($"[LockDial] {gameObject.name} nhận lệnh xoay tới số {number}");
-
-        // Tính góc: số nấc * góc mỗi nấc, có thể đảo chiều, cộng bù gốc
         float dir = invertDirection ? -1f : 1f;
         float angle = (anglePerStep * number * dir) + angleOffset;
 
