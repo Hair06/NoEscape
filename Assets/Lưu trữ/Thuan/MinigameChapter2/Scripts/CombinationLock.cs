@@ -43,10 +43,26 @@ public class CombinationLock : MonoBehaviour
     [Header("Chìa vặn hiện ra sau khi mở khóa")]
     [SerializeField] private GameObject windKeyReward;
 
+    [Header("Nắp hòm xoay lên (sau khi mở khóa)")]
+    [Tooltip("Kéo Object LidHinge (bản lề chứa nắp) vào đây")]
+    [SerializeField] private Transform lidHinge;
+    [Tooltip("Góc mở nắp (độ). Thử -100 hoặc 100 tùy hướng")]
+    [SerializeField] private float lidOpenAngle = -100f;
+    [Tooltip("Trục xoay nắp")]
+    [SerializeField] private Vector3 lidRotateAxis = new Vector3(1, 0, 0);
+    [SerializeField] private float lidSpeed = 3f;
+    [Tooltip("Chữ gợi ý mở nắp")]
+    [SerializeField] private string openLidMessage = "Nhấn [E] để mở nắp hòm";
+    [SerializeField] private AudioSource lidOpenAudio;
+
     private bool isPlayerInside = false;
     private bool isAdjusting = false;
     private bool isUnlocked = false;
     private bool isMoving = false;
+    private bool isUnlockedWaitingLid = false; // đã mở khóa, chờ nhấn E mở nắp
+    private bool isLidOpen = false;
+    private Quaternion lidClosedRot;
+    private Quaternion lidTargetRot;
 
     private int currentDigitIndex = 0;       // đang nhập vòng thứ mấy
     private int[] enteredDigits;              // các số đã nhập
@@ -72,10 +88,29 @@ public class CombinationLock : MonoBehaviour
         homePosition = lockBody.position;
         homeRotation = lockBody.rotation;
         homeParent = lockBody.parent;
+
+        if (lidHinge != null)
+        {
+            lidClosedRot = lidHinge.localRotation;
+            lidTargetRot = lidClosedRot;
+        }
     }
 
     private void Update()
     {
+        // Xoay nắp hòm mượt về góc đích
+        if (lidHinge != null)
+            lidHinge.localRotation = Quaternion.Slerp(lidHinge.localRotation, lidTargetRot, Time.deltaTime * lidSpeed);
+
+        // Sau khi mở khóa: nhấn E để mở nắp hòm (bỏ điều kiện isPlayerInside vì
+        // người chơi chắc chắn đang đứng đó vừa giải khóa xong)
+        if (isUnlockedWaitingLid && !isLidOpen
+            && Keyboard.current != null && Keyboard.current.eKey.wasPressedThisFrame)
+        {
+            Debug.Log("[CombinationLock] Nhấn E mở nắp hòm.");
+            OpenLid();
+        }
+
         // Di chuyển ổ khóa mượt
         if (isMoving)
         {
@@ -240,6 +275,12 @@ public class CombinationLock : MonoBehaviour
         if (gameCamera == null) return;
         lockBody.SetParent(null);
 
+        // Sau khi đổi parent, ghi lại góc gốc các vòng cho chuẩn
+        foreach (LockDial d in dials)
+        {
+            if (d != null) d.CaptureBase();
+        }
+
         Transform cam = gameCamera.transform;
         targetPosition = cam.position + cam.forward * closeUpDistance + cam.up * closeUpYOffset;
         targetRotation = Quaternion.LookRotation(cam.forward, cam.up) * Quaternion.Euler(closeUpEuler);
@@ -284,10 +325,31 @@ public class CombinationLock : MonoBehaviour
         if (playerInput != null) playerInput.enabled = true;
 
         if (inputDisplay != null) inputDisplay.gameObject.SetActive(false);
-        if (promptText != null) promptText.gameObject.SetActive(false);
 
         ReturnHome();
 
+        // Chưa hiện chìa. Chuyển sang trạng thái chờ người chơi nhấn E mở nắp.
+        isUnlockedWaitingLid = true;
+        if (promptText != null)
+        {
+            promptText.text = openLidMessage;
+            promptText.gameObject.SetActive(true);
+        }
+    }
+
+    private void OpenLid()
+    {
+        isLidOpen = true;
+        Debug.Log("Nắp hòm bật lên! Lộ ra Chìa Vặn.");
+
+        if (lidOpenAudio != null) lidOpenAudio.Play();
+
+        if (lidHinge != null)
+            lidTargetRot = lidClosedRot * Quaternion.AngleAxis(lidOpenAngle, lidRotateAxis.normalized);
+
+        if (promptText != null) promptText.gameObject.SetActive(false);
+
+        // Giờ mới hiện chìa vặn để nhặt (WindKeyCollect lo việc nhặt)
         if (windKeyReward != null) windKeyReward.SetActive(true);
     }
 
