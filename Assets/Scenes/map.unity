@@ -189619,6 +189619,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: MusicBox
       objectReference: {fileID: 0}
+    - target: {fileID: 8542486981596272160, guid: fc017a80091362840b2be4553735b8c2, type: 3}
+      propertyPath: m_Resource
+      value: 
+      objectReference: {fileID: 8300000, guid: 55cb7affa0a528d47bb390f18690224d, type: 3}
     - target: {fileID: 9011714207554727059, guid: fc017a80091362840b2be4553735b8c2, type: 3}
       propertyPath: m_LocalPosition.x
       value: -10.6692
