@@ -164514,7 +164514,7 @@ MonoBehaviour:
   jumpHeight: 1.2
   gravity: -25
   sensitivity: 0.1
-  maxLookUpAngle: 90
+  maxLookUpAngle: 40
   maxLookDownAngle: -90
   enableHeadBob: 1
   bobAmountX: 0.04
@@ -189619,10 +189619,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: MusicBox
       objectReference: {fileID: 0}
-    - target: {fileID: 8542486981596272160, guid: fc017a80091362840b2be4553735b8c2, type: 3}
-      propertyPath: m_Resource
-      value: 
-      objectReference: {fileID: 8300000, guid: 55cb7affa0a528d47bb390f18690224d, type: 3}
     - target: {fileID: 9011714207554727059, guid: fc017a80091362840b2be4553735b8c2, type: 3}
       propertyPath: m_LocalPosition.x
       value: -10.6692
@@ -286831,7 +286827,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
-  m_BackGroundColor: {r: 0.78898185, g: 0.81568176, b: 0.8490566, a: 0}
+  m_BackGroundColor: {r: 0.2269491, g: 0.40831923, b: 0.6415094, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0

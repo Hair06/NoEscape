@@ -154,11 +154,28 @@ namespace ElmanGameDevTools.PlayerSystem
                 _currentMovementSpeed = wantsToRun ? runSpeed : speed;
             }
 
-            // KÍCH HOẠT ANIMATION: Truyền dữ liệu chuyển động sang Animator của nhân vật
+            // KÍCH HOẠT ANIMATION: Đồng bộ hoàn toàn với các Parameter của Invector Animator
             if (anim != null)
             {
-                float moveMag = GetMoveInput().magnitude;
-                anim.SetBool("isMoving", moveMag > 0.1f); // Kích hoạt chạy/đi khi bấm phím di chuyển
+                Vector2 input = GetMoveInput();
+                float moveMag = input.magnitude;
+
+                // Nếu đang trạng thái chạy nhanh (Running), ta nhân đôi Magnitude để Blend Tree chuyển sang hoạt ảnh Run
+                float targetMag = moveMag;
+                if (_currentMovementState == MovementState.Running)
+                {
+                    targetMag *= 2f; // Ép giá trị lên cao để kích hoạt hoạt ảnh chạy nhanh công nghiệp của Invector
+                }
+
+                // Truyền mượt mà các giá trị vào Animator (Dùng thêm Lerp/Damp để chuyển trạng thái mượt hơn)
+                anim.SetFloat("InputHoriz", input.x, 0.1f, Time.deltaTime);
+                anim.SetFloat("InputVert", input.y, 0.1f, Time.deltaTime);
+                anim.SetFloat("InputMag", targetMag, 0.1f, Time.deltaTime);
+                
+                // Đồng bộ các biến Bool (Lưu ý chữ I viết hoa trong "IsMoving")
+                anim.SetBool("IsMoving", moveMag > 0.1f);
+                anim.SetBool("IsGrounded", _isGrounded);
+                anim.SetBool("IsSprinting", _currentMovementState == MovementState.Running);
             }
         }
 
