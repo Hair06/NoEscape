@@ -1,20 +1,27 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
+using TMPro;
 
-public class DoubleDoorInteractable : MonoBehaviour, IInteractable
+public class DoubleDoorInteractable : MonoBehaviour
 {
-    public string promptMessage = "Nhấn E để Mở/Đóng cửa";
+    [Header("Cấu hình UI Text bằng TextMesh Pro")]
+    [SerializeField] private TextMeshProUGUI promptText;
+    [SerializeField] private string interactMessage = "Nhấn [E] để mở/đóng cửa";
 
     [Header("Door Components")]
     [SerializeField] private Transform leftDoor;
     [SerializeField] private Transform rightDoor;
 
     [Header("Rotation Settings")]
-    public float openAngle = 90f;   // Góc mở cửa
-    public float speed = 3f;        // Tốc độ mở cửa
+    public float openAngle = 90f;
+    public float speed = 3f;
+
+    // Tự động lấy DoorAudioController trên cùng GameObject
+    private DoorAudioController doorAudio;
 
     private bool isOpen = false;
-    
-    // Lưu lại góc ban đầu của 2 cánh cửa
+    private bool isPlayerInside = false;
+
     private Quaternion leftTargetRotation;
     private Quaternion rightTargetRotation;
     private Quaternion leftInitialRotation;
@@ -22,25 +29,26 @@ public class DoubleDoorInteractable : MonoBehaviour, IInteractable
 
     private void Start()
     {
-        // Ghi nhớ góc đóng ban đầu
-        leftInitialRotation = leftDoor.localRotation;
-        rightInitialRotation = rightDoor.localRotation;
+        if (promptText != null) promptText.gameObject.SetActive(false);
 
-        // Đặt mục tiêu ban đầu là đóng
+        if (leftDoor != null) leftInitialRotation = leftDoor.localRotation;
+        if (rightDoor != null) rightInitialRotation = rightDoor.localRotation;
+
         leftTargetRotation = leftInitialRotation;
         rightTargetRotation = rightInitialRotation;
+
+        doorAudio = GetComponent<DoorAudioController>();
     }
 
     private void Update()
     {
-        // Xoay mượt mà cánh cửa về phía góc mục tiêu
-        leftDoor.localRotation = Quaternion.Slerp(leftDoor.localRotation, leftTargetRotation, Time.deltaTime * speed);
-        rightDoor.localRotation = Quaternion.Slerp(rightDoor.localRotation, rightTargetRotation, Time.deltaTime * speed);
-    }
+        if (leftDoor != null)
+            leftDoor.localRotation = Quaternion.Slerp(leftDoor.localRotation, leftTargetRotation, Time.deltaTime * speed);
+        if (rightDoor != null)
+            rightDoor.localRotation = Quaternion.Slerp(rightDoor.localRotation, rightTargetRotation, Time.deltaTime * speed);
 
-    public string GetInteractPrompt()
-    {
-        return promptMessage;
+        if (isPlayerInside && Keyboard.current != null && Keyboard.current.eKey.wasPressedThisFrame)
+            Interact();
     }
 
     public void Interact()
@@ -49,15 +57,37 @@ public class DoubleDoorInteractable : MonoBehaviour, IInteractable
 
         if (isOpen)
         {
-            // Cánh trái xoay góc âm, cánh phải xoay góc dương (hoặc ngược lại tùy tâm góc của model)
             leftTargetRotation = leftInitialRotation * Quaternion.Euler(0, -openAngle, 0);
             rightTargetRotation = rightInitialRotation * Quaternion.Euler(0, openAngle, 0);
+            doorAudio?.PlayOpen();
         }
         else
         {
-            // Quay về góc đóng ban đầu
             leftTargetRotation = leftInitialRotation;
             rightTargetRotation = rightInitialRotation;
+            doorAudio?.PlayClose();
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            isPlayerInside = true;
+            if (promptText != null)
+            {
+                promptText.text = interactMessage;
+                promptText.gameObject.SetActive(true);
+            }
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            isPlayerInside = false;
+            if (promptText != null) promptText.gameObject.SetActive(false);
         }
     }
 }

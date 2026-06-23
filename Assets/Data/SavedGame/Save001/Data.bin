@@ -1,0 +1,67 @@
+{
+  "id": "c6dd0b3c03b149d59aeffed466339d8f",
+  "playerData": {
+    "position": {
+      "x": 25.0,
+      "y": 0.0,
+      "z": 3.0
+    },
+    "rotation": {
+      "x": 0.0,
+      "y": 0.0
+    },
+    "localData": {
+      "health": 100,
+      "selectedItem": -1,
+      "playerItems": {
+        "playerItem_0": {
+          "recordingTime": 0,
+          "batteryEnergy": 100.0,
+          "nightVision": false
+        },
+        "playerItem_1": {},
+        "playerItem_2": {},
+        "playerItem_3": {
+          "flashlightAttached": false
+        },
+        "playerItem_4": {
+          "batteryEnergy": 320.0
+        },
+        "playerItem_5": {
+          "currentFuel": 60.0
+        },
+        "playerItem_6": {},
+        "playerItem_7": {},
+        "playerItem_8": {
+          "baseTemp": 23.0
+        },
+        "playerItem_9": {}
+      }
+    },
+    "globalData": {
+      "inventory": {
+        "expanded": 0,
+        "items": {},
+        "shortcuts": {
+          "shortcut_0": "{}",
+          "shortcut_1": "{}",
+          "shortcut_2": "{}",
+          "shortcut_3": "{}"
+        }
+      },
+      "objectives": {}
+    }
+  },
+  "worldState": {
+    "worldSaveables": {
+      "RainingSet.d61a7e2b02783e54aa4c815599bcbac1": {
+        "raining": true
+      },
+      "TimedInteractEvent.0c497a7105f0eb74b91eeb39b3684349": {
+        "interactOnce": false,
+        "isInteractTimed": false
+      }
+    },
+    "runtimeSaveables": {}
+  }
+}
