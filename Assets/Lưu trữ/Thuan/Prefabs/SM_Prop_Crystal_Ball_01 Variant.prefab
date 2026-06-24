@@ -1,0 +1,105 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &6537985302005776386
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 1496679833896514, guid: 58ab678a8e2485144aa575fdf3b037c0, type: 3}
+      propertyPath: m_Name
+      value: SM_Prop_Crystal_Ball_01 Variant
+      objectReference: {fileID: 0}
+    - target: {fileID: 4094821059034058, guid: 58ab678a8e2485144aa575fdf3b037c0, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -2.995
+      objectReference: {fileID: 0}
+    - target: {fileID: 4094821059034058, guid: 58ab678a8e2485144aa575fdf3b037c0, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.3386116
+      objectReference: {fileID: 0}
+    - target: {fileID: 4094821059034058, guid: 58ab678a8e2485144aa575fdf3b037c0, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -17.033756
+      objectReference: {fileID: 0}
+    - target: {fileID: 4094821059034058, guid: 58ab678a8e2485144aa575fdf3b037c0, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4094821059034058, guid: 58ab678a8e2485144aa575fdf3b037c0, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4094821059034058, guid: 58ab678a8e2485144aa575fdf3b037c0, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4094821059034058, guid: 58ab678a8e2485144aa575fdf3b037c0, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4094821059034058, guid: 58ab678a8e2485144aa575fdf3b037c0, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4094821059034058, guid: 58ab678a8e2485144aa575fdf3b037c0, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4094821059034058, guid: 58ab678a8e2485144aa575fdf3b037c0, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1496679833896514, guid: 58ab678a8e2485144aa575fdf3b037c0, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3137621327457342107}
+    - targetCorrespondingSourceObject: {fileID: 1496679833896514, guid: 58ab678a8e2485144aa575fdf3b037c0, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 157935691927394241}
+  m_SourcePrefab: {fileID: 100100000, guid: 58ab678a8e2485144aa575fdf3b037c0, type: 3}
+--- !u!1 &6538883366451676736 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1496679833896514, guid: 58ab678a8e2485144aa575fdf3b037c0, type: 3}
+  m_PrefabInstance: {fileID: 6537985302005776386}
+  m_PrefabAsset: {fileID: 0}
+--- !u!65 &3137621327457342107
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6538883366451676736}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.40929228, y: 0.23614845, z: 0.37124312}
+  m_Center: {x: 0, y: 0.118213266, z: -0.05068347}
+--- !u!114 &157935691927394241
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6538883366451676736}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1c8cb69e77ba99349952326e7c233117, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  interactMessage: "Nh\u1EA5n [E] \u0111\u1EC3 nh\u1EB7t L\xF2 Xo Nh\u1EA1c"
+  collectSound: {fileID: 0}

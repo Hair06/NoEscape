@@ -1,36 +1,23 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
-using TMPro;
 
-// Bản đơn giản để test: tới gần nhấn E nhặt Lò Xo Nhạc -> báo hộp nhạc.
-// (Sau này sẽ nâng cấp thêm soi đèn pin gầm giường + đọc thư H.N.)
-public class SpringPartCollect : MonoBehaviour
+// Bản dùng IInteractable (tương thích Player mới Elman + PlayerInteraction raycast).
+// Nhìn vào Lò Xo Nhạc và nhấn E để nhặt -> báo hộp nhạc.
+public class SpringPartCollect : MonoBehaviour, IInteractable
 {
-    [Header("UI hướng dẫn (TextMeshPro)")]
-    [SerializeField] private TextMeshProUGUI promptText;
+    [Header("Chữ gợi ý khi nhìn vào")]
     [SerializeField] private string interactMessage = "Nhấn [E] để nhặt Lò Xo Nhạc";
 
     [Header("Âm thanh khi nhặt (có thể để trống)")]
     [SerializeField] private AudioClip collectSound;
 
-    private bool isPlayerInside = false;
-
-    private void Start()
+    // PlayerInteraction gọi hàm này để lấy chữ hiển thị
+    public string GetInteractPrompt()
     {
-        if (promptText != null) promptText.gameObject.SetActive(false);
+        return interactMessage;
     }
 
-    private void Update()
-    {
-        if (isPlayerInside
-            && Keyboard.current != null
-            && Keyboard.current.eKey.wasPressedThisFrame)
-        {
-            CollectPart();
-        }
-    }
-
-    private void CollectPart()
+    // PlayerInteraction gọi hàm này khi người chơi nhìn vào và nhấn E
+    public void Interact()
     {
         if (collectSound != null)
             AudioSource.PlayClipAtPoint(collectSound, transform.position);
@@ -41,29 +28,6 @@ public class SpringPartCollect : MonoBehaviour
 
         Debug.Log("Đã nhặt Lò Xo Nhạc!");
 
-        if (promptText != null) promptText.gameObject.SetActive(false);
         Destroy(gameObject);
-    }
-
-    private void OnTriggerEnter(Collider other)
-    {
-        if (other.CompareTag("Player"))
-        {
-            isPlayerInside = true;
-            if (promptText != null)
-            {
-                promptText.text = interactMessage;
-                promptText.gameObject.SetActive(true);
-            }
-        }
-    }
-
-    private void OnTriggerExit(Collider other)
-    {
-        if (other.CompareTag("Player"))
-        {
-            isPlayerInside = false;
-            if (promptText != null) promptText.gameObject.SetActive(false);
-        }
     }
 }
