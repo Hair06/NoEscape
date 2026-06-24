@@ -8,13 +8,21 @@ public class PostCutsceneDashScare : MonoBehaviour
     [SerializeField] private GameObject ghoulVisual;
     [SerializeField] private Transform startPoint;
     [SerializeField] private Transform endPoint;
-    [SerializeField] private float dashDuration = 1f;
+    [SerializeField] private float dashDuration = 1.5f;
 
-    [Header("Test nhìn thấy Ghoul")]
-    [SerializeField] private bool testWithJKey = true;
-    [SerializeField] private bool forceVisibleLarge = true;
-    [SerializeField] private Vector3 debugScale = new Vector3(3f, 3f, 3f);
-    [SerializeField] private bool keepGhoulVisibleAfterDash = false;
+    [Header("Camera Player")]
+    [SerializeField] private Transform playerCamera;
+    [SerializeField] private Transform scareCameraPoint;
+    [SerializeField] private float moveCameraDuration = 0.4f;
+    [SerializeField] private float holdCameraBeforeDash = 0.3f;
+    [SerializeField] private float holdCameraAfterDash = 1.5f;
+    [SerializeField] private bool returnCameraAfterScare = true;
+
+    [Header("Khóa điều khiển Player + Camera")]
+    [SerializeField] private MonoBehaviour[] scriptsToDisable;
+
+    [Header("Menu hiện sau Jumpscare")]
+    [SerializeField] private GameObject menuAfterScare;
 
     [Header("Âm thanh")]
     [SerializeField] private AudioClip scareSound;
@@ -23,21 +31,28 @@ public class PostCutsceneDashScare : MonoBehaviour
     [Header("Đèn chớp")]
     [SerializeField] private Light[] lightsToFlicker;
     [SerializeField] private GameObject[] lightObjectsToDisable;
-    [SerializeField] private float flickerDuration = 0.4f;
+    [SerializeField] private float flickerDuration = 0.8f;
 
-    [Header("Khóa điều khiển khi jumpscare")]
-    [SerializeField] private MonoBehaviour[] scriptsToDisable;
+    [Header("Debug")]
+    [SerializeField] private bool testWithJKey = true;
+    [SerializeField] private bool forceVisibleLarge = true;
+    [SerializeField] private Vector3 debugScale = new Vector3(3f, 3f, 3f);
+    [SerializeField] private bool keepGhoulVisibleAfterDash = false;
 
     private bool triggered;
+    private bool forceLockCamera;
+
+    private Vector3 originalCameraPos;
+    private Quaternion originalCameraRot;
 
     private void Awake()
-    {
-        if (ghoulHolder != null)
-            ghoulHolder.gameObject.SetActive(true);
+{
+    if (ghoulHolder != null)
+        ghoulHolder.gameObject.SetActive(true);
 
-        if (ghoulVisual != null)
-            ghoulVisual.SetActive(false);
-    }
+    if (ghoulVisual != null)
+        ghoulVisual.SetActive(false);
+}
 
     private void Update()
     {
@@ -47,40 +62,70 @@ public class PostCutsceneDashScare : MonoBehaviour
         }
     }
 
+    private void LateUpdate()
+    {
+        if (forceLockCamera && playerCamera != null && scareCameraPoint != null)
+        {
+            playerCamera.position = scareCameraPoint.position;
+            playerCamera.rotation = scareCameraPoint.rotation;
+        }
+    }
+
     public void TriggerScare()
     {
         if (triggered) return;
 
-        Debug.Log("TriggerScare được gọi.");
         StartCoroutine(PlayScare());
     }
 
     private IEnumerator PlayScare()
     {
-        Debug.Log("JUMPSCARE START");
-
         triggered = true;
-        SetGameplayControl(false);
 
         if (!ValidateReferences())
         {
-            SetGameplayControl(true);
+            triggered = false;
             yield break;
         }
 
-        SetupGhoulAtStartPoint();
+        if (menuAfterScare != null)
+            menuAfterScare.SetActive(false);
 
+        SetGameplayControl(false);
+
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+
+        originalCameraPos = playerCamera.position;
+        originalCameraRot = playerCamera.rotation;
+
+        yield return StartCoroutine(MoveCameraToScarePoint());
+
+        forceLockCamera = true;
+
+        yield return new WaitForSecondsRealtime(holdCameraBeforeDash);
+
+        SetupGhoulAtStartPoint();
         PlaySound();
 
         yield return StartCoroutine(FlickerLightsAndDash());
 
+        yield return new WaitForSecondsRealtime(holdCameraAfterDash);
+
         if (!keepGhoulVisibleAfterDash && ghoulVisual != null)
-        {
             ghoulVisual.SetActive(false);
-            Debug.Log("Ghoul Visual đã tắt sau khi dash.");
-        }
+
+        forceLockCamera = false;
+
+        if (returnCameraAfterScare)
+            yield return StartCoroutine(ReturnCamera());
 
         SetGameplayControl(true);
+
+        if (menuAfterScare != null)
+            menuAfterScare.SetActive(true);
+
+        Debug.Log("Jumpscare kết thúc, trả lại điều khiển cho Player và hiện menu.");
     }
 
     private bool ValidateReferences()
@@ -111,7 +156,63 @@ public class PostCutsceneDashScare : MonoBehaviour
             valid = false;
         }
 
+        if (playerCamera == null)
+        {
+            Debug.LogError("Chưa gán Player Camera.");
+            valid = false;
+        }
+
+        if (scareCameraPoint == null)
+        {
+            Debug.LogError("Chưa gán Scare Camera Point.");
+            valid = false;
+        }
+
         return valid;
+    }
+
+    private IEnumerator MoveCameraToScarePoint()
+    {
+        Vector3 startPos = playerCamera.position;
+        Quaternion startRot = playerCamera.rotation;
+
+        float timer = 0f;
+
+        while (timer < moveCameraDuration)
+        {
+            timer += Time.unscaledDeltaTime;
+            float t = Mathf.Clamp01(timer / moveCameraDuration);
+
+            playerCamera.position = Vector3.Lerp(startPos, scareCameraPoint.position, t);
+            playerCamera.rotation = Quaternion.Slerp(startRot, scareCameraPoint.rotation, t);
+
+            yield return null;
+        }
+
+        playerCamera.position = scareCameraPoint.position;
+        playerCamera.rotation = scareCameraPoint.rotation;
+    }
+
+    private IEnumerator ReturnCamera()
+    {
+        Vector3 startPos = playerCamera.position;
+        Quaternion startRot = playerCamera.rotation;
+
+        float timer = 0f;
+
+        while (timer < moveCameraDuration)
+        {
+            timer += Time.unscaledDeltaTime;
+            float t = Mathf.Clamp01(timer / moveCameraDuration);
+
+            playerCamera.position = Vector3.Lerp(startPos, originalCameraPos, t);
+            playerCamera.rotation = Quaternion.Slerp(startRot, originalCameraRot, t);
+
+            yield return null;
+        }
+
+        playerCamera.position = originalCameraPos;
+        playerCamera.rotation = originalCameraRot;
     }
 
     private void SetupGhoulAtStartPoint()
@@ -127,12 +228,7 @@ public class PostCutsceneDashScare : MonoBehaviour
             ghoulHolder.localScale = debugScale;
 
         ghoulVisual.SetActive(true);
-
         EnableAllRenderers(ghoulVisual);
-
-        Debug.Log("Ghoul Holder Position: " + ghoulHolder.position);
-        Debug.Log("Ghoul Visual Active: " + ghoulVisual.activeInHierarchy);
-        Debug.Log("Distance Start-End: " + Vector3.Distance(startPoint.position, endPoint.position));
     }
 
     private IEnumerator FlickerLightsAndDash()
@@ -144,8 +240,8 @@ public class PostCutsceneDashScare : MonoBehaviour
         while (timer < dashDuration)
         {
             timer += Time.unscaledDeltaTime;
-
             float t = Mathf.Clamp01(timer / dashDuration);
+
             ghoulHolder.position = Vector3.Lerp(startPoint.position, endPoint.position, t);
 
             yield return null;
@@ -177,25 +273,15 @@ public class PostCutsceneDashScare : MonoBehaviour
                     obj.SetActive(state);
             }
         }
-
-        Debug.Log(state ? "Đèn đã bật lại." : "Đèn đã tắt.");
     }
 
     private void EnableAllRenderers(GameObject target)
     {
+        if (target == null) return;
+
         Renderer[] renderers = target.GetComponentsInChildren<Renderer>(true);
 
-        Debug.Log("Số Renderer trong Ghoul Visual: " + renderers.Length);
-
         foreach (Renderer r in renderers)
-        {
-            r.enabled = true;
-            r.gameObject.SetActive(true);
-        }
-
-        SkinnedMeshRenderer[] skinnedRenderers = target.GetComponentsInChildren<SkinnedMeshRenderer>(true);
-
-        foreach (SkinnedMeshRenderer r in skinnedRenderers)
         {
             r.enabled = true;
             r.gameObject.SetActive(true);
