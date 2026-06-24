@@ -6,7 +6,7 @@ using System.Collections.Generic;
 // Quản lý tổng khóa số 3D (nhập bằng phím số).
 // Nhấn E -> ổ khóa bay lên cận cảnh -> gõ phím số 0-9 để nhập mật mã.
 // Mỗi số gõ vào: vòng tương ứng xoay mượt tới số đó. Đủ 4 số tự kiểm tra.
-public class CombinationLock : MonoBehaviour
+public class CombinationLock : MonoBehaviour, IInteractable
 {
     [Header("UI hướng dẫn (TextMeshPro)")]
     [SerializeField] private TextMeshProUGUI promptText;
@@ -55,7 +55,6 @@ public class CombinationLock : MonoBehaviour
     [SerializeField] private string openLidMessage = "Nhấn [E] để mở nắp hòm";
     [SerializeField] private AudioSource lidOpenAudio;
 
-    private bool isPlayerInside = false;
     private bool isAdjusting = false;
     private bool isUnlocked = false;
     private bool isMoving = false;
@@ -73,6 +72,32 @@ public class CombinationLock : MonoBehaviour
     private Vector3 targetPosition;
     private Quaternion targetRotation;
     private bool returningHome = false;
+
+    // ===== IInteractable: Player mới gọi qua raycast + GameInputBridge =====
+    public string GetInteractPrompt()
+    {
+        if (isUnlocked && !isUnlockedWaitingLid && !isLidOpen) return "";
+        if (isUnlockedWaitingLid && !isLidOpen) return openLidMessage;
+        if (isAdjusting) return ""; // đang chỉnh thì không hiện prompt
+        return interactMessage;
+    }
+
+    public void Interact()
+    {
+        // Chưa mở khóa -> vào chế độ chỉnh (nếu chưa đang chỉnh)
+        if (!isUnlocked && !isAdjusting)
+        {
+            EnterAdjustMode();
+            return;
+        }
+
+        // Đã mở khóa, đang chờ mở nắp -> mở nắp
+        if (isUnlockedWaitingLid && !isLidOpen)
+        {
+            OpenLid();
+            return;
+        }
+    }
 
     private void Start()
     {
@@ -102,15 +127,6 @@ public class CombinationLock : MonoBehaviour
         if (lidHinge != null)
             lidHinge.localRotation = Quaternion.Slerp(lidHinge.localRotation, lidTargetRot, Time.deltaTime * lidSpeed);
 
-        // Sau khi mở khóa: nhấn E để mở nắp hòm (bỏ điều kiện isPlayerInside vì
-        // người chơi chắc chắn đang đứng đó vừa giải khóa xong)
-        if (isUnlockedWaitingLid && !isLidOpen
-            && Keyboard.current != null && Keyboard.current.eKey.wasPressedThisFrame)
-        {
-            Debug.Log("[CombinationLock] Nhấn E mở nắp hòm.");
-            OpenLid();
-        }
-
         // Di chuyển ổ khóa mượt
         if (isMoving)
         {
@@ -128,13 +144,6 @@ public class CombinationLock : MonoBehaviour
                     returningHome = false;
                 }
             }
-        }
-
-        // Vào chế độ chỉnh
-        if (isPlayerInside && !isUnlocked && !isAdjusting
-            && Keyboard.current != null && Keyboard.current.eKey.wasPressedThisFrame)
-        {
-            EnterAdjustMode();
         }
 
         if (isAdjusting)
@@ -353,26 +362,5 @@ public class CombinationLock : MonoBehaviour
         if (windKeyReward != null) windKeyReward.SetActive(true);
     }
 
-    private void OnTriggerEnter(Collider other)
-    {
-        if (other.CompareTag("Player") && !isUnlocked)
-        {
-            isPlayerInside = true;
-            if (promptText != null && !isAdjusting)
-            {
-                promptText.text = interactMessage;
-                promptText.gameObject.SetActive(true);
-            }
-        }
-    }
 
-    private void OnTriggerExit(Collider other)
-    {
-        if (other.CompareTag("Player"))
-        {
-            isPlayerInside = false;
-            if (!isAdjusting && promptText != null)
-                promptText.gameObject.SetActive(false);
-        }
-    }
 }
