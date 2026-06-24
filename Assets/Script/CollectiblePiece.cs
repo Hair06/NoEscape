@@ -16,6 +16,7 @@ public class CollectiblePiece : MonoBehaviour
     [SerializeField] private float detectionRadius = 1.2f; 
 
     private bool isPlayerInside = false;
+    private bool promptSuppressedUntilExit = false;
 
     private void Start()
     {
@@ -38,10 +39,16 @@ public class CollectiblePiece : MonoBehaviour
     private void Update()
     {
         // Nhận diện phím E theo Input System mới, không lo xung đột Input cũ
-        if (isPlayerInside && Keyboard.current != null && Keyboard.current.eKey.wasPressedThisFrame)
+        if (isPlayerInside && GameInputBridge.GetKeyDown(KeyCode.E))
         {
             CollectThisPiece();
         }
+    }
+
+    public void SuppressPromptUntilExit()
+    {
+        promptSuppressedUntilExit = true;
+        if (promptText != null) promptText.gameObject.SetActive(false);
     }
 
     private void CollectThisPiece()
@@ -70,6 +77,7 @@ public class CollectiblePiece : MonoBehaviour
         if (promptText != null) promptText.gameObject.SetActive(false);
         
         // Phá hủy mảnh giấy (Point Light con nằm trong nó cũng sẽ bị tự động xóa theo sạch sẽ)
+        if (ItemInfoUI.IsVisible) ItemInfoUI.Instance.HideInfo();
         Destroy(gameObject);
         if (QuestManager.Instance != null)
 {
@@ -83,6 +91,7 @@ public class CollectiblePiece : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             isPlayerInside = true;
+            promptSuppressedUntilExit = false;
             if (promptText != null) 
             {
                 promptText.text = interactMessage; // Gán nội dung chữ hướng dẫn
@@ -99,7 +108,7 @@ public class CollectiblePiece : MonoBehaviour
             isPlayerInside = true;
             
             // Đề phòng trường hợp chữ bị script khác tắt mất, tự động kích hoạt lại UI
-            if (promptText != null && !promptText.gameObject.activeSelf)
+            if (!promptSuppressedUntilExit && promptText != null && !promptText.gameObject.activeSelf)
             {
                 promptText.text = interactMessage;
                 promptText.gameObject.SetActive(true);
@@ -112,6 +121,7 @@ public class CollectiblePiece : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             isPlayerInside = false;
+            promptSuppressedUntilExit = false;
             if (promptText != null) promptText.gameObject.SetActive(false);
         }
     }
@@ -127,6 +137,7 @@ public class CollectiblePiece : MonoBehaviour
             if (hitCollider.CompareTag("Player"))
             {
                 isPlayerInside = true;
+                promptSuppressedUntilExit = false;
                 if (promptText != null) 
                 {
                     promptText.text = interactMessage;

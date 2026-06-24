@@ -1,6 +1,7 @@
 using UnityEngine;
 
 public class ItemInfoData : MonoBehaviour
+
 {
     [Header("Thông tin item")]
     public string itemName;
@@ -10,4 +11,5 @@ public class ItemInfoData : MonoBehaviour
 
     [TextArea(2, 5)]
     public string useDescription;
+    
 }

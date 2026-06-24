@@ -13,6 +13,7 @@ public class ItemInfoUI : MonoBehaviour
     public GameObject infoPanel;
 
     [Header("Text")]
+    public TextMeshProUGUI showInfoText;
     public TextMeshProUGUI itemNameText;
     public TextMeshProUGUI descriptionText;
     public TextMeshProUGUI useText;
@@ -94,6 +95,12 @@ public class ItemInfoUI : MonoBehaviour
             useText.text = itemInfo.useDescription;
         }
 
+        if (showInfoText != null)
+        {
+            showInfoText.text =
+                $"{itemInfo.itemName}\n\n{itemInfo.description}\n\n{itemInfo.useDescription}";
+        }
+
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.None;
     }
@@ -141,9 +148,27 @@ public class ItemInfoUI : MonoBehaviour
         {
             Debug.LogWarning($"[ItemInfoUI] infoPanel '{infoPanel.name}' is activeSelf but inactive in hierarchy. Check parent Canvas.");
         }
+        else if (showInfoText == null)
+        {
+            showInfoText = FindTextByName(infoPanel.transform, "showinfo");
+        }
 
+        if (showInfoText == null) Debug.LogWarning("[ItemInfoUI] showInfoText is not assigned. This is OK if using itemNameText/descriptionText/useText.");
         if (itemNameText == null) Debug.LogWarning("[ItemInfoUI] itemNameText is not assigned.");
         if (descriptionText == null) Debug.LogWarning("[ItemInfoUI] descriptionText is not assigned.");
         if (useText == null) Debug.LogWarning("[ItemInfoUI] useText is not assigned.");
+    }
+
+    private static TextMeshProUGUI FindTextByName(Transform root, string targetName)
+    {
+        foreach (TextMeshProUGUI text in root.GetComponentsInChildren<TextMeshProUGUI>(true))
+        {
+            if (string.Equals(text.name, targetName, System.StringComparison.OrdinalIgnoreCase))
+            {
+                return text;
+            }
+        }
+
+        return null;
     }
 }
