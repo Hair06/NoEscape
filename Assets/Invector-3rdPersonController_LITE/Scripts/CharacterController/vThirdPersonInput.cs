@@ -287,6 +287,7 @@ public static class GameInputBridge
             KeyCode.RightShift => Keyboard.current.rightShiftKey,
             KeyCode.E => Keyboard.current.eKey,
             KeyCode.F => Keyboard.current.fKey,
+            KeyCode.I => Keyboard.current.iKey,
             KeyCode.J => Keyboard.current.jKey,
             KeyCode.W => Keyboard.current.wKey,
             KeyCode.A => Keyboard.current.aKey,
