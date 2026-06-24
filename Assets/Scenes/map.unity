@@ -8103,11 +8103,20 @@ MonoBehaviour:
   ghoulVisual: {fileID: 1193556674}
   startPoint: {fileID: 1997137298}
   endPoint: {fileID: 1528573410}
-  dashDuration: 3
-  testWithJKey: 1
-  forceVisibleLarge: 1
-  debugScale: {x: 3, y: 3, z: 3}
-  keepGhoulVisibleAfterDash: 0
+  dashDuration: 2.5
+  playerCamera: {fileID: 581401314}
+  scareCameraPoint: {fileID: 2015247267}
+  moveCameraDuration: 0.4
+  holdCameraBeforeDash: 0.2
+  holdCameraAfterDash: 1
+  returnCameraAfterScare: 1
+  scriptsToDisable:
+  - {fileID: 1205354181}
+  - {fileID: 1205354181}
+  - {fileID: 1205354181}
+  - {fileID: 1205354181}
+  - {fileID: 1205354181}
+  menuAfterScare: {fileID: 654073367}
   scareSound: {fileID: 8300000, guid: 768bcc3a16f7ba8469fdbefa26a5d4dc, type: 3}
   volume: 1
   lightsToFlicker:
@@ -8117,8 +8126,10 @@ MonoBehaviour:
   - {fileID: 856717200}
   lightObjectsToDisable: []
   flickerDuration: 0.4
-  scriptsToDisable:
-  - {fileID: 0}
+  testWithJKey: 1
+  forceVisibleLarge: 1
+  debugScale: {x: 3, y: 3, z: 3}
+  keepGhoulVisibleAfterDash: 0
 --- !u!4 &54831474
 Transform:
   m_ObjectHideFlags: 0
@@ -160951,7 +160962,7 @@ MonoBehaviour:
   objectsToHide:
   - {fileID: 1517797187}
   afterCutsceneScare: {fileID: 54831473}
-  scareDelay: 2
+  scareDelay: 3
 --- !u!1001 &1180184516
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -274413,6 +274424,37 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4244864611525652, guid: 6b37fcf0e702ada4f807982a4b56200c, type: 3}
   m_PrefabInstance: {fileID: 2014380320}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &2015247266
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2015247267}
+  m_Layer: 0
+  m_Name: ScareCameraPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2015247267
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2015247266}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.006800876, y: 0.70946807, z: -0.005946013, w: 0.70467967}
+  m_LocalPosition: {x: -1.1554079, y: 6.1502194, z: -23.267548}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &2015277956
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -294356,6 +294398,7 @@ SceneRoots:
   - {fileID: 560368625}
   - {fileID: 1909855623}
   - {fileID: 346345512}
+  - {fileID: 2015247267}
   - {fileID: 54831474}
   - {fileID: 1887353168}
   - {fileID: 1930619521}

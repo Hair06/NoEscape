@@ -4,12 +4,11 @@ using UnityEngine.UI;
 using TMPro;
 
 [System.Serializable]
-
 public class SealCutsceneFrame
 {
     public Sprite image;
 
-    [TextArea(3,10)]
+    [TextArea(3, 10)]
     public string dialogue;
 
     public float waitTime = 3f;
@@ -38,6 +37,7 @@ public class MapSealCutscenePlayer : MonoBehaviour
 
     [Header("After Cutscene Scare")]
     [SerializeField] private PostCutsceneDashScare afterCutsceneScare;
+
     [Header("Scare Delay")]
     [SerializeField] private float scareDelay = 2f;
 
@@ -147,7 +147,7 @@ public class MapSealCutscenePlayer : MonoBehaviour
         while (timer < fadeDuration)
         {
             timer += Time.unscaledDeltaTime;
-            float t = timer / fadeDuration;
+            float t = Mathf.Clamp01(timer / fadeDuration);
 
             SetImageAlpha(imageA, 1f - t);
             SetImageAlpha(imageB, t);
@@ -176,19 +176,32 @@ public class MapSealCutscenePlayer : MonoBehaviour
             Chapter1Manager.Instance.OnCutsceneFinished();
 
         Debug.Log("Cutscene kết thúc thành công! Trả lại quyền điều khiển cho Player.");
+
         if (QuestManager.Instance != null)
         {
             QuestManager.Instance.CompleteSubQuest(3);
             QuestManager.Instance.CompleteCurrentChapter();
         }
+
         if (afterCutsceneScare != null)
         {
-        Debug.Log("Jumpscare sẽ chạy sau 2 giây.");
-        StartCoroutine(StartScareAfterDelay());
+            Debug.Log("Jumpscare sẽ chạy sau " + scareDelay + " giây.");
+            StartCoroutine(StartScareAfterDelay());
         }
         else
         {
             Debug.LogWarning("Chưa gán After Cutscene Scare trong MapSealCutscenePlayer.");
+        }
+    }
+
+    private IEnumerator StartScareAfterDelay()
+    {
+        yield return new WaitForSecondsRealtime(scareDelay);
+
+        if (afterCutsceneScare != null)
+        {
+            Debug.Log("Bắt đầu Ghoul Jumpscare.");
+            afterCutsceneScare.TriggerScare();
         }
     }
 
@@ -229,15 +242,5 @@ public class MapSealCutscenePlayer : MonoBehaviour
         Color c = img.color;
         c.a = alpha;
         img.color = c;
-    }
-    private IEnumerator StartScareAfterDelay()
-    {
-        yield return new WaitForSeconds(scareDelay);
-
-        if (afterCutsceneScare != null)
-        {
-            Debug.Log("Bắt đầu Ghoul Jumpscare.");
-            afterCutsceneScare.TriggerScare();
-        }
     }
 }
