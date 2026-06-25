@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using TMPro;
+using ElmanGameDevTools.PlayerSystem; // để tự tìm PlayerController Elman
 
 // Quản lý tổng mini game ghép đĩa nhạc.
 // Gắn vào Object đĩa vỡ gần cửa sổ (có Collider trigger để bắt [E]).
@@ -22,8 +23,9 @@ public class DiscPuzzleManager : MonoBehaviour
     [SerializeField] private bool scatterOnOpen = true;
 
     [Header("Khóa camera khi chơi")]
-    [Tooltip("Kéo Player (script vThirdPersonInput) vào đây để khóa lúc ghép")]
+    [Tooltip("Có thể để trống - script sẽ tự tìm PlayerController trong scene")]
     [SerializeField] private MonoBehaviour cameraScript;
+    private PlayerController autoFoundPlayer; // tự tìm nếu cameraScript trống
 
     [Header("Âm thanh khi ghép xong")]
     [Tooltip("Giai điệu đĩa nhạc - giống tiếng trong băng cassette")]
@@ -90,7 +92,16 @@ public class DiscPuzzleManager : MonoBehaviour
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
 
-        if (cameraScript != null) cameraScript.enabled = false;
+        if (cameraScript != null)
+        {
+            cameraScript.enabled = false;
+        }
+        else
+        {
+            autoFoundPlayer = FindFirstObjectByType<PlayerController>();
+            if (autoFoundPlayer != null) autoFoundPlayer.enabled = false;
+            else Debug.LogWarning("[DiscPuzzleManager] Không tìm thấy PlayerController để khóa camera!");
+        }
 
         Debug.Log("Mở mini game ghép đĩa nhạc. Hãy kéo các mảnh vào đúng vị trí.");
     }
@@ -119,6 +130,7 @@ public class DiscPuzzleManager : MonoBehaviour
 
         // Bật lại camera
         if (cameraScript != null) cameraScript.enabled = true;
+        else if (autoFoundPlayer != null) autoFoundPlayer.enabled = true;
 
         // Phát giai điệu đĩa nhạc
         if (discMelody != null) discMelody.Play();

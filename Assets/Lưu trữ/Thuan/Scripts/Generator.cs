@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
-using UnityEngine.InputSystem;   // de doc phim bang Input System moi
+using UnityEngine.InputSystem;   // de doc input bang Input System moi
 
 public class Generator : MonoBehaviour, IInteractable
 {
@@ -11,10 +11,10 @@ public class Generator : MonoBehaviour, IInteractable
     [Header("Trang thai")]
     public bool isPowered = false;
 
-    [Header("Thanh xang (mash phim C)")]
+    [Header("Thanh xang (bam chuot trai)")]
     public Slider fuelBar;                 // keo FuelFillBar vao day
-    public float fillPerPress = 0.06f;     // moi lan nhan C tang bao nhieu
-    public float drainPerSecond = 0.25f;   // ngung nhan thi tut bao nhieu/giay
+    public float fillPerPress = 0.06f;     // moi lan bam chuot tang bao nhieu
+    public float drainPerSecond = 0.25f;   // ngung bam thi tut bao nhieu/giay
 
     [Header("Hieu ung (co the de trong)")]
     public AudioSource generatorAudio;
@@ -29,7 +29,7 @@ public class Generator : MonoBehaviour, IInteractable
     public string GetInteractPrompt()
     {
         if (isPowered) return "";
-        if (isFilling) return "Nhan C lien tuc de do xang!";
+        if (isFilling) return "Bam chuot trai lien tuc de do xang!";
         return "Nhan E de bat dau do xang";
     }
 
@@ -51,15 +51,15 @@ public class Generator : MonoBehaviour, IInteractable
             fuelBar.value = 0f;
             fuelBar.gameObject.SetActive(true);   // hien thanh
         }
-        Debug.Log("Bat dau do xang. Nhan C lien tuc!");
+        Debug.Log("Bat dau do xang. Bam chuot trai lien tuc!");
     }
 
     void Update()
     {
         if (!isFilling || isPowered) return;
 
-        // Nhan C (nhan-nha lien tuc) -> tang; khong nhan -> tut dan
-        if (Keyboard.current != null && Keyboard.current.cKey.wasPressedThisFrame)
+        // Bam chuot trai (bam-nha lien tuc) -> tang; khong bam -> tut dan
+        if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
         {
             fillAmount += fillPerPress;
         }
