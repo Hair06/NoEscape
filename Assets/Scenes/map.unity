@@ -262440,7 +262440,7 @@ PrefabInstance:
     - target: {fileID: -8957218800462256024, guid: 9ba749448c63bee429c719ec05f16a26, type: 3}
       propertyPath: m_Resource
       value: 
-      objectReference: {fileID: 8300000, guid: 70191663cf00def4faf8dc088f516361, type: 3}
+      objectReference: {fileID: 8300000, guid: 800a704d384f3fb4e8715ee1e50987e7, type: 3}
     - target: {fileID: -8957218800462256024, guid: 9ba749448c63bee429c719ec05f16a26, type: 3}
       propertyPath: panLevelCustomCurve.m_Curve.Array.data[0].value
       value: 1
