@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using TMPro;
 using System.Collections.Generic;
+using ElmanGameDevTools.PlayerSystem; // để tự tìm PlayerController Elman
 
 // Quản lý tổng khóa số 3D (nhập bằng phím số).
 // Nhấn E -> ổ khóa bay lên cận cảnh -> gõ phím số 0-9 để nhập mật mã.
@@ -27,7 +28,9 @@ public class CombinationLock : MonoBehaviour, IInteractable
     [SerializeField] private Camera gameCamera;
 
     [Header("Khóa di chuyển khi chỉnh")]
+    [Tooltip("Có thể để trống - script sẽ tự tìm PlayerController trong scene")]
     [SerializeField] private MonoBehaviour playerInput;
+    private PlayerController autoFoundPlayer; // tự tìm nếu playerInput trống
 
     [Header("Ổ khóa bay lên cận cảnh")]
     [SerializeField] private Transform lockBody;
@@ -173,7 +176,25 @@ public class CombinationLock : MonoBehaviour, IInteractable
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
 
-        if (playerInput != null) playerInput.enabled = false;
+        // Ưu tiên dùng playerInput đã gán; nếu trống thì tự tìm PlayerController Elman
+        if (playerInput != null)
+        {
+            playerInput.enabled = false;
+            Debug.Log($"[CombinationLock] Đã tắt playerInput: {playerInput.GetType().Name}");
+        }
+        else
+        {
+            autoFoundPlayer = FindFirstObjectByType<PlayerController>();
+            if (autoFoundPlayer != null)
+            {
+                autoFoundPlayer.enabled = false;
+                Debug.Log("[CombinationLock] Tự tìm và tắt PlayerController Elman.");
+            }
+            else
+            {
+                Debug.LogWarning("[CombinationLock] Không tìm thấy PlayerController nào để khóa camera!");
+            }
+        }
 
         MoveToCloseUp();
         Debug.Log("Vào chế độ chỉnh khóa số. Gõ phím số để nhập mật mã.");
@@ -305,6 +326,7 @@ public class CombinationLock : MonoBehaviour, IInteractable
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
         if (playerInput != null) playerInput.enabled = true;
+        else if (autoFoundPlayer != null) autoFoundPlayer.enabled = true;
 
         if (inputDisplay != null) inputDisplay.gameObject.SetActive(false);
         if (promptText != null) promptText.text = interactMessage;
@@ -332,6 +354,7 @@ public class CombinationLock : MonoBehaviour, IInteractable
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
         if (playerInput != null) playerInput.enabled = true;
+        else if (autoFoundPlayer != null) autoFoundPlayer.enabled = true;
 
         if (inputDisplay != null) inputDisplay.gameObject.SetActive(false);
 
