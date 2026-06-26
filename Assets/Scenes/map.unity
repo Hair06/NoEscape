@@ -295615,6 +295615,26 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 609467633}
     m_Modifications:
+    - target: {fileID: 2079660661635711170, guid: 7d0afdddf297d0a459e9ece6febf9ced, type: 3}
+      propertyPath: m_Size.x
+      value: 14.77705
+      objectReference: {fileID: 0}
+    - target: {fileID: 2079660661635711170, guid: 7d0afdddf297d0a459e9ece6febf9ced, type: 3}
+      propertyPath: m_Size.y
+      value: 16.321404
+      objectReference: {fileID: 0}
+    - target: {fileID: 2079660661635711170, guid: 7d0afdddf297d0a459e9ece6febf9ced, type: 3}
+      propertyPath: m_Center.x
+      value: -0.29690742
+      objectReference: {fileID: 0}
+    - target: {fileID: 2079660661635711170, guid: 7d0afdddf297d0a459e9ece6febf9ced, type: 3}
+      propertyPath: m_Center.y
+      value: 0.65861404
+      objectReference: {fileID: 0}
+    - target: {fileID: 2079660661635711170, guid: 7d0afdddf297d0a459e9ece6febf9ced, type: 3}
+      propertyPath: m_Center.z
+      value: 2.8707616
+      objectReference: {fileID: 0}
     - target: {fileID: 4752266852145966460, guid: 7d0afdddf297d0a459e9ece6febf9ced, type: 3}
       propertyPath: promptText
       value: 
@@ -295736,9 +295756,33 @@ PrefabInstance:
       value: manh 3
       objectReference: {fileID: 0}
     - target: {fileID: 5338043843406190805, guid: 99d9c4aeb96666d4a9ed60e77cabe1b4, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5338043843406190805, guid: 99d9c4aeb96666d4a9ed60e77cabe1b4, type: 3}
       propertyPath: itemVisualPrefab
       value: 
       objectReference: {fileID: 8960788091910362923, guid: b81ace9777dd4b742bf31b3add0392bc, type: 3}
+    - target: {fileID: 8813575695494481434, guid: 99d9c4aeb96666d4a9ed60e77cabe1b4, type: 3}
+      propertyPath: m_Size.x
+      value: 15.133419
+      objectReference: {fileID: 0}
+    - target: {fileID: 8813575695494481434, guid: 99d9c4aeb96666d4a9ed60e77cabe1b4, type: 3}
+      propertyPath: m_Size.y
+      value: 17.84278
+      objectReference: {fileID: 0}
+    - target: {fileID: 8813575695494481434, guid: 99d9c4aeb96666d4a9ed60e77cabe1b4, type: 3}
+      propertyPath: m_Center.x
+      value: -0.09186745
+      objectReference: {fileID: 0}
+    - target: {fileID: 8813575695494481434, guid: 99d9c4aeb96666d4a9ed60e77cabe1b4, type: 3}
+      propertyPath: m_Center.y
+      value: 1.0115598
+      objectReference: {fileID: 0}
+    - target: {fileID: 8813575695494481434, guid: 99d9c4aeb96666d4a9ed60e77cabe1b4, type: 3}
+      propertyPath: m_Center.z
+      value: -2.0961862
+      objectReference: {fileID: 0}
     - target: {fileID: 8881897974442154524, guid: 99d9c4aeb96666d4a9ed60e77cabe1b4, type: 3}
       propertyPath: promptText
       value: 
