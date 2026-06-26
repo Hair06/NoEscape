@@ -38,7 +38,8 @@ public class Generator : MonoBehaviour, IInteractable
     {
         if (isPowered || isFilling) return;
 
-        if (FuelInventory.cansHeld < requiredCans)
+        // Dem so binh xang trong kho moi
+        if (PlayerInventory.Count("Xang") < requiredCans)
         {
             Debug.Log("Chua du binh xang! Can " + requiredCans + " binh.");
             return;
@@ -82,7 +83,9 @@ public class Generator : MonoBehaviour, IInteractable
         isFilling = false;
 
         if (fuelBar != null) fuelBar.gameObject.SetActive(false);   // an thanh
-        FuelInventory.cansHeld -= requiredCans;   // tru so binh da dung
+
+        // Xoa het binh xang khoi kho sau khi do xong
+        PlayerInventory.RemoveAll("Xang");
 
         if (generatorAudio != null) generatorAudio.Play();
         if (exhaustSmoke != null) exhaustSmoke.Play();
