@@ -8103,7 +8103,7 @@ MonoBehaviour:
   ghoulVisual: {fileID: 1193556674}
   startPoint: {fileID: 1997137298}
   endPoint: {fileID: 1528573410}
-  dashDuration: 2.5
+  dashDuration: 1.5
   playerCamera: {fileID: 581401314}
   scareCameraPoint: {fileID: 2015247267}
   moveCameraDuration: 0.4
@@ -134847,7 +134847,7 @@ MonoBehaviour:
     - 4
   fadeDuration: 0.5
   typeSpeed: 0.02
-  autoHideTime: 3
+  autoHideTime: 2
 --- !u!224 &982221154
 RectTransform:
   m_ObjectHideFlags: 0
@@ -212340,7 +212340,7 @@ PrefabInstance:
     - target: {fileID: 4790755905903027072, guid: e2830cbae7a3379409ecc1f6bea494a5, type: 3}
       propertyPath: cameraScript
       value: 
-      objectReference: {fileID: 1205354181}
+      objectReference: {fileID: 0}
     - target: {fileID: 4790755905903027072, guid: e2830cbae7a3379409ecc1f6bea494a5, type: 3}
       propertyPath: completedDisc3D
       value: 
