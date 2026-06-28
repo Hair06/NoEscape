@@ -65594,7 +65594,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 476064914}
-  - component: {fileID: 476064913}
+  - component: {fileID: 476064915}
   m_Layer: 0
   m_Name: Chapter1Manager
   m_TagString: Untagged
@@ -65602,24 +65602,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &476064913
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 476064912}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a09c61f6ada17d94fb8d5fc4ed271063, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  collectedPieces: 0
-  totalPiecesRequired: 4
-  puzzleMiniGameUI: {fileID: 1517797187}
-  playerInputSystem: {fileID: 0}
-  victoryCutsceneTimeline: {fileID: 0}
-  victoryCutsceneObject: {fileID: 0}
 --- !u!4 &476064914
 Transform:
   m_ObjectHideFlags: 0
@@ -65635,6 +65617,26 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &476064915
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 476064912}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a09c61f6ada17d94fb8d5fc4ed271063, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  collectedPieces: 0
+  totalPiecesRequired: 4
+  puzzleMiniGameUI: {fileID: 1517797187}
+  playerController: {fileID: 1205354184}
+  victoryCutsceneTimeline: {fileID: 0}
+  victoryCutsceneObject: {fileID: 0}
+  handOpenTexture: {fileID: 2800000, guid: e2432f332c8b0e745a02876066811332, type: 3}
+  handClosedTexture: {fileID: 2800000, guid: 078a8b2ee8773c14780636891f631821, type: 3}
 --- !u!1001 &476092928
 PrefabInstance:
   m_ObjectHideFlags: 0

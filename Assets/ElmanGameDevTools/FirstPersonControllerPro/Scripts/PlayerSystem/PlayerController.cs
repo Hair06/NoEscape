@@ -78,9 +78,13 @@ namespace ElmanGameDevTools.PlayerSystem
         private bool _isGrounded;
         private bool _isCrouching;
         private bool _hasJumped;
-        private MovementState _currentMovementState = MovementState.Walking;
+        
+        // CÁC BIẾN LOGIC KHÓA CAMERA ĐÃ ĐƯỢC THÊM VÀO ĐÂY
+        private bool _isCameraLocked = false; 
+        private float _currentTiltState = 0f;
 
         public enum MovementState { Walking, Running, Crouching, Jumping }
+        private MovementState _currentMovementState = MovementState.Walking;
 
         // Các thuộc tính hỗ trợ đồng bộ mượt mà với script âm thanh bước chân (PlayerMusic)
         public bool IsGrounded => _isGrounded;
@@ -228,6 +232,18 @@ namespace ElmanGameDevTools.PlayerSystem
 
         private void HandleCameraControl()
         {
+            // === LOGIC KHÓA CAMERA QUYẾT ĐỊNH ĐÃ ĐƯỢC TÍCH HỢP ===
+            if (_isCameraLocked)
+            {
+                // Cưỡng ép giữ nguyên góc xoay hiện tại, chặn đứng chuột can thiệp
+                transform.rotation = Quaternion.Euler(0f, _currentYaw, 0f);
+                if (playerCamera != null)
+                {
+                    playerCamera.localRotation = Quaternion.Euler(_currentPitch, 0f, _currentTilt);
+                }
+                return; // Thoát hàm luôn, đóng băng chuột
+            }
+
             // Đọc tín hiệu di chuyển của chuột qua Input mới độc lập, không cần kéo thả Component bên ngoài
             Vector2 mouseDelta = Mouse.current != null ? Mouse.current.delta.ReadValue() : Vector2.zero;
             float mouseX = mouseDelta.x * sensitivity;
@@ -325,6 +341,50 @@ namespace ElmanGameDevTools.PlayerSystem
                 Gizmos.color = CanStandUp() ? Color.green : Color.red;
                 Gizmos.DrawWireSphere(standingHeightMarker.transform.position, standingCheckRadius);
             }
+        }
+
+        // ==========================================
+        // CÁC HÀM TIỆN ÍCH QUẢN LÝ KHÓA CAM (MỚI NÂNG CẤP)
+        // ==========================================
+
+        /// <summary>
+        /// Ép Camera phải quay ngay lập tức về một góc mong muốn và KHÓA CHẶT (Dùng cho Jumpscare/Cutscene)
+        /// </summary>
+        public void ForceLookAtDirection(Quaternion targetWorldRotation)
+        {
+            _isCameraLocked = true;
+
+            Vector3 euler = targetWorldRotation.eulerAngles;
+            _targetYaw = euler.y;
+            _currentYaw = euler.y;
+
+            float pitch = euler.x;
+            if (pitch > 180f) pitch -= 360f;
+
+            _targetPitch = Mathf.Clamp(pitch, maxLookDownAngle, maxLookUpAngle);
+            _currentPitch = _targetPitch;
+
+            transform.rotation = Quaternion.Euler(0f, _currentYaw, 0f);
+            if (playerCamera != null)
+            {
+                playerCamera.localRotation = Quaternion.Euler(_currentPitch, 0f, _currentTilt);
+            }
+        }
+
+        /// <summary>
+        /// Chỉ khóa cứng camera tại hướng hiện tại mà không xoay đi đâu (Dùng khi chơi Mini-game/Puzzle)
+        /// </summary>
+        public void LockCameraOnly()
+        {
+            _isCameraLocked = true;
+        }
+
+        /// <summary>
+        /// Hàm dùng để mở khóa góc quay chuột, trả lại tự do
+        /// </summary>
+        public void UnlockCamera()
+        {
+            _isCameraLocked = false;
         }
     }
 }
