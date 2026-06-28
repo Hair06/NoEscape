@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using TMPro;
-using ElmanGameDevTools.PlayerSystem; // tự tìm PlayerController Elman
 
 public class DiaryRead : MonoBehaviour
 {
@@ -36,11 +35,6 @@ public class DiaryRead : MonoBehaviour
     [Header("Âm thanh (có thể để trống)")]
     [SerializeField] private AudioSource drawerAudio;   // tiếng kéo ngăn
     [SerializeField] private AudioSource pageAudio;     // tiếng lật giấy
-
-    [Header("Khóa camera khi xem nhật ký (có thể để trống)")]
-    [Tooltip("Để trống sẽ tự tìm PlayerController trong scene")]
-    [SerializeField] private MonoBehaviour cameraScript;
-    private PlayerController autoFoundPlayer;
 
     // Biến cho bước sau (mini game băng keo) kiểm tra
     [HideInInspector] public bool hasReadDiary = false;
@@ -130,17 +124,6 @@ public class DiaryRead : MonoBehaviour
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
 
-        // Khóa điều khiển Player (di chuyển + camera)
-        if (cameraScript != null)
-        {
-            cameraScript.enabled = false;
-        }
-        else
-        {
-            autoFoundPlayer = FindFirstObjectByType<PlayerController>();
-            if (autoFoundPlayer != null) autoFoundPlayer.enabled = false;
-        }
-
         // Ẩn chữ hướng dẫn khi đang xem nhật ký
         if (promptText != null) promptText.gameObject.SetActive(false);
 
@@ -156,10 +139,6 @@ public class DiaryRead : MonoBehaviour
         // Khóa chuột lại để tiếp tục chơi
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
-
-        // Mở lại điều khiển Player
-        if (cameraScript != null) cameraScript.enabled = true;
-        else if (autoFoundPlayer != null) autoFoundPlayer.enabled = true;
 
         // Đánh dấu đã đọc xong -> mở khóa cho mini game băng keo
         hasReadDiary = true;
