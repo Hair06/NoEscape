@@ -182354,7 +182354,7 @@ PrefabInstance:
     - target: {fileID: 2223632770451406756, guid: 9a8f210322ee9df46ae960d1a9363dbd, type: 3}
       propertyPath: endCutscene
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 2055690569}
     - target: {fileID: 5160378225533204091, guid: 9a8f210322ee9df46ae960d1a9363dbd, type: 3}
       propertyPath: m_Name
       value: MusicBox Variant
