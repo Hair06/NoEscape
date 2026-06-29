@@ -8604,6 +8604,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c3c3f566946fd4d4ba4858b3a32729bc, type: 3}
+--- !u!1 &59757651 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2197994547849717711, guid: c3c3f566946fd4d4ba4858b3a32729bc, type: 3}
+  m_PrefabInstance: {fileID: 59757650}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &59758045
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -136238,6 +136243,11 @@ PrefabInstance:
       addedObject: {fileID: 2064171117}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4ed580d61d205ac4382fb9ad76382513, type: 3}
+--- !u!1 &989167970 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 9107276430643932033, guid: 4ed580d61d205ac4382fb9ad76382513, type: 3}
+  m_PrefabInstance: {fileID: 989167969}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &989311166
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -182408,6 +182418,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9a8f210322ee9df46ae960d1a9363dbd, type: 3}
+--- !u!1 &1327656914 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5160378225533204091, guid: 9a8f210322ee9df46ae960d1a9363dbd, type: 3}
+  m_PrefabInstance: {fileID: 1327656913}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1328022396
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -213074,6 +213089,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e2830cbae7a3379409ecc1f6bea494a5, type: 3}
+--- !u!1 &1550016896 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5364145969206034915, guid: e2830cbae7a3379409ecc1f6bea494a5, type: 3}
+  m_PrefabInstance: {fileID: 1550016895}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1550239568
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -283059,7 +283079,11 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   objectsToHide:
-  - {fileID: 0}
+  - {fileID: 1327656914}
+  - {fileID: 989167970}
+  - {fileID: 229146777}
+  - {fileID: 1550016896}
+  - {fileID: 59757651}
   afterCutsceneScare: {fileID: 0}
   scareDelay: 2
 --- !u!114 &2055690570
