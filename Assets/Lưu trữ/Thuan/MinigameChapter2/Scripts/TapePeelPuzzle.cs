@@ -1,4 +1,5 @@
 using UnityEngine;
+using ElmanGameDevTools.PlayerSystem; // tự tìm PlayerController Elman
 
 // Quản lý tổng mini game gỡ băng keo.
 // Gắn vào Panel UI chứa các miếng băng keo (TapePiece).
@@ -18,6 +19,7 @@ public class TapePeelPuzzle : MonoBehaviour
     [Header("Khóa camera khi chơi")]
     [Tooltip("Kéo Player (script vThirdPersonInput) vào đây để khóa lúc gỡ băng")]
     [SerializeField] private MonoBehaviour cameraScript;
+    private PlayerController autoFoundPlayer; // tự tìm nếu cameraScript trống
 
     [Header("Phần thưởng sau khi gỡ hết")]
     [Tooltip("Kéo Object Con Thoi Nhạc (để sẵn trong ngăn kéo) vào đây")]
@@ -71,7 +73,16 @@ public class TapePeelPuzzle : MonoBehaviour
         Cursor.visible = true;
 
         // Khóa camera để không xoay theo chuột khi đang gỡ băng
-        if (cameraScript != null) cameraScript.enabled = false;
+        if (cameraScript != null)
+        {
+            cameraScript.enabled = false;
+        }
+        else
+        {
+            autoFoundPlayer = FindFirstObjectByType<PlayerController>();
+            if (autoFoundPlayer != null) autoFoundPlayer.enabled = false;
+            else Debug.LogWarning("[TapePeelPuzzle] Không tìm thấy PlayerController để khóa camera!");
+        }
 
         Debug.Log("Mở mini game gỡ băng keo. Hãy kéo từng miếng để lột.");
     }
@@ -100,6 +111,7 @@ public class TapePeelPuzzle : MonoBehaviour
 
         // Bật lại camera cho người chơi đi tiếp
         if (cameraScript != null) cameraScript.enabled = true;
+        else if (autoFoundPlayer != null) autoFoundPlayer.enabled = true;
 
         // Hiện Con Thoi Nhạc để người chơi nhặt
         if (shuttleReward != null) shuttleReward.SetActive(true);
