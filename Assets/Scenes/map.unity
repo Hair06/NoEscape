@@ -76899,6 +76899,14 @@ MonoBehaviour:
     icon: {fileID: 21300000, guid: d1e6800ad9ebf1d4c96dcbb730016988, type: 3}
   - itemName: DenPin
     icon: {fileID: 21300000, guid: d300b8045c58bc649b1c7ffad74b71bf, type: 3}
+  - itemName: ManhGiay1
+    icon: {fileID: 21300000, guid: 21d1ce02fc1f9c34c8eb123e762afc5e, type: 3}
+  - itemName: ManhGiay2
+    icon: {fileID: 21300000, guid: 7dc4add2d2fc72f409e9bf432131865e, type: 3}
+  - itemName: ManhGiay3
+    icon: {fileID: 21300000, guid: b094baf175d24c542a5876d770f9dc19, type: 3}
+  - itemName: ManhGiay4
+    icon: {fileID: 21300000, guid: c30bd72235733d34e9acd27761f1f8b3, type: 3}
   slots:
   - {fileID: 1329098340}
   - {fileID: 1857262648}
@@ -296466,6 +296474,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8353112975692836827, guid: 3180d7ec7f4dc8940b85931d8c077460, type: 3}
+      propertyPath: itemName
+      value: ManhGiay2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8353112975692836827, guid: 3180d7ec7f4dc8940b85931d8c077460, type: 3}
       propertyPath: promptText
       value: 
       objectReference: {fileID: 1896452819}
@@ -296508,6 +296520,10 @@ PrefabInstance:
     - target: {fileID: 2079660661635711170, guid: 7d0afdddf297d0a459e9ece6febf9ced, type: 3}
       propertyPath: m_Center.z
       value: 2.8707616
+      objectReference: {fileID: 0}
+    - target: {fileID: 4752266852145966460, guid: 7d0afdddf297d0a459e9ece6febf9ced, type: 3}
+      propertyPath: itemName
+      value: ManhGiay4
       objectReference: {fileID: 0}
     - target: {fileID: 4752266852145966460, guid: 7d0afdddf297d0a459e9ece6febf9ced, type: 3}
       propertyPath: promptText
@@ -296656,6 +296672,10 @@ PrefabInstance:
     - target: {fileID: 8813575695494481434, guid: 99d9c4aeb96666d4a9ed60e77cabe1b4, type: 3}
       propertyPath: m_Center.z
       value: -2.0961862
+      objectReference: {fileID: 0}
+    - target: {fileID: 8881897974442154524, guid: 99d9c4aeb96666d4a9ed60e77cabe1b4, type: 3}
+      propertyPath: itemName
+      value: ManhGiay3
       objectReference: {fileID: 0}
     - target: {fileID: 8881897974442154524, guid: 99d9c4aeb96666d4a9ed60e77cabe1b4, type: 3}
       propertyPath: promptText
