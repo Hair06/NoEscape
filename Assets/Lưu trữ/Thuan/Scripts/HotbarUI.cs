@@ -6,15 +6,18 @@ public class HotbarUI : MonoBehaviour
     [System.Serializable]
     public class ItemIcon
     {
-        public string itemName;   // ten item (khop voi PickupItem)
-        public Sprite icon;       // anh icon cua item do
+        public string itemName;
+        public Sprite icon;
     }
 
     [Header("Danh sach icon cho tung loai item")]
-    public ItemIcon[] iconLibrary;   // khai bao Xang -> anh binh xang, BoPhan1 -> anh...
+    public ItemIcon[] iconLibrary;
 
     [Header("Cac o tren hotbar (keo theo thu tu)")]
-    public Image[] slots;            // o 0, o 1, o 2... (cac Image dat trong khung)
+    public Image[] slots;
+
+    [Header("O co dinh cho den pin (o cuoi)")]
+    public Image flashlightSlot;   // keo o cuoi cung vao day
 
     void Start()
     {
@@ -29,24 +32,36 @@ public class HotbarUI : MonoBehaviour
 
     void RefreshHotbar()
     {
-        // Duyet tung o
+        // Cac o thuong: dien theo thu tu nhat
         for (int i = 0; i < slots.Length; i++)
         {
             if (slots[i] == null) continue;
 
             if (i < PlayerInventory.items.Count)
             {
-                // O nay co item -> hien icon tuong ung
                 string name = PlayerInventory.items[i];
                 Sprite icon = FindIcon(name);
-
                 slots[i].sprite = icon;
                 slots[i].enabled = (icon != null);
             }
             else
             {
-                // O trong -> an icon
                 slots[i].enabled = false;
+            }
+        }
+
+        // O den pin: hien khi da nhat, an khi chua
+        if (flashlightSlot != null)
+        {
+            if (PlayerInventory.hasFlashlight)
+            {
+                Sprite icon = FindIcon("DenPin");
+                flashlightSlot.sprite = icon;
+                flashlightSlot.enabled = (icon != null);
+            }
+            else
+            {
+                flashlightSlot.enabled = false;
             }
         }
     }

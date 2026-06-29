@@ -1,7 +1,5 @@
 using UnityEngine;
 
-// Bản dùng IInteractable (tương thích Player mới Elman + PlayerInteraction raycast).
-// Nhìn vào Lò Xo Nhạc và nhấn E để nhặt -> báo hộp nhạc.
 public class SpringPartCollect : MonoBehaviour, IInteractable
 {
     [Header("Chữ gợi ý khi nhìn vào")]
@@ -10,21 +8,20 @@ public class SpringPartCollect : MonoBehaviour, IInteractable
     [Header("Âm thanh khi nhặt (có thể để trống)")]
     [SerializeField] private AudioClip collectSound;
 
-    // PlayerInteraction gọi hàm này để lấy chữ hiển thị
     public string GetInteractPrompt()
     {
         return interactMessage;
     }
 
-    // PlayerInteraction gọi hàm này khi người chơi nhìn vào và nhấn E
     public void Interact()
     {
         if (collectSound != null)
             AudioSource.PlayClipAtPoint(collectSound, transform.position);
 
-        // Báo về hộp nhạc: đã có Lò Xo Nhạc
         if (MusicBoxRestore.Instance != null)
             MusicBoxRestore.Instance.CollectPart(MusicBoxRestore.MusicBoxPart.Spring);
+
+        PlayerInventory.Add("LoXo");   // them vao hotbar
 
         Debug.Log("Đã nhặt Lò Xo Nhạc!");
 
