@@ -65,9 +65,9 @@ public class ItemViewer : MonoBehaviour
         currentActualCollectible = actualCollectible;
 
         // Khóa di chuyển nhân vật Invector để không bị đi lung tung khi đang ngắm ảnh
-        if (Chapter1Manager.Instance != null && Chapter1Manager.Instance.playerInputSystem != null)
+        if (Chapter1Manager.Instance != null && Chapter1Manager.Instance.playerController != null)
         {
-            Chapter1Manager.Instance.playerInputSystem.enabled = false;
+            Chapter1Manager.Instance.playerController.enabled = false;
         }
 
         // Mở khóa chuột để người chơi tương tác xoay
@@ -100,9 +100,9 @@ public class ItemViewer : MonoBehaviour
         }
 
         // Trả lại quyền di chuyển cho Player Invector
-        if (Chapter1Manager.Instance != null && Chapter1Manager.Instance.playerInputSystem != null)
+        if (Chapter1Manager.Instance != null && Chapter1Manager.Instance.playerController != null)
         {
-            Chapter1Manager.Instance.playerInputSystem.enabled = true;
+            Chapter1Manager.Instance.playerController.enabled = true;
         }
 
         Cursor.lockState = CursorLockMode.Locked;
