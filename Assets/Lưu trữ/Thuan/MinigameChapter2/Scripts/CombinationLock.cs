@@ -34,7 +34,7 @@ public class CombinationLock : MonoBehaviour, IInteractable
 
     [Header("Ổ khóa bay lên cận cảnh")]
     [SerializeField] private Transform lockBody;
-    [SerializeField] private float closeUpDistance = 0.6f;
+    [SerializeField] private float closeUpDistance = 0.3f;
     [SerializeField] private float closeUpYOffset = 0f;
     [SerializeField] private Vector3 closeUpEuler = new Vector3(0, 180, 0);
     [SerializeField] private float moveSpeed = 8f;
@@ -302,15 +302,7 @@ public class CombinationLock : MonoBehaviour, IInteractable
 
     private void MoveToCloseUp()
     {
-        // Tự tìm camera nếu chưa gán (ưu tiên camera của Player đang chạy)
-        if (gameCamera == null) gameCamera = Camera.main;
-        if (gameCamera == null && autoFoundPlayer != null)
-            gameCamera = autoFoundPlayer.GetComponentInChildren<Camera>();
-        if (gameCamera == null)
-        {
-            Debug.LogWarning("[CombinationLock] Không tìm thấy camera để đưa ổ khóa cận cảnh!");
-            return;
-        }
+        if (gameCamera == null) return;
         lockBody.SetParent(null);
 
         // Sau khi đổi parent, ghi lại góc gốc các vòng cho chuẩn

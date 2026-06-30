@@ -1,13 +1,11 @@
 using UnityEngine;
-using UnityEngine.InputSystem; // Sử dụng thư viện Input mới để đồng bộ với PlayerController
-using ElmanGameDevTools.PlayerSystem; // Gọi namespace chứa PlayerController mới
 
 public class ItemViewer : MonoBehaviour
 {
     public static ItemViewer Instance;
 
     [Header("Giao diện UI Soi Vật Phẩm")]
-    [SerializeField] private GameObject viewerUI; // Kéo ô Object "Viewer_UI" vào đây
+    [SerializeField] private GameObject viewerUI; // Kéo ô Object "Viewer_UI" (chứa chữ hướng dẫn nút bấm) vào đây
     [SerializeField] private Transform inspectPoint; // Kéo ô Object trống "Inspect_Point" trước Camera vào đây
 
     [Header("Tốc độ xoay chuột")]
@@ -32,32 +30,27 @@ public class ItemViewer : MonoBehaviour
     {
         if (!isInspecting) return;
 
-        // 1. Giữ chuột trái và di chuyển chuột để xoay vật phẩm 3D tự do
-        if (Mouse.current != null && Mouse.current.leftButton.isPressed && currentInspectItem != null)
+        // 1. Giữ chuột trái và di chuyển chuột để xoay vật phẩm 3D tự do các hướng để soi mặt trước/sau
+        if (Input.GetMouseButton(0) && currentInspectItem != null)
         {
-            // Thay thế Input.GetAxis cũ bằng Mouse.current.delta của New Input System để không bị đơ
-            Vector2 mouseDelta = Mouse.current.delta.ReadValue() * 0.05f; 
-            float rotX = mouseDelta.x * rotationSpeed * Mathf.Deg2Rad;
-            float rotY = mouseDelta.y * rotationSpeed * Mathf.Deg2Rad;
+            float rotX = Input.GetAxis("Mouse X") * rotationSpeed * Mathf.Deg2Rad;
+            float rotY = Input.GetAxis("Mouse Y") * rotationSpeed * Mathf.Deg2Rad;
 
             // Thực hiện xoay theo trục ngang và trục dọc màn hình
             currentInspectItem.transform.Rotate(Vector3.up, -rotX, Space.World);
             currentInspectItem.transform.Rotate(Vector3.right, rotY, Space.World);
         }
 
-        if (Keyboard.current != null)
+        // 2. Nhấn E để quyết định nhặt hẳn mảnh này vào túi bỏ vào tiến trình game
+        if (Input.GetKeyDown(KeyCode.E))
         {
-            // 2. Nhấn E để quyết định nhặt hẳn mảnh này vào túi
-            if (Keyboard.current.eKey.wasPressedThisFrame)
-            {
-                CollectCurrentItem();
-            }
+            CollectCurrentItem();
+        }
 
-            // 3. Nhấn F hoặc ESC để hủy bỏ, trả mảnh ghép về vị trí cũ
-            if (Keyboard.current.fKey.wasPressedThisFrame || Keyboard.current.escapeKey.wasPressedThisFrame)
-            {
-                CloseInspect(false);
-            }
+        // 3. Nhấn F hoặc ESC để hủy bỏ, trả mảnh ghép về vị trí cũ ngoài môi trường
+        if (Input.GetKeyDown(KeyCode.F) || Input.GetKeyDown(KeyCode.Escape))
+        {
+            CloseInspect(false);
         }
     }
 
@@ -65,19 +58,19 @@ public class ItemViewer : MonoBehaviour
     {
         if (isInspecting) return;
 
+        // TỰ ĐỘNG BẬT: Kích hoạt chính nó và Camera phụ lên ngay khi bắt đầu soi
         gameObject.SetActive(true);
 
         isInspecting = true;
         currentActualCollectible = actualCollectible;
 
-        // === FIX LỖI 1: TẮT DI CHUYỂN VÀ KHÓA CHUỘT PLAYER GÓC NHÌN THỨ NHẤT ===
-        if (Chapter1Manager.Instance != null && Chapter1Manager.Instance.playerController != null)
+        // Khóa di chuyển nhân vật Invector để không bị đi lung tung khi đang ngắm ảnh
+        if (Chapter1Manager.Instance != null && Chapter1Manager.Instance.playerInputSystem != null)
         {
-            Chapter1Manager.Instance.playerController.enabled = false;   // Khóa di chuyển WASD
-            Chapter1Manager.Instance.playerController.LockCameraOnly(); // Khóa cứng camera chính không bị lắc theo vật phẩm
+            Chapter1Manager.Instance.playerInputSystem.enabled = false;
         }
 
-        // Mở khóa con trỏ chuột tự do để người chơi click giữ xoay vật phẩm giải đố
+        // Mở khóa chuột để người chơi tương tác xoay
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
 
@@ -100,21 +93,22 @@ public class ItemViewer : MonoBehaviour
         if (currentInspectItem != null) Destroy(currentInspectItem);
         if (viewerUI != null) viewerUI.SetActive(false);
 
+        // Nếu người chơi nhấn thoát chứ không nhặt, ta hiện lại mảnh đó ở ngoài map
         if (!isCollected && currentActualCollectible != null)
         {
             currentActualCollectible.CancelInspect();
         }
 
-        // === FIX LỖI 2: TRẢ LẠI TOÀN BỘ QUYỀN ĐIỀU KHIỂN CHO PLAYER GÓC NHÌN THỨ NHẤT ===
-        if (Chapter1Manager.Instance != null && Chapter1Manager.Instance.playerController != null)
+        // Trả lại quyền di chuyển cho Player Invector
+        if (Chapter1Manager.Instance != null && Chapter1Manager.Instance.playerInputSystem != null)
         {
-            Chapter1Manager.Instance.playerController.UnlockCamera(); // Mở lại camera quay chuột chơi game
-            Chapter1Manager.Instance.playerController.enabled = true;   // Mở lại di chuyển WASD
+            Chapter1Manager.Instance.playerInputSystem.enabled = true;
         }
 
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
 
+        // TỰ ĐỘNG TẮT: Ẩn trạm soi đi sau khi hoàn thành để trả lại màn hình góc nhìn gốc cho Player
         gameObject.SetActive(false);
     }
 
