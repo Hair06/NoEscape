@@ -2,6 +2,8 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using TMPro;
 
+// Gắn vào Object Con Thoi Nhạc (bộ phận 1 của hộp nhạc).
+// Object này tắt sẵn, chỉ bật khi gỡ hết băng keo (TapePeelPuzzle bật lên).
 public class ShuttlePartCollect : MonoBehaviour
 {
     [Header("UI hướng dẫn (TextMeshPro)")]
@@ -30,16 +32,17 @@ public class ShuttlePartCollect : MonoBehaviour
 
     private void CollectPart()
     {
+        // Phát âm thanh nhặt tại vị trí Con Thoi
         if (collectSound != null)
             AudioSource.PlayClipAtPoint(collectSound, transform.position);
 
+        // Báo về hộp nhạc: đã có bộ phận Con Thoi
         if (MusicBoxRestore.Instance != null)
             MusicBoxRestore.Instance.CollectPart(MusicBoxRestore.MusicBoxPart.Shuttle);
 
-        PlayerInventory.Add("ConThoi");   // them vao hotbar
-
         Debug.Log("Đã nhặt Con Thoi Nhạc! (Bộ phận 1/4)");
 
+        // Ẩn chữ và hủy Object
         if (promptText != null) promptText.gameObject.SetActive(false);
         Destroy(gameObject);
     }

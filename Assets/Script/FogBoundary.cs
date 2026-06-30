@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class FogBoundary : MonoBehaviour
 {
@@ -21,14 +21,21 @@ public class FogBoundary : MonoBehaviour
 
         for (int i = 0; i < count; i++)
         {
-            Vector3 worldPos = fogParticles.transform.TransformPoint(particles[i].position);
+            // Thử cả 2 cách lấy position
+            Vector3 localPos = particles[i].position;
+            Vector3 worldPos = fogParticles.transform.TransformPoint(localPos);
+
+            // Debug vị trí particle đầu tiên
+            if (i == 0)
+                Debug.Log($"Particle[0] local={localPos} world={worldPos}");
 
             foreach (Collider zone in blockedZones)
             {
-                Vector3 closest = zone.ClosestPoint(worldPos);
-                float dist = Vector3.Distance(closest, worldPos);
+                // Debug bounds của collider
+                if (i == 0)
+                    Debug.Log($"Zone bounds: center={zone.bounds.center} size={zone.bounds.size}");
 
-                if (dist < 0.01f)
+                if (zone.bounds.Contains(worldPos) || zone.bounds.Contains(localPos))
                 {
                     particles[i].remainingLifetime = 0f;
                     break;

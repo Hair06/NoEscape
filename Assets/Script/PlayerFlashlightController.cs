@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem; // BẮT BUỘC: Thêm thư viện này để nhận diện phím F đồng bộ
 
 public class PlayerFlashlightController : MonoBehaviour
 {
@@ -21,8 +22,8 @@ public class PlayerFlashlightController : MonoBehaviour
         // Nếu chưa nhặt được đèn thì không cho làm gì cả
         if (!hasFlashlight) return;
 
-        // Nhấn phím F (hoặc đổi thành KeyCode.Mouse0 nếu muốn dùng chuột trái) để bật/tắt
-        if (GameInputBridge.GetKeyDown(KeyCode.F))
+        // ĐÃ SỬA: Chuyển sang Input System mới đồng bộ với PlayerController
+        if (Keyboard.current != null && Keyboard.current.fKey.wasPressedThisFrame)
         {
             ToggleFlashlight();
         }
@@ -49,10 +50,13 @@ public class PlayerFlashlightController : MonoBehaviour
         if (flashlightLight != null)
         {
             flashlightLight.enabled = isLightOn;
-            
-            // Bạn có thể thêm âm thanh click tại đây nếu có:
-            // AudioSource.PlayClipAtPoint(clickSound, transform.position);
             Debug.Log(isLightOn ? "Đã bật đèn pin" : "Đã tắt đèn pin");
         }
+    }
+
+    // Hàm tiện ích để các script khác có thể check xem Player đã có đèn pin chưa
+    public bool HasFlashlight()
+    {
+        return hasFlashlight;
     }
 }

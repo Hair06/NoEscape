@@ -14,7 +14,7 @@ PlayerSettings:
   accelerometerFrequency: 60
   companyName: DefaultCompany
   productName: NoEscape
-  defaultCursor: {fileID: 2800000, guid: e2432f332c8b0e745a02876066811332, type: 3}
+  defaultCursor: {fileID: 2800000, guid: 75b0c0b4e8c3694428a8063e3ffd30ac, type: 3}
   cursorHotspot: {x: 0, y: 0}
   m_SplashScreenBackgroundColor: {r: 0, g: 0, b: 0, a: 1}
   m_ShowUnitySplashScreen: 1
