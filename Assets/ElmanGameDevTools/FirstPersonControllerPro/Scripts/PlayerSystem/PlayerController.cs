@@ -79,9 +79,8 @@ namespace ElmanGameDevTools.PlayerSystem
         private bool _isCrouching;
         private bool _hasJumped;
         
-        // CÁC BIẾN LOGIC KHÓA CAMERA ĐÃ ĐƯỢC THÊM VÀO ĐÂY
+        // BIẾN QUẢN LÝ KHÓA CAMERA KHI CHƠI MINI-GAME VÀ JUMPSCARE
         private bool _isCameraLocked = false; 
-        private float _currentTiltState = 0f;
 
         public enum MovementState { Walking, Running, Crouching, Jumping }
         private MovementState _currentMovementState = MovementState.Walking;
@@ -232,16 +231,16 @@ namespace ElmanGameDevTools.PlayerSystem
 
         private void HandleCameraControl()
         {
-            // === LOGIC KHÓA CAMERA QUYẾT ĐỊNH ĐÃ ĐƯỢC TÍCH HỢP ===
+            // === LOGIC KHÓA CAMERA NẾU ĐANG CHƠI MINI-GAME ===
             if (_isCameraLocked)
             {
-                // Cưỡng ép giữ nguyên góc xoay hiện tại, chặn đứng chuột can thiệp
+                // Cưỡng ép đóng băng góc quay hiện tại, chặn đứng chuột xoay camera chính
                 transform.rotation = Quaternion.Euler(0f, _currentYaw, 0f);
                 if (playerCamera != null)
                 {
                     playerCamera.localRotation = Quaternion.Euler(_currentPitch, 0f, _currentTilt);
                 }
-                return; // Thoát hàm luôn, đóng băng chuột
+                return; // Thoát ra luôn, không đọc di chuột dưới nữa
             }
 
             // Đọc tín hiệu di chuyển của chuột qua Input mới độc lập, không cần kéo thả Component bên ngoài
@@ -309,7 +308,6 @@ namespace ElmanGameDevTools.PlayerSystem
             playerCamera.localPosition = Vector3.Lerp(playerCamera.localPosition, newPos, Time.deltaTime * bobSmoothness);
         }
 
-        // Hàm đọc phím mô phỏng GetAxis bằng cụm phím di chuyển W, A, S, D mới
         private Vector2 GetMoveInput()
         {
             if (Keyboard.current == null) return Vector2.zero;
@@ -344,11 +342,11 @@ namespace ElmanGameDevTools.PlayerSystem
         }
 
         // ==========================================
-        // CÁC HÀM TIỆN ÍCH QUẢN LÝ KHÓA CAM (MỚI NÂNG CẤP)
+        // CÁC HÀM QUẢN LÝ KHÓA/MỞ KHÓA CAMERA 
         // ==========================================
 
         /// <summary>
-        /// Ép Camera phải quay ngay lập tức về một góc mong muốn và KHÓA CHẶT (Dùng cho Jumpscare/Cutscene)
+        /// Ép Camera xoay ngay lập tức về hướng chỉ định và khóa cứng (Dùng cho Jumpscare/Cutscene)
         /// </summary>
         public void ForceLookAtDirection(Quaternion targetWorldRotation)
         {
@@ -372,7 +370,7 @@ namespace ElmanGameDevTools.PlayerSystem
         }
 
         /// <summary>
-        /// Chỉ khóa cứng camera tại hướng hiện tại mà không xoay đi đâu (Dùng khi chơi Mini-game/Puzzle)
+        /// Chỉ khóa cứng góc nhìn camera hiện tại (Dùng khi chơi Mini-game giải đố)
         /// </summary>
         public void LockCameraOnly()
         {
@@ -380,7 +378,7 @@ namespace ElmanGameDevTools.PlayerSystem
         }
 
         /// <summary>
-        /// Hàm dùng để mở khóa góc quay chuột, trả lại tự do
+        /// Mở khóa camera, trả lại quyền xoay chuột tự do cho người chơi
         /// </summary>
         public void UnlockCamera()
         {

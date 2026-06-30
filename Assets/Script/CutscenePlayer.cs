@@ -10,7 +10,6 @@ public class CutscenePlayer : MonoBehaviour
     public Image imageA;
     public Image imageB;
     public TextMeshProUGUI dialogueText;
-    public AudioSource audioSource; // ← THÊM MỚI
 
     public CutsceneFrame[] frames;
 
@@ -35,35 +34,44 @@ public class CutscenePlayer : MonoBehaviour
     void Update()
     {
         if (GameInputBridge.GetKeyDown(KeyCode.Space) || GameInputBridge.GetMouseButtonDown(0))
+        {
             nextFrameRequested = true;
+        }
 
         HandleHoldSkip();
     }
 
     void HandleHoldSkip()
-    {
-        if (frames == null || frames.Length == 0) return;
-        if (currentFrameIndex >= skipToFrameNumber - 1) return;
-        if (Keyboard.current == null) return;
+{
+    if (frames == null || frames.Length == 0) return;
 
-        if (Keyboard.current.eKey.isPressed)
+    if (currentFrameIndex >= skipToFrameNumber - 1) return;
+
+    if (Keyboard.current == null) return;
+
+    if (Keyboard.current.eKey.isPressed)
+    {
+        holdTimer += Time.deltaTime;
+
+        if (holdTimer >= holdSkipTime)
         {
-            holdTimer += Time.deltaTime;
-            if (holdTimer >= holdSkipTime)
-            {
-                skipToFrameRequested = true;
-                holdTimer = 0f;
-            }
-        }
-        else
-        {
+            skipToFrameRequested = true;
             holdTimer = 0f;
         }
     }
+    else
+    {
+        holdTimer = 0f;
+    }
+}
 
     IEnumerator PlayCutscene()
     {
-        if (frames.Length == 0) { EndCutscene(); yield break; }
+        if (frames.Length == 0)
+        {
+            EndCutscene();
+            yield break;
+        }
 
         imageA.sprite = frames[0].image;
         SetImageAlpha(imageA, 1);
@@ -81,6 +89,7 @@ public class CutscenePlayer : MonoBehaviour
             }
 
             currentFrameIndex = i;
+
             yield return CrossFade(frames[i]);
             yield return ShowFrame(frames[i]);
         }
@@ -93,36 +102,39 @@ public class CutscenePlayer : MonoBehaviour
         nextFrameRequested = false;
         dialogueText.text = "";
 
-        // ← THÊM MỚI: Play âm thanh lồng tiếng
-        if (audioSource != null && frame.voiceClip != null)
-        {
-            audioSource.Stop();
-            audioSource.clip = frame.voiceClip;
-            audioSource.Play();
-        }
-
         foreach (char c in frame.dialogue)
         {
-            if (skipToFrameRequested) yield break;
+            if (skipToFrameRequested)
+            {
+                yield break;
+            }
+
             if (nextFrameRequested)
             {
                 dialogueText.text = frame.dialogue;
                 nextFrameRequested = false;
                 break;
             }
+
             dialogueText.text += c;
             yield return new WaitForSeconds(typeSpeed);
         }
 
         float timer = 0;
+
         while (timer < frame.waitTime)
         {
-            if (skipToFrameRequested) yield break;
+            if (skipToFrameRequested)
+            {
+                yield break;
+            }
+
             if (nextFrameRequested)
             {
                 nextFrameRequested = false;
                 yield break;
             }
+
             timer += Time.deltaTime;
             yield return null;
         }
@@ -134,13 +146,20 @@ public class CutscenePlayer : MonoBehaviour
         SetImageAlpha(imageB, 0);
 
         float timer = 0;
+
         while (timer < fadeDuration)
         {
-            if (skipToFrameRequested) yield break;
+            if (skipToFrameRequested)
+            {
+                yield break;
+            }
+
             timer += Time.deltaTime;
             float t = timer / fadeDuration;
+
             SetImageAlpha(imageA, 1 - t);
             SetImageAlpha(imageB, t);
+
             yield return null;
         }
 
@@ -151,7 +170,6 @@ public class CutscenePlayer : MonoBehaviour
 
     void EndCutscene()
     {
-        if (audioSource != null) audioSource.Stop();
         SceneManager.LoadScene(nextSceneName);
     }
 

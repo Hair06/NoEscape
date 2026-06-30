@@ -2,6 +2,8 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using TMPro;
 
+// Gắn vào Object đĩa hoàn chỉnh 3D (hiện ra sau khi ghép xong mini game).
+// Người chơi tới gần nhấn E để nhặt -> đĩa biến mất -> báo hộp nhạc.
 public class DiscPartCollect : MonoBehaviour
 {
     [Header("UI hướng dẫn (TextMeshPro)")]
@@ -30,16 +32,17 @@ public class DiscPartCollect : MonoBehaviour
 
     private void CollectPart()
     {
+        // Phát âm thanh nhặt tại vị trí đĩa
         if (collectSound != null)
             AudioSource.PlayClipAtPoint(collectSound, transform.position);
 
+        // Báo về hộp nhạc: đã có Đĩa Nhạc
         if (MusicBoxRestore.Instance != null)
             MusicBoxRestore.Instance.CollectPart(MusicBoxRestore.MusicBoxPart.Disc);
 
-        PlayerInventory.Add("DiaNhac");   // them vao hotbar
-
         Debug.Log("Đã nhặt Đĩa Nhạc!");
 
+        // Ẩn chữ và hủy đĩa
         if (promptText != null) promptText.gameObject.SetActive(false);
         Destroy(gameObject);
     }

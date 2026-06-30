@@ -11,14 +11,14 @@ public class FlashlightItem : MonoBehaviour, IInteractable
 
     public void Interact()
     {
+        // Tìm script điều khiển đèn trên người Player
         PlayerFlashlightController playerFlashlight = FindFirstObjectByType<PlayerFlashlightController>();
 
         if (playerFlashlight != null)
         {
-            playerFlashlight.EquipFlashlight();
-            PlayerInventory.hasFlashlight = true;   // danh dau da co den pin
+            playerFlashlight.EquipFlashlight(); // Kích hoạt đèn trên tay
             Debug.Log("Đã nhặt và trang bị đèn pin lên tay!");
-            Destroy(gameObject);
+            Destroy(gameObject); // Xóa cây đèn dưới đất
         }
     }
 }
