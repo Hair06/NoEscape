@@ -65906,9 +65906,11 @@ MonoBehaviour:
   collectedPieces: 0
   totalPiecesRequired: 4
   puzzleMiniGameUI: {fileID: 1517797187}
-  playerInputSystem: {fileID: 0}
+  playerController: {fileID: 1205354184}
   victoryCutsceneTimeline: {fileID: 0}
   victoryCutsceneObject: {fileID: 0}
+  handOpenTexture: {fileID: 2800000, guid: 75b0c0b4e8c3694428a8063e3ffd30ac, type: 3}
+  handClosedTexture: {fileID: 2800000, guid: ea24373d75d575447b471a64635a6b28, type: 3}
 --- !u!4 &476064914
 Transform:
   m_ObjectHideFlags: 0
@@ -151793,7 +151795,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1092190086
 Transform:
   m_ObjectHideFlags: 0
@@ -166029,7 +166031,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   handFlashlight: {fileID: 1092190085}
-  flashlightLight: {fileID: 0}
+  flashlightLight: {fileID: 872375311}
 --- !u!114 &1205354183
 MonoBehaviour:
   m_ObjectHideFlags: 0
