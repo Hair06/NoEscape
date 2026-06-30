@@ -6,12 +6,21 @@ using System.Text;
 public class PlayerInteraction : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI promptText;
+    [SerializeField] private ItemPromptUI itemPromptUI;
 
     private IInteractable currentInteractable;
     private ItemInfoData currentItemInfo;
     private Transform currentItemRoot;
     private bool promptHiddenForCurrentTarget;
     private readonly HashSet<Collider> nearbyColliders = new HashSet<Collider>();
+
+    private void Awake()
+    {
+        if (itemPromptUI == null)
+        {
+            itemPromptUI = FindFirstObjectByType<ItemPromptUI>(FindObjectsInactive.Include);
+        }
+    }
 
     void Update()
     {
@@ -178,6 +187,12 @@ public class PlayerInteraction : MonoBehaviour
 
     private void HidePrompt()
     {
+        if (itemPromptUI != null)
+        {
+            itemPromptUI.Hide();
+            return;
+        }
+
         if (promptText != null)
         {
             promptText.gameObject.SetActive(false);
@@ -209,12 +224,29 @@ public class PlayerInteraction : MonoBehaviour
 
     private void UpdatePrompt()
     {
-        if (promptText == null) return;
         if (promptHiddenForCurrentTarget)
         {
             HidePrompt();
             return;
         }
+
+        string interactPrompt = null;
+        if (currentInteractable != null)
+        {
+            interactPrompt = currentInteractable.GetInteractPrompt();
+            if (string.IsNullOrWhiteSpace(interactPrompt))
+            {
+                interactPrompt = "[E] Nh\u1eb7t v\u1eadt ph\u1ea9m";
+            }
+        }
+
+        if (itemPromptUI != null)
+        {
+            itemPromptUI.Show(currentItemInfo != null, interactPrompt);
+            return;
+        }
+
+        if (promptText == null) return;
 
         StringBuilder builder = new StringBuilder();
         if (currentItemInfo != null)
@@ -222,14 +254,10 @@ public class PlayerInteraction : MonoBehaviour
             builder.Append("I - Xem th\u00f4ng tin v\u1eadt ph\u1ea9m");
         }
 
-        if (currentInteractable != null)
+        if (!string.IsNullOrWhiteSpace(interactPrompt))
         {
-            string interactPrompt = currentInteractable.GetInteractPrompt();
-            if (!string.IsNullOrWhiteSpace(interactPrompt))
-            {
-                if (builder.Length > 0) builder.AppendLine();
-                builder.Append(interactPrompt);
-            }
+            if (builder.Length > 0) builder.AppendLine();
+            builder.Append(interactPrompt);
         }
 
         if (builder.Length > 0)
@@ -319,10 +347,7 @@ public class PlayerInteraction : MonoBehaviour
         IInteractable interactable = collider.GetComponent<IInteractable>();
         if (interactable != null) return interactable;
 
-        interactable = collider.GetComponentInParent<IInteractable>();
-        if (interactable != null) return interactable;
-
-        return collider.GetComponentInChildren<IInteractable>();
+        return collider.GetComponentInParent<IInteractable>();
     }
 
     private static ItemInfoData GetItemInfoFromComponent(Component component)
@@ -330,10 +355,7 @@ public class PlayerInteraction : MonoBehaviour
         ItemInfoData itemInfo = component.GetComponent<ItemInfoData>();
         if (itemInfo != null) return itemInfo;
 
-        itemInfo = component.GetComponentInParent<ItemInfoData>();
-        if (itemInfo != null) return itemInfo;
-
-        return component.GetComponentInChildren<ItemInfoData>();
+        return component.GetComponentInParent<ItemInfoData>();
     }
 
     private readonly struct NearbyItemTarget
