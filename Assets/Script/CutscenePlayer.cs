@@ -7,24 +7,30 @@ using UnityEngine.InputSystem;
 
 public class CutscenePlayer : MonoBehaviour
 {
+    [Header("UI References")]
     public Image imageA;
     public Image imageB;
     public TextMeshProUGUI dialogueText;
+    public AudioSource audioSource;
 
+    [Header("Frames")]
     public CutsceneFrame[] frames;
 
+    [Header("Settings")]
     public float fadeDuration = 0.8f;
     public float typeSpeed = 0.035f;
     public string nextSceneName = "map";
 
-    [Header("Hold E để skip tới frame 27")]
+    [Header("Skip Settings")]
     public float holdSkipTime = 2f;
-    public int skipToFrameNumber = 27;
+    public int skipToFrameIndex = 26; // Frame bắt đầu từ 0
 
-    private bool nextFrameRequested = false;
-    private bool skipToFrameRequested = false;
-    private int currentFrameIndex = 0;
-    private float holdTimer = 0f;
+    // Private
+    private int _currentIndex = 0;
+    private float _holdTimer = 0f;
+    private bool _nextRequested = false;
+    private bool _skipRequested = false;
+    private bool _isPlaying = false;
 
     void Start()
     {
@@ -33,62 +39,71 @@ public class CutscenePlayer : MonoBehaviour
 
     void Update()
     {
-        if (GameInputBridge.GetKeyDown(KeyCode.Space) || GameInputBridge.GetMouseButtonDown(0))
-        {
-            nextFrameRequested = true;
-        }
-
+        HandleNextInput();
         HandleHoldSkip();
     }
 
-    void HandleHoldSkip()
-{
-    if (frames == null || frames.Length == 0) return;
+    // ── Input ──────────────────────────────────────────────
 
-    if (currentFrameIndex >= skipToFrameNumber - 1) return;
-
-    if (Keyboard.current == null) return;
-
-    if (Keyboard.current.eKey.isPressed)
+    void HandleNextInput()
     {
-        holdTimer += Time.deltaTime;
+        bool spacePressed = Keyboard.current != null && Keyboard.current.spaceKey.wasPressedThisFrame;
+        bool mouseClicked = Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame;
 
-        if (holdTimer >= holdSkipTime)
+        if (spacePressed || mouseClicked)
+            _nextRequested = true;
+    }
+
+    void HandleHoldSkip()
+    {
+        if (frames == null || _currentIndex >= skipToFrameIndex) return;
+        if (Keyboard.current == null) return;
+
+        if (Keyboard.current.eKey.isPressed)
         {
-            skipToFrameRequested = true;
-            holdTimer = 0f;
+            _holdTimer += Time.deltaTime;
+            if (_holdTimer >= holdSkipTime)
+            {
+                _skipRequested = true;
+                _holdTimer = 0f;
+            }
+        }
+        else
+        {
+            _holdTimer = 0f;
         }
     }
-    else
-    {
-        holdTimer = 0f;
-    }
-}
+
+    // ── Playback ───────────────────────────────────────────
 
     IEnumerator PlayCutscene()
     {
-        if (frames.Length == 0)
+        if (frames == null || frames.Length == 0)
         {
             EndCutscene();
             yield break;
         }
 
-        imageA.sprite = frames[0].image;
-        SetImageAlpha(imageA, 1);
-        SetImageAlpha(imageB, 0);
+        _isPlaying = true;
 
-        currentFrameIndex = 0;
+        // Frame đầu tiên không cần crossfade
+        imageA.sprite = frames[0].image;
+        SetAlpha(imageA, 1f);
+        SetAlpha(imageB, 0f);
+        _currentIndex = 0;
+
         yield return ShowFrame(frames[0]);
 
         for (int i = 1; i < frames.Length; i++)
         {
-            if (skipToFrameRequested)
+            // Skip tới frame chỉ định
+            if (_skipRequested)
             {
-                i = skipToFrameNumber - 1;
-                skipToFrameRequested = false;
+                i = skipToFrameIndex;
+                _skipRequested = false;
             }
 
-            currentFrameIndex = i;
+            _currentIndex = i;
 
             yield return CrossFade(frames[i]);
             yield return ShowFrame(frames[i]);
@@ -99,20 +114,21 @@ public class CutscenePlayer : MonoBehaviour
 
     IEnumerator ShowFrame(CutsceneFrame frame)
     {
-        nextFrameRequested = false;
+        _nextRequested = false;
         dialogueText.text = "";
 
+        // Play voice
+        PlayVoice(frame.voiceClip);
+
+        // Typewriter effect
         foreach (char c in frame.dialogue)
         {
-            if (skipToFrameRequested)
-            {
-                yield break;
-            }
+            if (_skipRequested) yield break;
 
-            if (nextFrameRequested)
+            if (_nextRequested)
             {
                 dialogueText.text = frame.dialogue;
-                nextFrameRequested = false;
+                _nextRequested = false;
                 break;
             }
 
@@ -120,22 +136,14 @@ public class CutscenePlayer : MonoBehaviour
             yield return new WaitForSeconds(typeSpeed);
         }
 
-        float timer = 0;
-
-        while (timer < frame.waitTime)
+        // Chờ sau khi text hiện xong
+        float elapsed = 0f;
+        while (elapsed < frame.waitTime)
         {
-            if (skipToFrameRequested)
-            {
-                yield break;
-            }
+            if (_skipRequested) yield break;
+            if (_nextRequested) { _nextRequested = false; yield break; }
 
-            if (nextFrameRequested)
-            {
-                nextFrameRequested = false;
-                yield break;
-            }
-
-            timer += Time.deltaTime;
+            elapsed += Time.deltaTime;
             yield return null;
         }
     }
@@ -143,40 +151,48 @@ public class CutscenePlayer : MonoBehaviour
     IEnumerator CrossFade(CutsceneFrame frame)
     {
         imageB.sprite = frame.image;
-        SetImageAlpha(imageB, 0);
+        SetAlpha(imageB, 0f);
 
-        float timer = 0;
-
-        while (timer < fadeDuration)
+        float elapsed = 0f;
+        while (elapsed < fadeDuration)
         {
-            if (skipToFrameRequested)
-            {
-                yield break;
-            }
+            if (_skipRequested) yield break;
 
-            timer += Time.deltaTime;
-            float t = timer / fadeDuration;
+            elapsed += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / fadeDuration);
 
-            SetImageAlpha(imageA, 1 - t);
-            SetImageAlpha(imageB, t);
+            SetAlpha(imageA, 1f - t);
+            SetAlpha(imageB, t);
 
             yield return null;
         }
 
+        // Swap A/B để chuẩn bị frame tiếp theo
         imageA.sprite = frame.image;
-        SetImageAlpha(imageA, 1);
-        SetImageAlpha(imageB, 0);
+        SetAlpha(imageA, 1f);
+        SetAlpha(imageB, 0f);
     }
 
-    void EndCutscene()
+    // ── Helpers ────────────────────────────────────────────
+
+    void PlayVoice(AudioClip clip)
     {
-        SceneManager.LoadScene(nextSceneName);
+        if (audioSource == null || clip == null) return;
+        audioSource.Stop();
+        audioSource.clip = clip;
+        audioSource.Play();
     }
 
-    void SetImageAlpha(Image img, float alpha)
+    void SetAlpha(Image img, float alpha)
     {
         Color c = img.color;
         c.a = alpha;
         img.color = c;
+    }
+
+    void EndCutscene()
+    {
+        if (audioSource != null) audioSource.Stop();
+        SceneManager.LoadScene(nextSceneName);
     }
 }
