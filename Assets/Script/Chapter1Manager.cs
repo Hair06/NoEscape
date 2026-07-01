@@ -1,7 +1,7 @@
 using UnityEngine;
-using UnityEngine.Playables; 
-using UnityEngine.InputSystem; // Thư viện bắt buộc để đọc tín hiệu nhấn giữ chuột trái
-using ElmanGameDevTools.PlayerSystem; // Gọi hệ thống PlayerController góc nhìn thứ nhất
+using UnityEngine.Playables;
+using UnityEngine.InputSystem;
+using ElmanGameDevTools.PlayerSystem;
 
 public class Chapter1Manager : MonoBehaviour
 {
@@ -12,24 +12,22 @@ public class Chapter1Manager : MonoBehaviour
     public int totalPiecesRequired = 4;
 
     private bool isPuzzleFinished = false;
-    private bool isMiniGameOpen = false; // Biến kiểm tra trạng thái mở mini-game
 
     [Header("Tham chiếu UI Mini Game")]
-    public GameObject puzzleMiniGameUI; 
+    public GameObject puzzleMiniGameUI;
 
     [Header("Tham chiếu Player Góc Nhìn Thứ Nhất")]
-    public PlayerController playerController;     
+    public PlayerController playerController;
 
     [Header("Cấu hình Cutscene Sau Khi Thắng")]
-    [SerializeField] private PlayableDirector victoryCutsceneTimeline; 
+    [SerializeField] private PlayableDirector victoryCutsceneTimeline;
     [SerializeField] private GameObject victoryCutsceneObject;
 
-    // === HỆ THỐNG HIỆU ỨNG CO NẮM BÀN TAY ===
     [Header("Cấu hình Con Trỏ Chuột Custom")]
-    [Tooltip("Ảnh bàn tay xòe ra khi rê chuột đi lại bình thường")]
-    [SerializeField] private Texture2D handOpenTexture; 
+    [Tooltip("Ảnh bàn tay xòe ra khi rê chuột bình thường")]
+    [SerializeField] private Texture2D handOpenTexture;
     [Tooltip("Ảnh bàn tay nắm chặt lại khi nhấn giữ chuột trái để kéo ảnh")]
-    [SerializeField] private Texture2D handClosedTexture; 
+    [SerializeField] private Texture2D handClosedTexture;
 
     private void Awake()
     {
@@ -42,24 +40,18 @@ public class Chapter1Manager : MonoBehaviour
         if (puzzleMiniGameUI != null) puzzleMiniGameUI.SetActive(false);
         if (victoryCutsceneObject != null) victoryCutsceneObject.SetActive(false);
 
-        // Tự động tìm Player Controller góc nhìn thứ nhất đời mới trên Map
         if (playerController == null)
         {
             playerController = FindAnyObjectByType<PlayerController>();
         }
 
-        // Vừa vào game: Ép hệ thống dùng ảnh bàn tay mở làm con trỏ chuột mặc định luôn
         ResetCursorToDefaultHand();
     }
 
     private void Update()
     {
-        // Chỉ xử lý hiệu ứng co/nắm ngón tay khi bảng Mini-game xếp hình đang mở
-        if (!isMiniGameOpen) return;
-
-        if (Mouse.current != null)
+        if (Cursor.visible && Mouse.current != null)
         {
-            // Nếu người chơi nhấn GIỮ chuột trái để kéo thả mảnh tranh -> Bàn tay nắm lại
             if (Mouse.current.leftButton.isPressed)
             {
                 if (handClosedTexture != null)
@@ -67,7 +59,6 @@ public class Chapter1Manager : MonoBehaviour
                     Cursor.SetCursor(handClosedTexture, Vector2.zero, CursorMode.Auto);
                 }
             }
-            // Nếu người chơi THẢ chuột trái ra -> Quay về bàn tay mở xòe ngón bình thường
             else
             {
                 if (handOpenTexture != null)
@@ -83,7 +74,7 @@ public class Chapter1Manager : MonoBehaviour
         if (isPuzzleFinished)
         {
             Debug.Log("Bạn đã hoàn thành phong ấn bức tranh này rồi, không thể mở lại!");
-            return; 
+            return;
         }
 
         if (collectedPieces >= totalPiecesRequired)
@@ -100,21 +91,17 @@ public class Chapter1Manager : MonoBehaviour
     {
         if (puzzleMiniGameUI != null)
         {
-            puzzleMiniGameUI.SetActive(true); 
-            isMiniGameOpen = true; // Kích hoạt bộ kiểm tra Update nhận diện bấm giữ chuột
+            puzzleMiniGameUI.SetActive(true);
 
-            // KHÓA CỨNG PLAYER GÓC NHÌN THỨ NHẤT
-            if (playerController != null) 
+            if (playerController != null)
             {
-                playerController.enabled = false;   // Khóa di chuyển WASD không cho đi lung tung
-                playerController.LockCameraOnly(); // Khóa cứng camera chính, chuột di giải đố không bị lắc camera
+                playerController.enabled = false;
+                playerController.LockCameraOnly();
             }
 
-            // HIỆN CON TRỎ CHUỘT LÊN TRÊN MÀN HÌNH
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
 
-            // Đảm bảo lúc mới hiện lên là bàn tay xòe mở sẵn sàng
             ResetCursorToDefaultHand();
         }
     }
@@ -123,16 +110,18 @@ public class Chapter1Manager : MonoBehaviour
     {
         if (puzzleMiniGameUI != null)
         {
-            puzzleMiniGameUI.SetActive(false); 
-            isMiniGameOpen = false; // Tắt bộ kiểm tra chuột khi đóng bảng xếp hình
-
-            // Trả con trỏ chuột về mặc định của hệ thống
-            Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
+            puzzleMiniGameUI.SetActive(false);
 
             if (isWin)
             {
                 isPuzzleFinished = true;
                 Debug.Log("Chúc mừng! Bạn đã thắng Mini-game. Đang chuyển giao phân cảnh Cutscene...");
+
+                // Xoa 4 manh giay khoi hotbar sau khi giai xong puzzle
+                PlayerInventory.RemoveAll("ManhGiay1");
+                PlayerInventory.RemoveAll("ManhGiay2");
+                PlayerInventory.RemoveAll("ManhGiay3");
+                PlayerInventory.RemoveAll("ManhGiay4");
 
                 Cursor.lockState = CursorLockMode.Locked;
                 Cursor.visible = false;
@@ -140,14 +129,13 @@ public class Chapter1Manager : MonoBehaviour
                 if (victoryCutsceneTimeline != null) victoryCutsceneTimeline.Play();
                 if (victoryCutsceneObject != null) victoryCutsceneObject.SetActive(true);
 
-                return; 
+                return;
             }
 
-            // Trường hợp THOÁT NGANG XƯƠNG (Mở lại camera và WASD để đi tiếp)
-            if (playerController != null) 
+            if (playerController != null)
             {
-                playerController.UnlockCamera(); // Nhả khóa camera quay nhìn bình thường
-                playerController.enabled = true;   // Nhả khóa di chuyển WASD
+                playerController.UnlockCamera();
+                playerController.enabled = true;
             }
 
             Cursor.lockState = CursorLockMode.Locked;
@@ -158,24 +146,19 @@ public class Chapter1Manager : MonoBehaviour
     public void OnCutsceneFinished()
     {
         Debug.Log("🎬 Cutscene kết thúc thành công! Trả lại quyền điều khiển cho Player.");
-        
+
         if (victoryCutsceneObject != null) victoryCutsceneObject.SetActive(false);
-        
-        // Ẩn chuột hoàn toàn khi quay lại góc nhìn chơi game bình thường
-        Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
+
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
 
-        if (playerController != null) 
+        if (playerController != null)
         {
-            playerController.UnlockCamera(); 
-            playerController.enabled = true;   
+            playerController.UnlockCamera();
+            playerController.enabled = true;
         }
     }
 
-    /// <summary>
-    /// Hàm tiện ích ép con trỏ chuột hiển thị hình dáng bàn tay mở
-    /// </summary>
     public void ResetCursorToDefaultHand()
     {
         if (handOpenTexture != null)

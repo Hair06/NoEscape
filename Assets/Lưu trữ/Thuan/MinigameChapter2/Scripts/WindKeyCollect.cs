@@ -2,8 +2,6 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using TMPro;
 
-// Gắn vào Object Chìa Vặn (hiện ra sau khi mở hộp khóa ký hiệu).
-// Người chơi tới gần nhấn E để nhặt -> chìa biến mất -> báo hộp nhạc.
 public class WindKeyCollect : MonoBehaviour
 {
     [Header("UI hướng dẫn (TextMeshPro)")]
@@ -35,9 +33,10 @@ public class WindKeyCollect : MonoBehaviour
         if (collectSound != null)
             AudioSource.PlayClipAtPoint(collectSound, transform.position);
 
-        // Báo về hộp nhạc: đã có Chìa Vặn
         if (MusicBoxRestore.Instance != null)
             MusicBoxRestore.Instance.CollectPart(MusicBoxRestore.MusicBoxPart.WindKey);
+
+        PlayerInventory.Add("ChiaVan");   // them vao hotbar
 
         Debug.Log("Đã nhặt Chìa Vặn!");
 
