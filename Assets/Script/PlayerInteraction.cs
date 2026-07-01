@@ -319,10 +319,7 @@ public class PlayerInteraction : MonoBehaviour
         IInteractable interactable = collider.GetComponent<IInteractable>();
         if (interactable != null) return interactable;
 
-        interactable = collider.GetComponentInParent<IInteractable>();
-        if (interactable != null) return interactable;
-
-        return collider.GetComponentInChildren<IInteractable>();
+        return collider.GetComponentInParent<IInteractable>();
     }
 
     private static ItemInfoData GetItemInfoFromComponent(Component component)
@@ -330,10 +327,7 @@ public class PlayerInteraction : MonoBehaviour
         ItemInfoData itemInfo = component.GetComponent<ItemInfoData>();
         if (itemInfo != null) return itemInfo;
 
-        itemInfo = component.GetComponentInParent<ItemInfoData>();
-        if (itemInfo != null) return itemInfo;
-
-        return component.GetComponentInChildren<ItemInfoData>();
+        return component.GetComponentInParent<ItemInfoData>();
     }
 
     private readonly struct NearbyItemTarget
