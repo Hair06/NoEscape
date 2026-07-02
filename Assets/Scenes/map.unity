@@ -162747,34 +162747,41 @@ MonoBehaviour:
   imageA: {fileID: 503922581}
   imageB: {fileID: 495553983}
   dialogueText: {fileID: 331541189}
+  audioSource: {fileID: 0}
   cutsceneRoot: {fileID: 452722565}
   frames:
   - image: {fileID: -168039260, guid: 6af53c91a4157014989a67b52f7c1dec, type: 3}
     dialogue: 
     waitTime: 4
+    voiceClip: {fileID: 0}
   - image: {fileID: -1837537836, guid: c786c32e5e49c9b4487ac4011212321e, type: 3}
     dialogue: "\u0110\xE3 t\u1EEBng c\xF3 m\u1ED9t th\u1EDDi gian, ng\xF4i nh\xE0
       n\xE0y tr\xE0n ng\u1EADp ti\u1EBFng c\u01B0\u1EDDi v\xE0 h\u01A1i \u1EA5m c\u1EE7a
       m\u1ED9t gia \u0111\xECnh h\u1EA1nh ph\xFAc."
     waitTime: 2
+    voiceClip: {fileID: 8300000, guid: e54cdcc087396e94a9fcbd000a319301, type: 3}
   - image: {fileID: -1928315324, guid: c786c32e5e49c9b4487ac4011212321e, type: 3}
     dialogue: "Trong \xE1nh n\u1EBFn sinh nh\u1EADt \u1EA5y, kh\xF4ng ai bi\u1EBFt
       r\u1EB1ng bi k\u1ECBch \u0111ang \xE2m th\u1EA7m ti\u1EBFn \u0111\u1EBFn."
     waitTime: 2
+    voiceClip: {fileID: 8300000, guid: 1042728effd05c7498eb3517ec1643b1, type: 3}
   - image: {fileID: -609469154, guid: c786c32e5e49c9b4487ac4011212321e, type: 3}
     dialogue: "M\u1ED9t cu\u1ED9c g\u1ECDi b\u1EA5t ng\u1EDD \u0111\xE3 ph\xE1 v\u1EE1
       kho\u1EA3nh kh\u1EAFc b\xECnh y\xEAn cu\u1ED1i c\xF9ng c\u1EE7a h\u1ECD."
     waitTime: 2
+    voiceClip: {fileID: 8300000, guid: 961b55751ce75a9409e060b7ce13bc39, type: 3}
   - image: {fileID: 1827872573, guid: c786c32e5e49c9b4487ac4011212321e, type: 3}
     dialogue: "Tin d\u1EEF \u1EADp \u0111\u1EBFn nhanh nh\u01B0 c\u01A1n b\xE3o.
       Chi\u1EBFc b\xE1nh sinh nh\u1EADt r\u01A1i xu\u1ED1ng n\u1EC1n nh\xE0 c\xF9ng
       v\u1EDBi nh\u1EEFng hy v\u1ECDng mong manh c\xF2n s\xF3t l\u1EA1i."
     waitTime: 2
+    voiceClip: {fileID: 8300000, guid: 9b96cb8f138c50747b0590a5311a2aab, type: 3}
   - image: {fileID: -2091281707, guid: c786c32e5e49c9b4487ac4011212321e, type: 3}
     dialogue: "K\u1EC3 t\u1EEB \u0111\xEAm \u0111\xF3, tr\xE1i tim c\u1EE7a ng\u01B0\u1EDDi
       m\u1EB9 b\u1EAFt \u0111\u1EA7u ch\xECm d\u1EA7n v\xE0o b\xF3ng t\u1ED1i v\xE0
       n\u1ED7i \u0111au kh\xF4ng th\u1EC3 ch\u1EEFa l\xE0nh."
     waitTime: 2
+    voiceClip: {fileID: 8300000, guid: b746059a9dc2c0949a7acfc4bcdd547b, type: 3}
   fadeDuration: 0.4
   typeSpeed: 0.035
   scriptsToDisable:
@@ -182756,6 +182763,10 @@ PrefabInstance:
       propertyPath: m_Resource
       value: 
       objectReference: {fileID: 8300000, guid: 55cb7affa0a528d47bb390f18690224d, type: 3}
+    - target: {fileID: 6851157836320316534, guid: 9a8f210322ee9df46ae960d1a9363dbd, type: 3}
+      propertyPath: m_PlayOnAwake
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -283821,38 +283832,45 @@ MonoBehaviour:
   imageA: {fileID: 588525071}
   imageB: {fileID: 1256586935}
   dialogueText: {fileID: 666658998}
+  audioSource: {fileID: 0}
   cutsceneRoot: {fileID: 434541540}
   frames:
   - image: {fileID: -792926701, guid: 6af53c91a4157014989a67b52f7c1dec, type: 3}
     dialogue: 
     waitTime: 4
+    voiceClip: {fileID: 0}
   - image: {fileID: 1103857415, guid: e53c24c2a2d1e874f97e3fe4b857dbb4, type: 3}
     dialogue: "Sau c\xFA s\u1ED1c m\u1EA5t \u0111i ng\u01B0\u1EDDi ch\u1ED3ng, c\xF4
       \u0111i\xEAn cu\u1ED3ng t\xECm m\u1ECDi c\xE1ch \u0111\u1EC3 c\xF3 th\u1EC3
       h\u1ED3i sinh \xF4ng l\u1EA1i."
     waitTime: 2
+    voiceClip: {fileID: 8300000, guid: 697cdbdeaed8f584ea32829a311cb4a4, type: 3}
   - image: {fileID: 368138217, guid: e53c24c2a2d1e874f97e3fe4b857dbb4, type: 3}
     dialogue: "Trong kho\u1EA3ng th\u1EDDi gian t\xECm ki\u1EBFm, Anna t\xECm ra
       m\u1ED9t h\u1ED9i nh\xF3m v\u1EDBi l\u1EDDi h\u1EE9a h\u1ED3i sinh ng\u01B0\u1EDDi
       \u0111\u1EAB m\u1EA5t."
     waitTime: 2
+    voiceClip: {fileID: 8300000, guid: aadaf7b35e46d4348822850deba683c1, type: 3}
   - image: {fileID: 2073853318, guid: e53c24c2a2d1e874f97e3fe4b857dbb4, type: 3}
     dialogue: "Ban \u0111\u1EA7u c\xF4 b\xE1n t\xEDnh b\xE1n nghi, h\u1ECD trao c\xF4
       m\u1ED9t chi\u1EBFc v\xF2ng v\xE0 b\u1EA3o khi ng\u1EE7 h\xE3y \u0111\u1EC3
       d\u01B0\u1EDBi g\u1ED1i s\u1EBD g\u1EB7p \u0111\u01B0\u1EE3c ng\u01B0\u1EDDi
       ch\u1ED3ng."
     waitTime: 2
+    voiceClip: {fileID: 8300000, guid: 5c0bdb52c9a730b44b120c5e93548b6d, type: 3}
   - image: {fileID: -126681154, guid: e53c24c2a2d1e874f97e3fe4b857dbb4, type: 3}
     dialogue: "T\u1ED1i \u0111\u1EBFn, Anna \u0111\xE3 g\u1EB7p \u0111\u01B0\u1EE3c
       ng\u01B0\u1EDDi ch\u1ED3ng trong gi\u1EA5c m\u01A1. C\xF4 h\u1EA1nh ph\xFAc
       h\xF4m l\u1EA5y \xF4ng nh\u01B0ng kh\xF4ng bi\u1EBFt \u0111\xF3 kh\xF4ng ph\u1EA3i
       l\xE0 ch\u1ED3ng m\xECnh."
     waitTime: 2
+    voiceClip: {fileID: 8300000, guid: 1f598b5c41ee8ea4e8d5e111616aebdc, type: 3}
   - image: {fileID: -773461800, guid: e53c24c2a2d1e874f97e3fe4b857dbb4, type: 3}
     dialogue: "Sau khi t\u1EC9nh d\u1EADy, c\xF4 b\u1EAFt \u0111\u1EA7u tin t\u01B0\u1EDFng
       v\xE0 k\xFD k\u1EBFt v\u1EDBi h\u1ED9i nh\xF3m m\xE0 kh\xF4ng bi\u1EBFt l\xE0
       m\xECnh \u0111\xE3 d\xEDnh v\xE0o h\u1EE3p \u0111\u1ED3ng qu\u1EF7 d\u1EEF."
     waitTime: 2
+    voiceClip: {fileID: 0}
   fadeDuration: 0.4
   typeSpeed: 0.035
   scriptsToDisable:
