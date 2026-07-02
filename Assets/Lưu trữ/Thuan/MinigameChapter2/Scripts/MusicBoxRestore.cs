@@ -45,9 +45,14 @@ public class MusicBoxRestore : MonoBehaviour, IInteractable
     private void Start()
     {
         if (promptText != null) promptText.gameObject.SetActive(false);
-
         if (brokenVisual != null) brokenVisual.SetActive(true);
         if (fixedVisual != null) fixedVisual.SetActive(false);
+
+        // Debug kiểm tra Audio Source
+        if (musicBoxAudio == null)
+            Debug.LogError("MusicBoxRestore: musicBoxAudio chưa được gán!");
+        else if (musicBoxAudio.clip == null)
+            Debug.LogError("MusicBoxRestore: Audio Source chưa có clip!");
     }
 
     private void Update()
@@ -69,7 +74,7 @@ public class MusicBoxRestore : MonoBehaviour, IInteractable
             case MusicBoxPart.WindKey: hasWindKey = true; break;
         }
 
-        Debug.Log($"Đã thu thập bộ phận: {part}. Tiến độ: {CountParts()}/4");
+        Debug.Log($"Đã thu thập: {part} | Tiến độ: {CountParts()}/4");
     }
 
     private int CountParts()
@@ -82,10 +87,8 @@ public class MusicBoxRestore : MonoBehaviour, IInteractable
         return count;
     }
 
-    public bool IsComplete()
-    {
-        return hasShuttle && hasSpring && hasDisc && hasWindKey;
-    }
+    public bool IsComplete() =>
+        hasShuttle && hasSpring && hasDisc && hasWindKey;
 
     public string GetInteractPrompt()
     {
@@ -109,43 +112,53 @@ public class MusicBoxRestore : MonoBehaviour, IInteractable
     private void AssembleMusicBox()
     {
         isAssembled = true;
-        Debug.Log("Hộp nhạc đã được khôi phục! Giai điệu vang lên...");
+        Debug.Log("Hộp nhạc đã được khôi phục!");
 
-        // Xoa 4 bo phan khoi hotbar cho gon
+        // Xoá 4 bộ phận khỏi hotbar
         PlayerInventory.RemoveAll("ConThoi");
         PlayerInventory.RemoveAll("LoXo");
         PlayerInventory.RemoveAll("DiaNhac");
         PlayerInventory.RemoveAll("ChiaVan");
 
         if (promptText != null) promptText.gameObject.SetActive(false);
-
         if (brokenVisual != null) brokenVisual.SetActive(false);
         if (fixedVisual != null) fixedVisual.SetActive(true);
 
-        if (musicBoxAudio != null) musicBoxAudio.Play();
+        // Play âm thanh
+        if (musicBoxAudio != null)
+        {
+            Debug.Log($"Playing clip: {musicBoxAudio.clip?.name} | Volume: {musicBoxAudio.volume}");
+            musicBoxAudio.Play();
+        }
+        else
+        {
+            Debug.LogError("musicBoxAudio là null — chưa gán trong Inspector!");
+        }
 
-        if (endCutscene != null) endCutscene.PlayCutscene();
+        // Kích hoạt cutscene
+        if (endCutscene != null)
+            endCutscene.PlayCutscene();
+        else
+            Debug.LogWarning("endCutscene chưa được gán!");
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player"))
+        if (!other.CompareTag("Player")) return;
+
+        isPlayerInside = true;
+        if (promptText != null && !isAssembled)
         {
-            isPlayerInside = true;
-            if (promptText != null && !isAssembled)
-            {
-                promptText.text = GetInteractPrompt();
-                promptText.gameObject.SetActive(true);
-            }
+            promptText.text = GetInteractPrompt();
+            promptText.gameObject.SetActive(true);
         }
     }
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.CompareTag("Player"))
-        {
-            isPlayerInside = false;
-            if (promptText != null) promptText.gameObject.SetActive(false);
-        }
+        if (!other.CompareTag("Player")) return;
+
+        isPlayerInside = false;
+        if (promptText != null) promptText.gameObject.SetActive(false);
     }
 }
