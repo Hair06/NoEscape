@@ -8437,6 +8437,10 @@ PrefabInstance:
       propertyPath: promptText
       value: 
       objectReference: {fileID: 2025166744}
+    - target: {fileID: 1486454422522014041, guid: c3c3f566946fd4d4ba4858b3a32729bc, type: 3}
+      propertyPath: collectSound
+      value: 
+      objectReference: {fileID: 8300000, guid: 03d8c310e0947884ba576344da862fc3, type: 3}
     - target: {fileID: 2197994547849717711, guid: c3c3f566946fd4d4ba4858b3a32729bc, type: 3}
       propertyPath: m_Name
       value: BoPhan04
@@ -32731,7 +32735,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactMessage: "Nh\u1EA5n [E] \u0111\u1EC3 nh\u1EB7t L\xF2 Xo Nh\u1EA1c"
-  collectSound: {fileID: 0}
+  collectSound: {fileID: 8300000, guid: 03d8c310e0947884ba576344da862fc3, type: 3}
 --- !u!65 &229146779
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -144848,6 +144852,10 @@ PrefabInstance:
       propertyPath: promptText
       value: 
       objectReference: {fileID: 2025166744}
+    - target: {fileID: 7107566497365599657, guid: 9673acb30656f2d459d56cb56c04d535, type: 3}
+      propertyPath: collectSound
+      value: 
+      objectReference: {fileID: 8300000, guid: 03d8c310e0947884ba576344da862fc3, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -285560,7 +285568,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   promptText: {fileID: 2025166744}
   interactMessage: "Nh\u1EA5n [E] \u0111\u1EC3 nh\u1EB7t B\xE1nh R\u0103ng"
-  collectSound: {fileID: 0}
+  collectSound: {fileID: 8300000, guid: 03d8c310e0947884ba576344da862fc3, type: 3}
 --- !u!4 &2064171117 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 27d5c0ce8a24baa49a4a2defb0a6128d, type: 3}
