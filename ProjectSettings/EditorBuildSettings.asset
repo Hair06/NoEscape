@@ -6,11 +6,11 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Scenes/SceneMenu.unity
+    guid: 99c9720ab356a0642a771bea13969a05
+  - enabled: 1
     path: Assets/Scenes/Cutscene1.unity
     guid: 9aa1e536d9c5e944f809081becb0817f
-  - enabled: 1
-    path: Assets/Scenes/CutsceneEnd.unity
-    guid: 5e5c9fae743890f43908f76272f82de2
   - enabled: 1
     path: Assets/Scenes/map.unity
     guid: e694bffe1a5fba24389b1920a5ac7af3
@@ -18,8 +18,8 @@ EditorBuildSettings:
     path: Assets/Scenes/minigame.unity
     guid: 2909595d01aab09449f7c9e27d3c27d5
   - enabled: 1
-    path: Assets/Scenes/SceneMenu.unity
-    guid: 99c9720ab356a0642a771bea13969a05
+    path: Assets/Scenes/CutsceneEnd.unity
+    guid: 5e5c9fae743890f43908f76272f82de2
   m_configObjects:
     com.unity.addressableassets: {fileID: 11400000, guid: ae838b1c970aab641bb8e4643590df24, type: 2}
     com.unity.input.settings: {fileID: 11400000, guid: ce68c4c37abec5347801e4204a280574, type: 2}
