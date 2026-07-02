@@ -20364,19 +20364,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4055842502837856, guid: 6cf3988ed095953439adb77c7ab314aa, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.7071066
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4055842502837856, guid: 6cf3988ed095953439adb77c7ab314aa, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4055842502837856, guid: 6cf3988ed095953439adb77c7ab314aa, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0.70710695
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4055842502837856, guid: 6cf3988ed095953439adb77c7ab314aa, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 65019332945703136, guid: 6cf3988ed095953439adb77c7ab314aa, type: 3}
       propertyPath: m_Size.x
@@ -114690,15 +114690,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: aafa691c44f69114a9be22e64380618a, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 2.357
+      value: 1.895
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: aafa691c44f69114a9be22e64380618a, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.166
+      value: 1.533
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: aafa691c44f69114a9be22e64380618a, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -1.796
+      value: -13.396
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: aafa691c44f69114a9be22e64380618a, type: 3}
       propertyPath: m_LocalRotation.w
@@ -114882,8 +114882,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.781837, y: 0.16639464, z: 0.4500842}
-  m_Center: {x: -0.1090816, y: -0.013486708, z: 0.029330922}
+  m_Size: {x: 0.28029737, y: 0.17178674, z: 0.18202518}
+  m_Center: {x: 0.012107086, y: -0.010790658, z: -0.021934306}
 --- !u!114 &836412076
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -115618,7 +115618,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4055842502837856, guid: 6cf3988ed095953439adb77c7ab314aa, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -2.109
+      value: -1.134
       objectReference: {fileID: 0}
     - target: {fileID: 4055842502837856, guid: 6cf3988ed095953439adb77c7ab314aa, type: 3}
       propertyPath: m_LocalPosition.y
@@ -115626,27 +115626,27 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4055842502837856, guid: 6cf3988ed095953439adb77c7ab314aa, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 8.999
+      value: 9.029
       objectReference: {fileID: 0}
     - target: {fileID: 4055842502837856, guid: 6cf3988ed095953439adb77c7ab314aa, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.001767888
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4055842502837856, guid: 6cf3988ed095953439adb77c7ab314aa, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4055842502837856, guid: 6cf3988ed095953439adb77c7ab314aa, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0.9999985
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4055842502837856, guid: 6cf3988ed095953439adb77c7ab314aa, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4055842502837856, guid: 6cf3988ed095953439adb77c7ab314aa, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: 179.797
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 65019332945703136, guid: 6cf3988ed095953439adb77c7ab314aa, type: 3}
       propertyPath: m_Size.x
@@ -151983,7 +151983,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1092190086
 Transform:
   m_ObjectHideFlags: 0
