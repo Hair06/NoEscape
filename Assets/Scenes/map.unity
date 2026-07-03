@@ -242553,7 +242553,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1761544757}
   m_LocalRotation: {x: -0.0020044988, y: -0.9899025, z: 0.14173575, w: -0.00006046892}
-  m_LocalPosition: {x: 0, y: 0, z: 1.0081}
+  m_LocalPosition: {x: 0, y: 0, z: 1.014}
   m_LocalScale: {x: 0.002, y: 0.002, z: 0.002}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -242562,8 +242562,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 16.297, y: -179.973, z: 0.236}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: -0.0361, y: 1.2442}
-  m_SizeDelta: {x: 200, y: 200}
+  m_AnchoredPosition: {x: -0.01, y: 1.252}
+  m_SizeDelta: {x: 97.4888, y: 141.3469}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1761544760
 MonoBehaviour:
@@ -298195,7 +298195,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 353025283256538284, guid: e6dd1ab47e8422f458cc9c5dfed7cf91, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 150
+      value: 141.01
       objectReference: {fileID: 0}
     - target: {fileID: 353025283256538284, guid: e6dd1ab47e8422f458cc9c5dfed7cf91, type: 3}
       propertyPath: m_LocalPosition.x
@@ -298207,7 +298207,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 353025283256538284, guid: e6dd1ab47e8422f458cc9c5dfed7cf91, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: 0.000055763
       objectReference: {fileID: 0}
     - target: {fileID: 353025283256538284, guid: e6dd1ab47e8422f458cc9c5dfed7cf91, type: 3}
       propertyPath: m_LocalRotation.w
@@ -298231,7 +298231,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 353025283256538284, guid: e6dd1ab47e8422f458cc9c5dfed7cf91, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -4.66
+      value: -0.16666
       objectReference: {fileID: 0}
     - target: {fileID: 353025283256538284, guid: e6dd1ab47e8422f458cc9c5dfed7cf91, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -298248,6 +298248,26 @@ PrefabInstance:
     - target: {fileID: 3804944285080265106, guid: e6dd1ab47e8422f458cc9c5dfed7cf91, type: 3}
       propertyPath: m_Name
       value: World_Piece_1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3804944285080265106, guid: e6dd1ab47e8422f458cc9c5dfed7cf91, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5824659333044597582, guid: e6dd1ab47e8422f458cc9c5dfed7cf91, type: 3}
+      propertyPath: m_Size.x
+      value: 545.7751
+      objectReference: {fileID: 0}
+    - target: {fileID: 5824659333044597582, guid: e6dd1ab47e8422f458cc9c5dfed7cf91, type: 3}
+      propertyPath: m_Center.x
+      value: 3.2974722
+      objectReference: {fileID: 0}
+    - target: {fileID: 5824659333044597582, guid: e6dd1ab47e8422f458cc9c5dfed7cf91, type: 3}
+      propertyPath: m_Center.y
+      value: -0.124597766
+      objectReference: {fileID: 0}
+    - target: {fileID: 5824659333044597582, guid: e6dd1ab47e8422f458cc9c5dfed7cf91, type: 3}
+      propertyPath: m_Center.z
+      value: -128.82378
       objectReference: {fileID: 0}
     - target: {fileID: 6412436106372536178, guid: e6dd1ab47e8422f458cc9c5dfed7cf91, type: 3}
       propertyPath: promptText
