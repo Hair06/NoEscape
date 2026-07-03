@@ -329,9 +329,12 @@ private void FitRectToAspect(RectTransform rectTransform, float aspect)
     if (rectTransform == null || aspect <= 0f)
         return;
 
-    float width = maxPictureSize.x;
+    // Thay vì dùng maxPictureSize cố định, lấy luôn Width hiện tại bạn đã kéo trong Editor làm mốc
+    float width = rectTransform.rect.width; 
     float height = width / aspect;
 
+    // Bạn có thể giữ lại đoạn giới hạn bằng maxPictureSize dưới này nếu muốn, 
+    // nhưng nhớ là maxPictureSize phải đặt giá trị nhỏ (vừa với thế giới 3D)
     if (height > maxPictureSize.y)
     {
         height = maxPictureSize.y;
