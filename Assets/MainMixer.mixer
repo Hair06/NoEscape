@@ -1,5 +1,24 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!243 &-8170834482744931842
+AudioMixerGroupController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: BackGrMusic
+  m_AudioMixer: {fileID: 24100000}
+  m_GroupID: e37635e1406e4f5438effd63754e10b2
+  m_Children: []
+  m_Volume: e9eb49a14fc1f234098504609541e64f
+  m_Pitch: a2eaff526bccf3349a4dc97d3c256f1f
+  m_Send: 00000000000000000000000000000000
+  m_Effects:
+  - {fileID: -3263488783177661454}
+  m_UserColorIndex: 0
+  m_Mute: 0
+  m_Solo: 0
+  m_BypassEffects: 0
 --- !u!244 &-7255646784849267145
 AudioMixerEffectController:
   m_ObjectHideFlags: 3
@@ -33,6 +52,20 @@ AudioMixerGroupController:
   m_Mute: 0
   m_Solo: 0
   m_BypassEffects: 0
+--- !u!244 &-3263488783177661454
+AudioMixerEffectController:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 
+  m_EffectID: 1e6f4a4251fc5544cb4633841d426dce
+  m_EffectName: Attenuation
+  m_MixLevel: 39939ab9a9cf6a14bacb28f013aa6c87
+  m_Parameters: []
+  m_SendTarget: {fileID: 0}
+  m_EnableWetMix: 0
+  m_Bypass: 0
 --- !u!241 &24100000
 AudioMixerController:
   m_ObjectHideFlags: 0
@@ -54,6 +87,7 @@ AudioMixerController:
     - b8bde45118bd0c04787e57c8fe478810
     - 41f2f638a9f13f44da8d2a5e91a39226
     - 99448f83303ec3242afb8ffbcee29605
+    - e37635e1406e4f5438effd63754e10b2
     name: View
   m_CurrentViewIndex: 0
   m_TargetSnapshot: {fileID: 24500006}
@@ -101,9 +135,10 @@ AudioMixerSnapshotController:
   m_AudioMixer: {fileID: 24100000}
   m_SnapshotID: 1e82d12087c9f7647a9a2ad4d5594b67
   m_FloatValues:
-    253316156bc522646a915770f18ad61f: 4.648096
+    e9eb49a14fc1f234098504609541e64f: 17.077349
+    253316156bc522646a915770f18ad61f: -0.3709674
     611cda760ea18d24fa3a9026d0a46ffb: 2.5347874
-    918f621baff64264090f6ad10e22cbf2: 2.2347417
+    918f621baff64264090f6ad10e22cbf2: -3.6426327
   m_TransitionOverrides: {}
 --- !u!244 &22800942704195047
 AudioMixerEffectController:
@@ -129,6 +164,7 @@ AudioMixerGroupController:
   m_AudioMixer: {fileID: 24100000}
   m_GroupID: 41f2f638a9f13f44da8d2a5e91a39226
   m_Children:
+  - {fileID: -8170834482744931842}
   - {fileID: -6469578123609727186}
   m_Volume: 253316156bc522646a915770f18ad61f
   m_Pitch: 1d149c9acc7886f4d88ffdd3880e3f51
