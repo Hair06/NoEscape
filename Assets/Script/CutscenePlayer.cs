@@ -13,6 +13,9 @@ public class CutscenePlayer : MonoBehaviour
     public TextMeshProUGUI dialogueText;
     public AudioSource audioSource;
 
+    [Header("Nhạc nền (tắt khi cutscene chạy)")]
+    public AudioSource bgMusic;
+
     [Header("Frames")]
     public CutsceneFrame[] frames;
 
@@ -23,17 +26,18 @@ public class CutscenePlayer : MonoBehaviour
 
     [Header("Skip Settings")]
     public float holdSkipTime = 2f;
-    public int skipToFrameIndex = 26; // Frame bắt đầu từ 0
+    public int skipToFrameIndex = 26;
 
-    // Private
     private int _currentIndex = 0;
     private float _holdTimer = 0f;
     private bool _nextRequested = false;
     private bool _skipRequested = false;
-    private bool _isPlaying = false;
 
     void Start()
     {
+        if (audioSource == null)
+            audioSource = GetComponent<AudioSource>();
+
         StartCoroutine(PlayCutscene());
     }
 
@@ -42,8 +46,6 @@ public class CutscenePlayer : MonoBehaviour
         HandleNextInput();
         HandleHoldSkip();
     }
-
-    // ── Input ──────────────────────────────────────────────
 
     void HandleNextInput()
     {
@@ -74,8 +76,6 @@ public class CutscenePlayer : MonoBehaviour
         }
     }
 
-    // ── Playback ───────────────────────────────────────────
-
     IEnumerator PlayCutscene()
     {
         if (frames == null || frames.Length == 0)
@@ -84,9 +84,9 @@ public class CutscenePlayer : MonoBehaviour
             yield break;
         }
 
-        _isPlaying = true;
+        // Tắt nhạc nền
+        if (bgMusic != null) bgMusic.Pause();
 
-        // Frame đầu tiên không cần crossfade
         imageA.sprite = frames[0].image;
         SetAlpha(imageA, 1f);
         SetAlpha(imageB, 0f);
@@ -96,7 +96,6 @@ public class CutscenePlayer : MonoBehaviour
 
         for (int i = 1; i < frames.Length; i++)
         {
-            // Skip tới frame chỉ định
             if (_skipRequested)
             {
                 i = skipToFrameIndex;
@@ -104,7 +103,6 @@ public class CutscenePlayer : MonoBehaviour
             }
 
             _currentIndex = i;
-
             yield return CrossFade(frames[i]);
             yield return ShowFrame(frames[i]);
         }
@@ -117,10 +115,8 @@ public class CutscenePlayer : MonoBehaviour
         _nextRequested = false;
         dialogueText.text = "";
 
-        // Play voice
         PlayVoice(frame.voiceClip);
 
-        // Typewriter effect
         foreach (char c in frame.dialogue)
         {
             if (_skipRequested) yield break;
@@ -136,7 +132,6 @@ public class CutscenePlayer : MonoBehaviour
             yield return new WaitForSeconds(typeSpeed);
         }
 
-        // Chờ sau khi text hiện xong
         float elapsed = 0f;
         while (elapsed < frame.waitTime)
         {
@@ -167,13 +162,10 @@ public class CutscenePlayer : MonoBehaviour
             yield return null;
         }
 
-        // Swap A/B để chuẩn bị frame tiếp theo
         imageA.sprite = frame.image;
         SetAlpha(imageA, 1f);
         SetAlpha(imageB, 0f);
     }
-
-    // ── Helpers ────────────────────────────────────────────
 
     void PlayVoice(AudioClip clip)
     {
@@ -193,6 +185,10 @@ public class CutscenePlayer : MonoBehaviour
     void EndCutscene()
     {
         if (audioSource != null) audioSource.Stop();
+
+        // Bật lại nhạc nền
+        if (bgMusic != null) bgMusic.UnPause();
+
         SceneManager.LoadScene(nextSceneName);
     }
 }
