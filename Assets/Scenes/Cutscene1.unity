@@ -550,6 +550,7 @@ MonoBehaviour:
   imageB: {fileID: 1605887645}
   dialogueText: {fileID: 474617392}
   audioSource: {fileID: 1054741064}
+  bgMusic: {fileID: 0}
   frames:
   - image: {fileID: -1298200812, guid: 43f24e4e486986c4b947d72f2d228b5c, type: 3}
     dialogue: "Sau khi r\u1EDDi kh\u1ECFi ng\xF4i nh\xE0 n\u0103m \u1EA5y, Alex l\u1EDBn
@@ -683,7 +684,7 @@ AudioSource:
   m_GameObject: {fileID: 1054741061}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: 8709967572030386355, guid: 4228c6613c182f247a1288c829745483, type: 2}
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
   m_PlayOnAwake: 0
