@@ -11,11 +11,14 @@ public class MapSealCutscenePlayer : MonoBehaviour
     public TextMeshProUGUI dialogueText;
     public AudioSource audioSource;
 
+    [Header("Nhạc nền (tắt khi cutscene chạy)")]
+    public AudioSource bgMusic;
+
     [Header("Cutscene Root")]
     public GameObject cutsceneRoot;
 
     [Header("Cutscene Data")]
-    public CutsceneFrame[] frames; // ← Dùng chung CutsceneFrame
+    public CutsceneFrame[] frames;
 
     [Header("Effect Settings")]
     public float fadeDuration = 0.8f;
@@ -74,6 +77,9 @@ public class MapSealCutscenePlayer : MonoBehaviour
     {
         isPlaying = true;
         DisableGameplay();
+
+        // Tắt nhạc nền
+        if (bgMusic != null) bgMusic.Pause();
 
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
@@ -161,6 +167,9 @@ public class MapSealCutscenePlayer : MonoBehaviour
 
         if (audioSource != null) audioSource.Stop();
 
+        // Bật lại nhạc nền
+        if (bgMusic != null) bgMusic.UnPause();
+
         EnableGameplay();
 
         Cursor.lockState = CursorLockMode.Locked;
@@ -171,8 +180,6 @@ public class MapSealCutscenePlayer : MonoBehaviour
 
         if (Chapter1Manager.Instance != null)
             Chapter1Manager.Instance.OnCutsceneFinished();
-
-        Debug.Log("Cutscene kết thúc thành công!");
 
         if (QuestManager.Instance != null)
         {

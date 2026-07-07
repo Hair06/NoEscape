@@ -162757,6 +162757,7 @@ MonoBehaviour:
   imageB: {fileID: 495553983}
   dialogueText: {fileID: 331541189}
   audioSource: {fileID: 1180164972}
+  bgMusic: {fileID: 1205354187}
   cutsceneRoot: {fileID: 452722565}
   frames:
   - image: {fileID: -168039260, guid: 6af53c91a4157014989a67b52f7c1dec, type: 3}
@@ -162783,13 +162784,13 @@ MonoBehaviour:
     dialogue: "Tin d\u1EEF \u1EADp \u0111\u1EBFn nhanh nh\u01B0 c\u01A1n b\xE3o.
       Chi\u1EBFc b\xE1nh sinh nh\u1EADt r\u01A1i xu\u1ED1ng n\u1EC1n nh\xE0 c\xF9ng
       v\u1EDBi nh\u1EEFng hy v\u1ECDng mong manh c\xF2n s\xF3t l\u1EA1i."
-    waitTime: 2
+    waitTime: 3
     voiceClip: {fileID: 8300000, guid: 9b96cb8f138c50747b0590a5311a2aab, type: 3}
   - image: {fileID: -2091281707, guid: c786c32e5e49c9b4487ac4011212321e, type: 3}
     dialogue: "K\u1EC3 t\u1EEB \u0111\xEAm \u0111\xF3, tr\xE1i tim c\u1EE7a ng\u01B0\u1EDDi
       m\u1EB9 b\u1EAFt \u0111\u1EA7u ch\xECm d\u1EA7n v\xE0o b\xF3ng t\u1ED1i v\xE0
       n\u1ED7i \u0111au kh\xF4ng th\u1EC3 ch\u1EEFa l\xE0nh."
-    waitTime: 2
+    waitTime: 3
     voiceClip: {fileID: 8300000, guid: b746059a9dc2c0949a7acfc4bcdd547b, type: 3}
   fadeDuration: 0.4
   typeSpeed: 0.035
@@ -162810,7 +162811,7 @@ AudioSource:
   m_GameObject: {fileID: 1180164966}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: 8709967572030386355, guid: 4228c6613c182f247a1288c829745483, type: 2}
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
   m_PlayOnAwake: 1
@@ -284154,6 +284155,7 @@ MonoBehaviour:
   imageB: {fileID: 1256586935}
   dialogueText: {fileID: 666658998}
   audioSource: {fileID: 2055690574}
+  bgMusic: {fileID: 1205354187}
   cutsceneRoot: {fileID: 434541540}
   frames:
   - image: {fileID: -792926701, guid: 6af53c91a4157014989a67b52f7c1dec, type: 3}
@@ -284177,21 +284179,21 @@ MonoBehaviour:
       m\u1ED9t chi\u1EBFc v\xF2ng v\xE0 b\u1EA3o khi ng\u1EE7 h\xE3y \u0111\u1EC3
       d\u01B0\u1EDBi g\u1ED1i s\u1EBD g\u1EB7p \u0111\u01B0\u1EE3c ng\u01B0\u1EDDi
       ch\u1ED3ng."
-    waitTime: 2
+    waitTime: 3
     voiceClip: {fileID: 8300000, guid: 5c0bdb52c9a730b44b120c5e93548b6d, type: 3}
   - image: {fileID: -126681154, guid: e53c24c2a2d1e874f97e3fe4b857dbb4, type: 3}
     dialogue: "T\u1ED1i \u0111\u1EBFn, Anna \u0111\xE3 g\u1EB7p \u0111\u01B0\u1EE3c
       ng\u01B0\u1EDDi ch\u1ED3ng trong gi\u1EA5c m\u01A1. C\xF4 h\u1EA1nh ph\xFAc
-      h\xF4m l\u1EA5y \xF4ng nh\u01B0ng kh\xF4ng bi\u1EBFt \u0111\xF3 kh\xF4ng ph\u1EA3i
+      \xF4m l\u1EA5y \xF4ng nh\u01B0ng kh\xF4ng bi\u1EBFt \u0111\xF3 kh\xF4ng ph\u1EA3i
       l\xE0 ch\u1ED3ng m\xECnh."
-    waitTime: 2
+    waitTime: 3
     voiceClip: {fileID: 8300000, guid: 1f598b5c41ee8ea4e8d5e111616aebdc, type: 3}
   - image: {fileID: -773461800, guid: e53c24c2a2d1e874f97e3fe4b857dbb4, type: 3}
     dialogue: "Sau khi t\u1EC9nh d\u1EADy, c\xF4 b\u1EAFt \u0111\u1EA7u tin t\u01B0\u1EDFng
       v\xE0 k\xFD k\u1EBFt v\u1EDBi h\u1ED9i nh\xF3m m\xE0 kh\xF4ng bi\u1EBFt l\xE0
       m\xECnh \u0111\xE3 d\xEDnh v\xE0o h\u1EE3p \u0111\u1ED3ng qu\u1EF7 d\u1EEF."
-    waitTime: 2
-    voiceClip: {fileID: 0}
+    waitTime: 3
+    voiceClip: {fileID: 8300000, guid: d17ed6d022b2fe04295e333c89027009, type: 3}
   fadeDuration: 0.4
   typeSpeed: 0.035
   scriptsToDisable:
@@ -284298,7 +284300,7 @@ AudioSource:
   m_GameObject: {fileID: 2055690568}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: 8709967572030386355, guid: 4228c6613c182f247a1288c829745483, type: 2}
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
   m_PlayOnAwake: 1
