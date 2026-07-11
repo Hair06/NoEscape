@@ -12,13 +12,14 @@ public class WoodenBarDoor : MonoBehaviour, IInteractable
 
     [Header("Cửa")]
     public Transform door;
-    public float doorOpenAngle = 90f;
+    public float doorOpenAngle = -90f;
     public float doorOpenSpeed = 2f;
 
     [Header("UI")]
     [SerializeField] private TextMeshProUGUI promptText;
 
     [Header("Âm thanh")]
+    [SerializeField] private AudioSource audioSource;
     [SerializeField] private AudioClip breakSound;
     [SerializeField] private AudioClip doorSound;
 
@@ -28,6 +29,10 @@ public class WoodenBarDoor : MonoBehaviour, IInteractable
     private void Start()
     {
         if (promptText != null) promptText.gameObject.SetActive(false);
+
+        // Tự tìm Audio Source nếu chưa gán
+        if (audioSource == null)
+            audioSource = GetComponent<AudioSource>();
     }
 
     private void Update()
@@ -62,8 +67,11 @@ public class WoodenBarDoor : MonoBehaviour, IInteractable
         isOpened = true;
 
         // Play sound phá gỗ
-        if (breakSound != null)
-            AudioSource.PlayClipAtPoint(breakSound, transform.position);
+        if (audioSource != null && breakSound != null)
+        {
+            audioSource.clip = breakSound;
+            audioSource.Play();
+        }
 
         // Thanh gỗ bay ra
         foreach (GameObject bar in woodenBars)
@@ -92,8 +100,11 @@ public class WoodenBarDoor : MonoBehaviour, IInteractable
         }
 
         // Play sound cửa mở
-        if (doorSound != null)
-            AudioSource.PlayClipAtPoint(doorSound, transform.position);
+        if (audioSource != null && doorSound != null)
+        {
+            audioSource.clip = doorSound;
+            audioSource.Play();
+        }
 
         // Mở cửa xoay
         if (door != null)
