@@ -20515,10 +20515,10 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 1879329439143930, guid: 6cf3988ed095953439adb77c7ab314aa, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 146976080}
+      addedObject: {fileID: 146976084}
     - targetCorrespondingSourceObject: {fileID: 1879329439143930, guid: 6cf3988ed095953439adb77c7ab314aa, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 146976084}
+      addedObject: {fileID: 146976088}
   m_SourcePrefab: {fileID: 100100000, guid: 6cf3988ed095953439adb77c7ab314aa, type: 3}
 --- !u!4 &146976078 stripped
 Transform:
@@ -20530,26 +20530,6 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 1879329439143930, guid: 6cf3988ed095953439adb77c7ab314aa, type: 3}
   m_PrefabInstance: {fileID: 146976077}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &146976080
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 146976079}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fd2fe558ba057664ab6d0971b714c5d4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  doorName: "C\u1EEDa s\u1ED1 2"
-  openRotationOffset: {x: 0, y: 90, z: 0}
-  openSpeed: 3
-  doorOpenSound: {fileID: 8300000, guid: f69e134b6955d1341a5181200bd2659f, type: 3}
-  isPlayerInside: 0
-  isOpened: 0
-  targetRotation: {x: 0, y: 0, z: 0, w: 0}
-  originalRotation: {x: 0, y: 0, z: 0, w: 0}
 --- !u!65 &146976084
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -20571,6 +20551,26 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1.002817, y: 1.9668593, z: 0.24399495}
   m_Center: {x: -0.50000304, y: 0.9834297, z: 0}
+--- !u!114 &146976088
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 146976079}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fd2fe558ba057664ab6d0971b714c5d4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  doorName: "C\u1EEDa s\u1ED1 2"
+  openRotationOffset: {x: 0, y: 90, z: 0}
+  openSpeed: 3
+  doorOpenSound: {fileID: 8300000, guid: f69e134b6955d1341a5181200bd2659f, type: 3}
+  isPlayerInside: 0
+  isOpened: 0
+  targetRotation: {x: 0, y: 0, z: 0, w: 0}
+  originalRotation: {x: 0, y: 0, z: 0, w: 0}
 --- !u!1001 &147130669
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -116421,10 +116421,10 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 1879329439143930, guid: 6cf3988ed095953439adb77c7ab314aa, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1740744963}
+      addedObject: {fileID: 1740744962}
     - targetCorrespondingSourceObject: {fileID: 1879329439143930, guid: 6cf3988ed095953439adb77c7ab314aa, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1740744962}
+      addedObject: {fileID: 1740744967}
   m_SourcePrefab: {fileID: 100100000, guid: 6cf3988ed095953439adb77c7ab314aa, type: 3}
 --- !u!1 &843777721
 GameObject:
@@ -166795,9 +166795,6 @@ PrefabInstance:
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 1879329439143930, guid: 6cf3988ed095953439adb77c7ab314aa, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1727248397}
     - targetCorrespondingSourceObject: {fileID: 1879329439143930, guid: 6cf3988ed095953439adb77c7ab314aa, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1727248396}
@@ -239058,26 +239055,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1.002817, y: 1.9668593, z: 0.24399495}
   m_Center: {x: -0.50000495, y: 0.9834297, z: 0}
---- !u!114 &1727248397
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1727248394}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fd2fe558ba057664ab6d0971b714c5d4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  doorName: "C\u1EEDa s\u1ED1 8"
-  openRotationOffset: {x: 0, y: 90, z: 0}
-  openSpeed: 3
-  doorOpenSound: {fileID: 8300000, guid: f69e134b6955d1341a5181200bd2659f, type: 3}
-  isPlayerInside: 0
-  isOpened: 0
-  targetRotation: {x: 0, y: 0, z: 0, w: 0}
-  originalRotation: {x: 0, y: 0, z: 0, w: 0}
 --- !u!1001 &1727408116
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -240972,8 +240949,8 @@ MonoBehaviour:
   defaultMessage: "Nh\u1EA5n [E] \u0111\u1EC3 m\u1EDF c\u1EEDa"
   allDoors:
   - {fileID: 2104402050}
-  - {fileID: 146976080}
-  - {fileID: 1740744963}
+  - {fileID: 0}
+  - {fileID: 0}
 --- !u!4 &1740268962
 Transform:
   m_ObjectHideFlags: 0
@@ -241161,7 +241138,7 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1.002817, y: 1.9668593, z: 0.24399495}
   m_Center: {x: -0.50000304, y: 0.9834297, z: 0}
---- !u!114 &1740744963
+--- !u!114 &1740744967
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -241173,7 +241150,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fd2fe558ba057664ab6d0971b714c5d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  doorName: "C\u1EEDa s\u1ED1 2"
+  doorName: "C\u1EEDa s\u1ED1 3"
   openRotationOffset: {x: 0, y: 90, z: 0}
   openSpeed: 3
   doorOpenSound: {fileID: 8300000, guid: f69e134b6955d1341a5181200bd2659f, type: 3}
