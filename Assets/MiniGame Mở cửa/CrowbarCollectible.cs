@@ -1,32 +1,56 @@
 ﻿using UnityEngine;
-using TMPro;
 
-public class CrowbarCollectible : MonoBehaviour
+public class CrowbarCollectible : MonoBehaviour, IInteractable
 {
     [Header("Tên item")]
     public string itemName = "Crowbar";
 
-    [Header("UI")]
-    [SerializeField] private TextMeshProUGUI promptText;
-    [SerializeField] private string interactMessage = "Nhấn [E] để nhặt xà beng";
+    [Header("Raycast Settings")]
+    [SerializeField] private float pickupRange = 3f;
 
     [Header("Âm thanh")]
     [SerializeField] private AudioClip collectSound;
 
-    private bool isPlayerInside = false;
+    private Camera playerCamera;
+    private bool isLookingAt = false;
 
     private void Start()
     {
-        if (promptText != null) promptText.gameObject.SetActive(false);
+        playerCamera = Camera.main;
     }
 
     private void Update()
     {
-        if (isPlayerInside && GameInputBridge.GetKeyDown(KeyCode.E))
-            Collect();
+        CheckLookAt();
     }
 
-    private void Collect()
+    private void CheckLookAt()
+    {
+        if (playerCamera == null) return;
+
+        Ray ray = playerCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
+        RaycastHit hit;
+
+        if (Physics.Raycast(ray, out hit, pickupRange))
+        {
+            if (hit.collider.gameObject == gameObject)
+                isLookingAt = true;
+            else
+                isLookingAt = false;
+        }
+        else
+        {
+            isLookingAt = false;
+        }
+    }
+
+    // ← IInteractable: PlayerInteraction tự hiện prompt này
+    public string GetInteractPrompt()
+    {
+        return isLookingAt ? "Nhấn [E] để nhặt xà beng" : "";
+    }
+
+    public void Interact()
     {
         PlayerInventory.Add(itemName);
         Debug.Log("Đã nhặt Crowbar!");
@@ -34,25 +58,6 @@ public class CrowbarCollectible : MonoBehaviour
         if (collectSound != null)
             AudioSource.PlayClipAtPoint(collectSound, transform.position);
 
-        if (promptText != null) promptText.gameObject.SetActive(false);
         Destroy(gameObject);
-    }
-
-    private void OnTriggerEnter(Collider other)
-    {
-        if (!other.CompareTag("Player")) return;
-        isPlayerInside = true;
-        if (promptText != null)
-        {
-            promptText.text = interactMessage;
-            promptText.gameObject.SetActive(true);
-        }
-    }
-
-    private void OnTriggerExit(Collider other)
-    {
-        if (!other.CompareTag("Player")) return;
-        isPlayerInside = false;
-        if (promptText != null) promptText.gameObject.SetActive(false);
     }
 }
