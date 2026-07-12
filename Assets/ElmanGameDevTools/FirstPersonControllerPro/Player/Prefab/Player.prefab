@@ -228,6 +228,9 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -267,29 +270,45 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   controller: {fileID: 5066347983977412304}
   playerCamera: {fileID: 2884546045553303299}
+  anim: {fileID: 0}
   speed: 6
   runSpeed: 9
   jumpHeight: 1
   gravity: -9.81
   sensitivity: 2
-  defaultRunKey: 304
-  defaultCrouchKey: 306
-  crouchHeight: 1.3
-  crouchSmoothTime: 0.2
   maxLookUpAngle: 90
   maxLookDownAngle: -90
   enableHeadBob: 1
-  walkBobSpeed: 14
-  walkBobAmount: 0.05
-  runBobSpeed: 18
-  runBobAmount: 0.03
+  bobAmountX: 0.04
+  bobAmountY: 0.05
+  walkBobFrequency: 12
+  runBobFrequency: 16
+  crouchBobFrequency: 8
+  bobSmoothness: 10
+  cameraWeight: 12
+  enableCameraTilt: 1
+  tiltAmount: 2
+  tiltSmoothness: 8
+  runTiltMultiplier: 1.2
+  crouchTiltMultiplier: 0.5
+  turnTiltAmount: 1.5
+  maxTotalTilt: 5
+  crouchHeight: 1.3
+  crouchSmoothTime: 0.2
+  enableRunFov: 1
+  normalFov: 60
+  runFov: 70
+  fovChangeSpeed: 8
   standingHeightMarker: {fileID: 1857981397293619070}
   standingCheckRadius: 0.2
   obstacleLayerMask:
     serializedVersion: 2
     m_Bits: 4294967295
   minStandingClearance: 0.01
-  standCheckCooldown: 0.1
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 1
+  groundCheckDistance: 0.5
 --- !u!143 &5066347983977412304
 CharacterController:
   m_ObjectHideFlags: 0
@@ -305,7 +324,6 @@ CharacterController:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -328,8 +346,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 805c39ae8f5117b499d598acf1d53ebf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  surfaceTags: []
-  footstepClips: []
+  surfaceSettings: []
+  defaultClip: {fileID: 0}
   audioSource: {fileID: 0}
   volume: 1
   walkPitch: 1.3
@@ -462,6 +480,9 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:

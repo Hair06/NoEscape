@@ -3,29 +3,22 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-[System.Serializable]
-public class SealCutsceneFrame
-{
-    public Sprite image;
-
-    [TextArea(3, 10)]
-    public string dialogue;
-
-    public float waitTime = 3f;
-}
-
 public class MapSealCutscenePlayer : MonoBehaviour
 {
     [Header("UI")]
     public Image imageA;
     public Image imageB;
     public TextMeshProUGUI dialogueText;
+    public AudioSource audioSource;
+
+    [Header("Nhạc nền (tắt khi cutscene chạy)")]
+    public AudioSource bgMusic;
 
     [Header("Cutscene Root")]
     public GameObject cutsceneRoot;
 
     [Header("Cutscene Data")]
-    public SealCutsceneFrame[] frames;
+    public CutsceneFrame[] frames;
 
     [Header("Effect Settings")]
     public float fadeDuration = 0.8f;
@@ -53,6 +46,12 @@ public class MapSealCutscenePlayer : MonoBehaviour
             cutsceneRoot.SetActive(false);
     }
 
+    private void Start()
+    {
+        if (audioSource == null)
+            audioSource = GetComponent<AudioSource>();
+    }
+
     private void Update()
     {
         if (!isPlaying) return;
@@ -77,8 +76,10 @@ public class MapSealCutscenePlayer : MonoBehaviour
     private IEnumerator PlayRoutine()
     {
         isPlaying = true;
-
         DisableGameplay();
+
+        // Tắt nhạc nền
+        if (bgMusic != null) bgMusic.Pause();
 
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
@@ -104,10 +105,12 @@ public class MapSealCutscenePlayer : MonoBehaviour
         EndCutscene();
     }
 
-    private IEnumerator ShowFrame(SealCutsceneFrame frame)
+    private IEnumerator ShowFrame(CutsceneFrame frame)
     {
         nextFrameRequested = false;
         dialogueText.text = "";
+
+        PlayVoice(frame.voiceClip);
 
         foreach (char c in frame.dialogue)
         {
@@ -123,7 +126,6 @@ public class MapSealCutscenePlayer : MonoBehaviour
         }
 
         float timer = 0f;
-
         while (timer < frame.waitTime)
         {
             if (nextFrameRequested)
@@ -137,13 +139,12 @@ public class MapSealCutscenePlayer : MonoBehaviour
         }
     }
 
-    private IEnumerator CrossFade(SealCutsceneFrame frame)
+    private IEnumerator CrossFade(CutsceneFrame frame)
     {
         imageB.sprite = frame.image;
         SetImageAlpha(imageB, 0f);
 
         float timer = 0f;
-
         while (timer < fadeDuration)
         {
             timer += Time.unscaledDeltaTime;
@@ -164,6 +165,11 @@ public class MapSealCutscenePlayer : MonoBehaviour
     {
         isPlaying = false;
 
+        if (audioSource != null) audioSource.Stop();
+
+        // Bật lại nhạc nền
+        if (bgMusic != null) bgMusic.UnPause();
+
         EnableGameplay();
 
         Cursor.lockState = CursorLockMode.Locked;
@@ -175,8 +181,6 @@ public class MapSealCutscenePlayer : MonoBehaviour
         if (Chapter1Manager.Instance != null)
             Chapter1Manager.Instance.OnCutsceneFinished();
 
-        Debug.Log("Cutscene kết thúc thành công! Trả lại quyền điều khiển cho Player.");
-
         if (QuestManager.Instance != null)
         {
             QuestManager.Instance.CompleteSubQuest(3);
@@ -184,61 +188,47 @@ public class MapSealCutscenePlayer : MonoBehaviour
         }
 
         if (afterCutsceneScare != null)
-        {
-            Debug.Log("Jumpscare sẽ chạy sau " + scareDelay + " giây.");
             StartCoroutine(StartScareAfterDelay());
-        }
         else
-        {
-            Debug.LogWarning("Chưa gán After Cutscene Scare trong MapSealCutscenePlayer.");
-        }
+            Debug.LogWarning("Chưa gán After Cutscene Scare.");
     }
 
     private IEnumerator StartScareAfterDelay()
     {
         yield return new WaitForSecondsRealtime(scareDelay);
-
         if (afterCutsceneScare != null)
-        {
-            Debug.Log("Bắt đầu Ghoul Jumpscare.");
             afterCutsceneScare.TriggerScare();
-        }
+    }
+
+    private void PlayVoice(AudioClip clip)
+    {
+        if (audioSource == null || clip == null) return;
+        audioSource.Stop();
+        audioSource.clip = clip;
+        audioSource.Play();
     }
 
     private void DisableGameplay()
     {
         foreach (MonoBehaviour script in scriptsToDisable)
-        {
-            if (script != null)
-                script.enabled = false;
-        }
+            if (script != null) script.enabled = false;
 
         foreach (GameObject obj in objectsToHide)
-        {
-            if (obj != null)
-                obj.SetActive(false);
-        }
+            if (obj != null) obj.SetActive(false);
     }
 
     private void EnableGameplay()
     {
         foreach (MonoBehaviour script in scriptsToDisable)
-        {
-            if (script != null)
-                script.enabled = true;
-        }
+            if (script != null) script.enabled = true;
 
         foreach (GameObject obj in objectsToHide)
-        {
-            if (obj != null)
-                obj.SetActive(true);
-        }
+            if (obj != null) obj.SetActive(true);
     }
 
     private void SetImageAlpha(Image img, float alpha)
     {
         if (img == null) return;
-
         Color c = img.color;
         c.a = alpha;
         img.color = c;
