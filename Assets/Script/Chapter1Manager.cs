@@ -2,6 +2,8 @@ using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.InputSystem;
 using ElmanGameDevTools.PlayerSystem;
+using System.Collections; // Bắt buộc để chạy Coroutine hiệu ứng mờ
+using UnityEngine.UI;      // Bắt buộc để điều khiển component Image Fade
 
 public class Chapter1Manager : MonoBehaviour
 {
@@ -29,6 +31,12 @@ public class Chapter1Manager : MonoBehaviour
     [Tooltip("Ảnh bàn tay nắm chặt lại khi nhấn giữ chuột trái để kéo ảnh")]
     [SerializeField] private Texture2D handClosedTexture;
 
+    [Header("CẤU HÌNH HIỆU ỨNG CHUYỂN CẢNH (FADE EFFECT)")]
+    [Tooltip("Kéo Object ảnh đen (FadeScreen) vào đây")]
+    [SerializeField] private Image fadeImage;
+    [Tooltip("Tốc độ tối dần của màn hình")]
+    [SerializeField] private float fadeSpeed = 1.5f;
+
     private void Awake()
     {
         if (Instance == null) Instance = this;
@@ -39,6 +47,15 @@ public class Chapter1Manager : MonoBehaviour
     {
         if (puzzleMiniGameUI != null) puzzleMiniGameUI.SetActive(false);
         if (victoryCutsceneObject != null) victoryCutsceneObject.SetActive(false);
+
+        // Đảm bảo lúc đầu game ảnh đen tàng hình
+        if (fadeImage != null)
+        {
+            Color c = fadeImage.color;
+            c.a = 0f;
+            fadeImage.color = c;
+            fadeImage.gameObject.SetActive(false);
+        }
 
         if (playerController == null)
         {
@@ -106,31 +123,12 @@ public class Chapter1Manager : MonoBehaviour
         }
     }
 
+    // Giữ nguyên hàm ClosePuzzleGame gốc phòng trường hợp bro bấm nút "Thoát ngang" minigame khi chưa giải xong
     public void ClosePuzzleGame(bool isWin = false)
     {
         if (puzzleMiniGameUI != null)
         {
             puzzleMiniGameUI.SetActive(false);
-
-            if (isWin)
-            {
-                isPuzzleFinished = true;
-                Debug.Log("Chúc mừng! Bạn đã thắng Mini-game. Đang chuyển giao phân cảnh Cutscene...");
-
-                // Xoa 4 manh giay khoi hotbar sau khi giai xong puzzle
-                PlayerInventory.RemoveAll("ManhGiay1");
-                PlayerInventory.RemoveAll("ManhGiay2");
-                PlayerInventory.RemoveAll("ManhGiay3");
-                PlayerInventory.RemoveAll("ManhGiay4");
-
-                Cursor.lockState = CursorLockMode.Locked;
-                Cursor.visible = false;
-
-                if (victoryCutsceneTimeline != null) victoryCutsceneTimeline.Play();
-                if (victoryCutsceneObject != null) victoryCutsceneObject.SetActive(true);
-
-                return;
-            }
 
             if (playerController != null)
             {
@@ -140,6 +138,80 @@ public class Chapter1Manager : MonoBehaviour
 
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
+        }
+    }
+
+    // =========================================================================
+    // HÀM TIẾP NHẬN XỬ LÝ SỰ KIỆN THẮNG TỪ PUZZLE MANAGER
+    // =========================================================================
+    public void StartGlitchFadeTransition(GameObject puzzleUI, GameObject photoOnWall, MapSealCutscenePlayer seal1Cutscene)
+    {
+        isPuzzleFinished = true;
+        StartCoroutine(UltimateWinRoutine(puzzleUI, photoOnWall, seal1Cutscene));
+    }
+
+    private IEnumerator UltimateWinRoutine(GameObject puzzleUI, GameObject photoOnWall, MapSealCutscenePlayer seal1Cutscene)
+    {
+        // 1. Giai đoạn: Màn hình tối dần về đen hoàn toàn
+        if (fadeImage != null)
+        {
+            fadeImage.gameObject.SetActive(true);
+            float alpha = 0f;
+            Color c = fadeImage.color;
+
+            while (alpha < 1f)
+            {
+                alpha += Time.deltaTime * fadeSpeed;
+                c.a = Mathf.Clamp01(alpha);
+                fadeImage.color = c;
+                yield return null;
+            }
+        }
+        else
+        {
+            yield return new WaitForSeconds(1.0f);
+        }
+
+        // ========================================================
+        // [ ĐÃ ĐEN THUI - NGƯỜI CHƠI KHÔNG NHÌN THẤY GÌ ]
+        // ========================================================
+
+        // 2. Tắt các UI giao diện xếp hình đi để dọn dẹp màn hình
+        if (puzzleMiniGameUI != null) puzzleMiniGameUI.SetActive(false);
+        if (puzzleUI != null) puzzleUI.SetActive(false);
+        
+        // 3. Kích hoạt hiện ảnh hoàn chỉnh trên tường
+        if (photoOnWall != null) photoOnWall.SetActive(true);
+
+        // 4. Xóa các mảnh giấy nhiệm vụ khỏi túi đồ
+        PlayerInventory.RemoveAll("ManhGiay1");
+        PlayerInventory.RemoveAll("ManhGiay2");
+        PlayerInventory.RemoveAll("ManhGiay3");
+        PlayerInventory.RemoveAll("ManhGiay4");
+
+        // Khóa con trỏ chuột chuẩn bị xem cutscene
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+
+        // 5. Kích hoạt và chạy các Cutscene cốt truyện chạy chữ và Timeline
+        if (victoryCutsceneObject != null) victoryCutsceneObject.SetActive(true);
+        if (victoryCutsceneTimeline != null) victoryCutsceneTimeline.Play();
+        if (seal1Cutscene != null) seal1Cutscene.PlayCutscene();
+
+        // 6. Giai đoạn: Màn hình từ từ sáng lên trở lại để xem phim
+        if (fadeImage != null)
+        {
+            float alpha = 1f;
+            Color c = fadeImage.color;
+
+            while (alpha > 0f)
+            {
+                alpha -= Time.deltaTime * fadeSpeed;
+                c.a = Mathf.Clamp01(alpha);
+                fadeImage.color = c;
+                yield return null;
+            }
+            fadeImage.gameObject.SetActive(false); // Sáng hẳn rồi thì ẩn ảnh đi
         }
     }
 
