@@ -14651,6 +14651,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3dc9cbc9439646749893602a4ff19dff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  itemName: ManhGiay1
   promptText: {fileID: 1896452819}
   interactMessage: "Nh\u1EA5n [E] \u0111\u1EC3 nh\u1EB7t m\u1EA3nh \u1EA3nh"
   collectSound: {fileID: 8300000, guid: 83b9a9049b5aa4a4092ba121398f62df, type: 3}
@@ -44263,7 +44264,8 @@ MonoBehaviour:
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_fontSharedMaterials: []
+  m_fontSharedMaterials:
+  - {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
@@ -59822,7 +59824,8 @@ MonoBehaviour:
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_fontSharedMaterials: []
+  m_fontSharedMaterials:
+  - {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
@@ -64158,9 +64161,11 @@ MonoBehaviour:
   collectedPieces: 0
   totalPiecesRequired: 4
   puzzleMiniGameUI: {fileID: 1517797187}
-  playerInputSystem: {fileID: 1205354177}
+  playerController: {fileID: 0}
   victoryCutsceneTimeline: {fileID: 0}
   victoryCutsceneObject: {fileID: 0}
+  handOpenTexture: {fileID: 0}
+  handClosedTexture: {fileID: 0}
 --- !u!4 &476064914
 Transform:
   m_ObjectHideFlags: 0
@@ -157971,34 +157976,42 @@ MonoBehaviour:
   imageA: {fileID: 503922581}
   imageB: {fileID: 495553983}
   dialogueText: {fileID: 331541189}
+  audioSource: {fileID: 0}
+  bgMusic: {fileID: 0}
   cutsceneRoot: {fileID: 452722565}
   frames:
   - image: {fileID: -168039260, guid: 6af53c91a4157014989a67b52f7c1dec, type: 3}
     dialogue: 
     waitTime: 4
+    voiceClip: {fileID: 0}
   - image: {fileID: -1837537836, guid: c786c32e5e49c9b4487ac4011212321e, type: 3}
     dialogue: "\u0110\xE3 t\u1EEBng c\xF3 m\u1ED9t th\u1EDDi gian, ng\xF4i nh\xE0
       n\xE0y tr\xE0n ng\u1EADp ti\u1EBFng c\u01B0\u1EDDi v\xE0 h\u01A1i \u1EA5m c\u1EE7a
       m\u1ED9t gia \u0111\xECnh h\u1EA1nh ph\xFAc."
     waitTime: 2
+    voiceClip: {fileID: 0}
   - image: {fileID: -1928315324, guid: c786c32e5e49c9b4487ac4011212321e, type: 3}
     dialogue: "Trong \xE1nh n\u1EBFn sinh nh\u1EADt \u1EA5y, kh\xF4ng ai bi\u1EBFt
       r\u1EB1ng bi k\u1ECBch \u0111ang \xE2m th\u1EA7m ti\u1EBFn \u0111\u1EBFn."
     waitTime: 2
+    voiceClip: {fileID: 0}
   - image: {fileID: -609469154, guid: c786c32e5e49c9b4487ac4011212321e, type: 3}
     dialogue: "M\u1ED9t cu\u1ED9c g\u1ECDi b\u1EA5t ng\u1EDD \u0111\xE3 ph\xE1 v\u1EE1
       kho\u1EA3nh kh\u1EAFc b\xECnh y\xEAn cu\u1ED1i c\xF9ng c\u1EE7a h\u1ECD."
     waitTime: 2
+    voiceClip: {fileID: 0}
   - image: {fileID: 1827872573, guid: c786c32e5e49c9b4487ac4011212321e, type: 3}
     dialogue: "Tin d\u1EEF \u1EADp \u0111\u1EBFn nhanh nh\u01B0 c\u01A1n b\xE3o.
       Chi\u1EBFc b\xE1nh sinh nh\u1EADt r\u01A1i xu\u1ED1ng n\u1EC1n nh\xE0 c\xF9ng
       v\u1EDBi nh\u1EEFng hy v\u1ECDng mong manh c\xF2n s\xF3t l\u1EA1i."
     waitTime: 2
+    voiceClip: {fileID: 0}
   - image: {fileID: -2091281707, guid: c786c32e5e49c9b4487ac4011212321e, type: 3}
     dialogue: "K\u1EC3 t\u1EEB \u0111\xEAm \u0111\xF3, tr\xE1i tim c\u1EE7a ng\u01B0\u1EDDi
       m\u1EB9 b\u1EAFt \u0111\u1EA7u ch\xECm d\u1EA7n v\xE0o b\xF3ng t\u1ED1i v\xE0
       n\u1ED7i \u0111au kh\xF4ng th\u1EC3 ch\u1EEFa l\xE0nh."
     waitTime: 2
+    voiceClip: {fileID: 0}
   fadeDuration: 0.4
   typeSpeed: 0.035
   scriptsToDisable:
@@ -218015,6 +218028,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3dc9cbc9439646749893602a4ff19dff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  itemName: ManhGiay1
   promptText: {fileID: 1896452819}
   interactMessage: "Nh\u1EA5n [E] \u0111\u1EC3 nh\u1EB7t m\u1EA3nh \u1EA3nh"
   collectSound: {fileID: 8300000, guid: 83b9a9049b5aa4a4092ba121398f62df, type: 3}
@@ -253268,7 +253282,8 @@ MonoBehaviour:
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: b5061a9bc38b7284d9cc6568f5a5b7dd, type: 2}
   m_sharedMaterial: {fileID: 9108110975851271829, guid: b5061a9bc38b7284d9cc6568f5a5b7dd, type: 2}
-  m_fontSharedMaterials: []
+  m_fontSharedMaterials:
+  - {fileID: 9108110975851271829, guid: b5061a9bc38b7284d9cc6568f5a5b7dd, type: 2}
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
@@ -269375,6 +269390,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3dc9cbc9439646749893602a4ff19dff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  itemName: ManhGiay1
   promptText: {fileID: 1896452819}
   interactMessage: "Nh\u1EA5n [E] \u0111\u1EC3 nh\u1EB7t m\u1EA3nh \u1EA3nh"
   collectSound: {fileID: 8300000, guid: 83b9a9049b5aa4a4092ba121398f62df, type: 3}
@@ -274560,6 +274576,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3dc9cbc9439646749893602a4ff19dff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  itemName: ManhGiay1
   promptText: {fileID: 1896452819}
   interactMessage: "Nh\u1EA5n [E] \u0111\u1EC3 nh\u1EB7t m\u1EA3nh \u1EA3nh"
   collectSound: {fileID: 8300000, guid: 83b9a9049b5aa4a4092ba121398f62df, type: 3}
