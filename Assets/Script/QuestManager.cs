@@ -70,6 +70,7 @@ public class QuestManager : MonoBehaviour
     private bool isShowingThought;
     private bool detailedHintUnlocked;
     private bool isCompletingChapter;
+    private bool subQuestHintsSuppressed;
 
     private Coroutine chapterRoutine;
     private Coroutine questToggleRoutine;
@@ -111,7 +112,8 @@ public class QuestManager : MonoBehaviour
         if (GameInputBridge.GetKeyDown(KeyCode.H))
         {
             if (!isShowingThought &&
-                !isCompletingChapter)
+                !isCompletingChapter &&
+                !IsSubQuestHintPresentationBlocked())
             {
                 ShowCurrentSubQuestHint();
             }
@@ -188,7 +190,7 @@ public class QuestManager : MonoBehaviour
         {
             ActivateSubQuest(
                 currentSubQuestIndex,
-                true
+                !IsSubQuestHintPresentationBlocked()
             );
         }
         else if (autoCompleteChapter)
@@ -311,6 +313,12 @@ public class QuestManager : MonoBehaviour
             return;
         }
 
+        if (nextIndex == currentSubQuestIndex)
+        {
+            RefreshSubQuestLine(currentSubQuestIndex);
+            return;
+        }
+
         ActivateSubQuest(nextIndex, showHint);
     }
 
@@ -366,7 +374,8 @@ public class QuestManager : MonoBehaviour
 
     public void ShowCurrentSubQuestHint()
     {
-        if (currentSubQuestIndex < 0)
+        if (IsSubQuestHintPresentationBlocked() ||
+            currentSubQuestIndex < 0)
         {
             return;
         }
@@ -430,7 +439,7 @@ public class QuestManager : MonoBehaviour
         if (hintControlText != null)
         {
             hintControlText.text = isDetailed
-                ? "Gợi ý chi tiết • H: Xem lại"
+                ? "Gợi ý chi tiết - H: Xem lại"
                 : "H: Xem lại gợi ý";
         }
 
@@ -480,7 +489,8 @@ public class QuestManager : MonoBehaviour
         detailedHintUnlocked = true;
         detailedHintRoutine = null;
 
-        if (autoShowDetailedHint)
+        if (autoShowDetailedHint &&
+            !IsSubQuestHintPresentationBlocked())
         {
             ShowCurrentSubQuestHint();
         }
@@ -599,7 +609,8 @@ public class QuestManager : MonoBehaviour
             return false;
         }
 
-        if (subQuestIndex != currentSubQuestIndex)
+        if (subQuestIndex != currentSubQuestIndex &&
+            !AllowsOutOfOrderCompletion())
         {
             Debug.LogWarning(
                 "Không thể hoàn thành nhiệm vụ số " +
@@ -636,7 +647,8 @@ public class QuestManager : MonoBehaviour
             return;
         }
 
-        if (index != currentSubQuestIndex)
+        if (index != currentSubQuestIndex &&
+            !AllowsOutOfOrderCompletion())
         {
             Debug.LogWarning(
                 "Không thể hoàn thành nhiệm vụ số " +
@@ -684,9 +696,59 @@ public class QuestManager : MonoBehaviour
             ActivateNextIncompleteSubQuest(false);
         }
 
+        if (IsSubQuestHintPresentationBlocked())
+        {
+            HideCanvasGroupInstant(subQuestHintPanelGroup);
+
+            if (AreAllSubQuestsCompleted() &&
+                autoCompleteChapter)
+            {
+                CompleteCurrentChapter();
+            }
+
+            return;
+        }
+
         hintRoutine = StartCoroutine(
             ShowCompletedSubQuestRoutine(index)
         );
+    }
+
+    public void CompleteCurrentSubQuest()
+    {
+        if (currentSubQuestIndex >= 0)
+        {
+            CompleteSubQuest(currentSubQuestIndex);
+        }
+    }
+
+    public void SetSubQuestHintsSuppressed(
+        bool suppressed,
+        bool showCurrentHintOnResume = true)
+    {
+        subQuestHintsSuppressed = suppressed;
+
+        if (suppressed)
+        {
+            if (hintRoutine != null)
+            {
+                StopCoroutine(hintRoutine);
+                hintRoutine = null;
+            }
+
+            HideCanvasGroupInstant(subQuestHintPanelGroup);
+            return;
+        }
+
+        if (showCurrentHintOnResume &&
+            !isCompletingChapter &&
+            currentSubQuestIndex >= 0 &&
+            completedSubQuests != null &&
+            currentSubQuestIndex < completedSubQuests.Length &&
+            !completedSubQuests[currentSubQuestIndex])
+        {
+            ShowCurrentSubQuestHint();
+        }
     }
 
     private IEnumerator ShowCompletedSubQuestRoutine(
@@ -704,7 +766,7 @@ public class QuestManager : MonoBehaviour
         if (subQuestHintText != null)
         {
             subQuestHintText.text =
-                "☑ " +
+                "[X] " +
                 chapter.subQuests[
                     completedIndex
                 ].title;
@@ -781,6 +843,27 @@ public class QuestManager : MonoBehaviour
         }
 
         return true;
+    }
+
+    private bool AllowsOutOfOrderCompletion()
+    {
+        return chapters != null &&
+               currentChapterIndex >= 0 &&
+               currentChapterIndex < chapters.Length &&
+               chapters[currentChapterIndex] != null &&
+               chapters[currentChapterIndex]
+                   .allowOutOfOrderCompletion;
+    }
+
+    private bool IsSubQuestHintPresentationBlocked()
+    {
+        // Các mini game của dự án đều mở con trỏ và bỏ khóa chuột.
+        // Trong trạng thái đó không tự bật hint đè lên UI đang thao tác.
+        bool modalUiIsOpen =
+            Cursor.visible &&
+            Cursor.lockState != CursorLockMode.Locked;
+
+        return subQuestHintsSuppressed || modalUiIsOpen;
     }
 
     public void CompleteCurrentChapter()
@@ -956,7 +1039,7 @@ public class QuestManager : MonoBehaviour
             completedSubQuests[index])
         {
             subQuestTexts[index].text =
-                "☑ " + title;
+                "[X] " + title;
 
             subQuestTexts[index].color =
                 new Color(0.65f, 0.65f, 0.65f);
@@ -979,17 +1062,26 @@ public class QuestManager : MonoBehaviour
             }
 
             subQuestTexts[index].text =
-                "▶ " + title + progressText;
+                "> " + title + progressText;
 
             subQuestTexts[index].color = Color.white;
             return;
         }
 
-        subQuestTexts[index].text =
-            "☐ " + title + " [Chưa mở]";
+        if (AllowsOutOfOrderCompletion())
+        {
+            subQuestTexts[index].text = "[ ] " + title;
+            subQuestTexts[index].color =
+                new Color(0.75f, 0.75f, 0.75f);
+        }
+        else
+        {
+            subQuestTexts[index].text =
+                "[ ] " + title + " [Chưa mở]";
 
-        subQuestTexts[index].color =
-            new Color(0.45f, 0.45f, 0.45f);
+            subQuestTexts[index].color =
+                new Color(0.45f, 0.45f, 0.45f);
+        }
     }
 
     private int GetConfiguredRequiredAmount(
@@ -1057,10 +1149,10 @@ public class QuestManager : MonoBehaviour
 
         canvasGroup.alpha = targetAlpha;
 
-        bool visible = targetAlpha > 0.01f;
-
-        canvasGroup.interactable = visible;
-        canvasGroup.blocksRaycasts = visible;
+        // Các CanvasGroup trong QuestManager chỉ dùng để hiển thị thông tin.
+        // Không cho chúng chặn raycast để người chơi vẫn kéo/thả và bấm UI mini game.
+        canvasGroup.interactable = false;
+        canvasGroup.blocksRaycasts = false;
     }
 
     private IEnumerator TypeText(

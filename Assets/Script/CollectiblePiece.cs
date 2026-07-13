@@ -20,6 +20,7 @@ public class CollectiblePiece : MonoBehaviour
 
     private bool isPlayerInside = false;
     private bool promptSuppressedUntilExit = false;
+    private bool isCollected = false;
 
     private void Start()
     {
@@ -49,6 +50,9 @@ public class CollectiblePiece : MonoBehaviour
 
     private void CollectThisPiece()
     {
+        if (isCollected) return;
+        isCollected = true;
+
         ProximityLightGlow proximityLight = GetComponent<ProximityLightGlow>();
         if (proximityLight != null)
         {
@@ -57,8 +61,7 @@ public class CollectiblePiece : MonoBehaviour
 
         if (Chapter1Manager.Instance != null)
         {
-            Chapter1Manager.Instance.collectedPieces++;
-            Debug.Log($"Đã nhặt được mảnh ảnh! Tiến độ hiện tại: {Chapter1Manager.Instance.collectedPieces}/{Chapter1Manager.Instance.totalPiecesRequired}");
+            Chapter1Manager.Instance.RegisterCollectedPiece(itemName);
         }
 
         PlayerInventory.Add(itemName);   // them vao hotbar
@@ -73,10 +76,6 @@ public class CollectiblePiece : MonoBehaviour
         if (ItemInfoUI.IsVisible) ItemInfoUI.Instance.HideInfo();
         Destroy(gameObject);
 
-        if (QuestManager.Instance != null)
-        {
-            QuestManager.Instance.CompleteSubQuest(0);
-        }
     }
 
     private void OnTriggerEnter(Collider other)

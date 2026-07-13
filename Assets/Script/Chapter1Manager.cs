@@ -3,6 +3,7 @@ using UnityEngine.Playables;
 using UnityEngine.InputSystem;
 using ElmanGameDevTools.PlayerSystem;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine.UI;
 
 public class Chapter1Manager : MonoBehaviour
@@ -12,6 +13,9 @@ public class Chapter1Manager : MonoBehaviour
     [Header("Tiến trình Nhiệm vụ")]
     public int collectedPieces = 0;
     public int totalPiecesRequired = 4;
+
+    private readonly HashSet<string> collectedPieceIds =
+        new HashSet<string>();
 
     private bool isPuzzleFinished = false;
 
@@ -88,26 +92,66 @@ public class Chapter1Manager : MonoBehaviour
         }
     }
 
-    public void TryTriggerPuzzle()
+    public bool TryTriggerPuzzle()
     {
         if (isPuzzleFinished)
         {
             Debug.Log("Bạn đã hoàn thành phong ấn bức tranh này rồi, không thể mở lại!");
-            return;
+            return false;
         }
 
         if (collectedPieces >= totalPiecesRequired)
         {
             OpenPuzzleGame();
+            return true;
         }
-        else
+
+        Debug.Log($"Chưa tìm đủ số mảnh ảnh nhiệm vụ! Tiến độ hiện tại: {collectedPieces}/{totalPiecesRequired}");
+        return false;
+    }
+
+    public bool RegisterCollectedPiece(string pieceId)
+    {
+        string safeId = string.IsNullOrWhiteSpace(pieceId)
+            ? "Piece_" + (collectedPieces + 1)
+            : pieceId.Trim();
+
+        if (!collectedPieceIds.Add(safeId))
         {
-            Debug.Log($"Chưa tìm đủ số mảnh ảnh nhiệm vụ! Tiến độ hiện tại: {collectedPieces}/{totalPiecesRequired}");
+            Debug.LogWarning("Mảnh ảnh đã được tính trước đó: " + safeId);
+            return false;
         }
+
+        collectedPieces = Mathf.Min(
+            collectedPieces + 1,
+            totalPiecesRequired
+        );
+
+        Debug.Log(
+            $"Đã nhặt mảnh ảnh {safeId}. Tiến độ: " +
+            $"{collectedPieces}/{totalPiecesRequired}"
+        );
+
+        if (QuestManager.Instance != null)
+        {
+            QuestManager.Instance.ReportProgressForChapter(
+                1,
+                0,
+                1,
+                totalPiecesRequired
+            );
+        }
+
+        return true;
     }
 
     private void OpenPuzzleGame()
     {
+        if (QuestManager.Instance != null)
+        {
+            QuestManager.Instance.SetSubQuestHintsSuppressed(true);
+        }
+
         if (puzzleMiniGameUI != null)
         {
             puzzleMiniGameUI.SetActive(true);
@@ -140,6 +184,11 @@ public class Chapter1Manager : MonoBehaviour
 
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
+        }
+
+        if (!isWin && QuestManager.Instance != null)
+        {
+            QuestManager.Instance.SetSubQuestHintsSuppressed(false);
         }
     }
 
