@@ -1,66 +1,78 @@
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
-using UnityEngine.InputSystem;   // de doc input bang Input System moi
 
 public class Generator : MonoBehaviour, IInteractable
 {
-    [Header("Cau hinh nhien lieu")]
-    public int requiredCans = 2;   // so binh can cam de bat dau do
+    [Header("Cấu hình nhiên liệu")]
+    [SerializeField] private string fuelItemName = "Xang";
+    [SerializeField] private int requiredCans = 2;
 
-    [Header("Trang thai")]
-    public bool isPowered = false;
+    [Header("Trạng thái")]
+    [SerializeField] private bool isPowered;
 
-    [Header("Thanh xang (bam chuot trai)")]
-    public Slider fuelBar;                 // keo FuelFillBar vao day
-    public float fillPerPress = 0.06f;     // moi lan bam chuot tang bao nhieu
-    public float drainPerSecond = 0.25f;   // ngung bam thi tut bao nhieu/giay
+    [Header("Thanh đổ xăng")]
+    [SerializeField] private Slider fuelBar;
 
-    [Header("Hieu ung (co the de trong)")]
-    public AudioSource generatorAudio;
-    public ParticleSystem exhaustSmoke;
+    [Tooltip("Lượng xăng tăng sau mỗi lần bấm chuột trái")]
+    [SerializeField, Range(0.01f, 1f)]
+    private float fillPerPress = 0.06f;
 
-    [Header("Su kien khi du xang")]
-    public UnityEvent onPowerOn;
+    [Tooltip("Lượng xăng bị tụt mỗi giây khi không bấm chuột")]
+    [SerializeField, Min(0f)]
+    private float drainPerSecond = 0.25f;
 
-    private bool isFilling = false;   // dang trong qua trinh do xang chua
-    private float fillAmount = 0f;    // do day hien tai (0 -> 1)
+    [Header("Hiệu ứng")]
+    [SerializeField] private AudioSource generatorAudio;
+    [SerializeField] private ParticleSystem exhaustSmoke;
 
-    public string GetInteractPrompt()
+    [Header("Sự kiện khi máy phát hoạt động")]
+    [SerializeField] private UnityEvent onPowerOn;
+
+    [Header("Nhiệm vụ")]
+    [SerializeField] private int chapterIndex = 0;
+    [SerializeField] private int generatorSubQuestIndex = 1;
+
+    private bool isFilling;
+    private float fillAmount;
+
+    public bool IsPowered => isPowered;
+
+    private void Start()
     {
-        if (isPowered) return "";
-        if (isFilling) return "Bam chuot trai lien tuc de do xang!";
-        return "Nhan E de bat dau do xang";
+        fillAmount = 0f;
+        isFilling = false;
+
+        if (fuelBar != null)
+        {
+            fuelBar.minValue = 0f;
+            fuelBar.maxValue = 1f;
+            fuelBar.value = 0f;
+            fuelBar.gameObject.SetActive(false);
+        }
+
+        if (exhaustSmoke != null && !isPowered)
+        {
+            exhaustSmoke.Stop(
+                true,
+                ParticleSystemStopBehavior.StopEmittingAndClear
+            );
+        }
     }
 
-    // Bam E de bat dau qua trinh do
-    public void Interact()
+    private void Update()
     {
-        if (isPowered || isFilling) return;
-
-        // Dem so binh xang trong kho moi
-        if (PlayerInventory.Count("Xang") < requiredCans)
+        if (!isFilling || isPowered)
         {
-            Debug.Log("Chua du binh xang! Can " + requiredCans + " binh.");
             return;
         }
 
-        isFilling = true;
-        fillAmount = 0f;
-        if (fuelBar != null)
-        {
-            fuelBar.value = 0f;
-            fuelBar.gameObject.SetActive(true);   // hien thanh
-        }
-        Debug.Log("Bat dau do xang. Bam chuot trai lien tuc!");
-    }
+        bool pressedLeftMouse =
+            Mouse.current != null &&
+            Mouse.current.leftButton.wasPressedThisFrame;
 
-    void Update()
-    {
-        if (!isFilling || isPowered) return;
-
-        // Bam chuot trai (bam-nha lien tuc) -> tang; khong bam -> tut dan
-        if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
+        if (pressedLeftMouse)
         {
             fillAmount += fillPerPress;
         }
@@ -70,26 +82,143 @@ public class Generator : MonoBehaviour, IInteractable
         }
 
         fillAmount = Mathf.Clamp01(fillAmount);
-        if (fuelBar != null) fuelBar.value = fillAmount;
 
-        // Day thanh -> bat dien
+        if (fuelBar != null)
+        {
+            fuelBar.value = fillAmount;
+        }
+
         if (fillAmount >= 1f)
+        {
             PowerOn();
+        }
     }
 
-    void PowerOn()
+    public string GetInteractPrompt()
     {
+        if (isPowered)
+        {
+            return "";
+        }
+
+        if (isFilling)
+        {
+            return "Bấm chuột trái liên tục để đổ xăng";
+        }
+
+        int currentCans = PlayerInventory.Count(fuelItemName);
+
+        if (currentCans < requiredCans)
+        {
+            return $"Cần tìm đủ can xăng ({currentCans}/{requiredCans})";
+        }
+
+        return "Nhấn E để bắt đầu đổ xăng";
+    }
+
+    public void Interact()
+    {
+        if (isPowered)
+        {
+            Debug.Log("Máy phát điện đã hoạt động.");
+            return;
+        }
+
+        if (isFilling)
+        {
+            return;
+        }
+
+        int currentCans = PlayerInventory.Count(fuelItemName);
+
+        if (currentCans < requiredCans)
+        {
+            Debug.Log(
+                $"Chưa đủ can xăng. Hiện có {currentCans}/{requiredCans}."
+            );
+
+            return;
+        }
+
+        BeginFueling();
+    }
+
+    private void BeginFueling()
+    {
+        if (fuelBar == null)
+        {
+            Debug.LogError(
+                "Generator chưa được gán Fuel Bar trong Inspector."
+            );
+
+            return;
+        }
+
+        isFilling = true;
+        fillAmount = 0f;
+
+        fuelBar.value = 0f;
+        fuelBar.gameObject.SetActive(true);
+
+        Debug.Log(
+            "Bắt đầu đổ xăng. Bấm chuột trái liên tục để làm đầy thanh."
+        );
+    }
+
+    private void PowerOn()
+    {
+        if (isPowered)
+        {
+            return;
+        }
+
         isPowered = true;
         isFilling = false;
+        fillAmount = 1f;
 
-        if (fuelBar != null) fuelBar.gameObject.SetActive(false);   // an thanh
+        if (fuelBar != null)
+        {
+            fuelBar.value = 1f;
+            fuelBar.gameObject.SetActive(false);
+        }
 
-        // Xoa het binh xang khoi kho sau khi do xong
-        PlayerInventory.RemoveAll("Xang");
+        // Xóa các can xăng khỏi kho sau khi sử dụng.
+        PlayerInventory.RemoveAll(fuelItemName);
 
-        if (generatorAudio != null) generatorAudio.Play();
-        if (exhaustSmoke != null) exhaustSmoke.Play();
-        onPowerOn.Invoke();
-        Debug.Log("Du xang! May phat chay, den bat.");
+        if (generatorAudio != null)
+        {
+            generatorAudio.loop = true;
+
+            if (!generatorAudio.isPlaying)
+            {
+                generatorAudio.Play();
+            }
+        }
+
+        if (exhaustSmoke != null)
+        {
+            exhaustSmoke.Play();
+        }
+
+        // Gọi RoomLight.TurnOn() được gán trong Inspector.
+        onPowerOn?.Invoke();
+
+        // Hoàn thành nhiệm vụ:
+        // "Đổ xăng và khởi động máy phát điện".
+        if (QuestManager.Instance != null)
+        {
+            QuestManager.Instance.CompleteSubQuestForChapter(
+                chapterIndex,
+                generatorSubQuestIndex
+            );
+        }
+        else
+        {
+            Debug.LogWarning(
+                "Không tìm thấy QuestManager trong Scene."
+            );
+        }
+
+        Debug.Log("Máy phát đã hoạt động và hệ thống đèn đã được bật.");
     }
 }

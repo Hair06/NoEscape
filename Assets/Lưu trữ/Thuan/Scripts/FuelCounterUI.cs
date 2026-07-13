@@ -1,27 +1,76 @@
-using UnityEngine;
 using TMPro;
+using UnityEngine;
 
 public class FuelCounterUI : MonoBehaviour
 {
-    public TextMeshProUGUI fuelText;
-    public Generator generator;        // keo object Generator vao day
-    public GameObject uiToHide;        // object UI se an di khi xong
+    [Header("UI")]
+    [SerializeField] private TextMeshProUGUI fuelText;
+    [SerializeField] private GameObject uiToHide;
 
-    void Start()
+    [Header("Máy phát")]
+    [SerializeField] private Generator generator;
+
+    [Header("Cấu hình")]
+    [SerializeField] private string fuelItemName = "Xang";
+    [SerializeField] private int requiredCans = 2;
+
+    private int lastFuelCount = -1;
+    private bool uiHidden;
+
+    private void Start()
     {
-        FuelInventory.cansHeld = 0;
+        // Không đặt số can về 0 tại đây vì PlayerInventory tự quản lý.
+        UpdateFuelText();
     }
 
-    void Update()
+    private void Update()
     {
-        // Khi may phat du xang -> an UI, xem nhu hoan thanh
-        if (generator != null && generator.isPowered)
+        if (generator != null && generator.IsPowered)
         {
-            if (uiToHide != null) uiToHide.SetActive(false);
+            HideFuelUI();
             return;
         }
 
+        int currentFuelCount =
+            PlayerInventory.Count(fuelItemName);
+
+        // Chỉ cập nhật UI khi số lượng thay đổi.
+        if (currentFuelCount != lastFuelCount)
+        {
+            UpdateFuelText();
+        }
+    }
+
+    private void UpdateFuelText()
+    {
+        int currentFuelCount =
+            PlayerInventory.Count(fuelItemName);
+
+        lastFuelCount = currentFuelCount;
+
         if (fuelText != null)
-            fuelText.text = " " + FuelInventory.cansHeld;
+        {
+            fuelText.text =
+                $"Can xăng: {currentFuelCount}/{requiredCans}";
+        }
+    }
+
+    private void HideFuelUI()
+    {
+        if (uiHidden)
+        {
+            return;
+        }
+
+        uiHidden = true;
+
+        if (uiToHide != null)
+        {
+            uiToHide.SetActive(false);
+        }
+        else if (fuelText != null)
+        {
+            fuelText.gameObject.SetActive(false);
+        }
     }
 }
