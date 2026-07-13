@@ -72,7 +72,7 @@ namespace ElmanGameDevTools.PlayerAudio
                 if (!audioSource.isPlaying || audioSource.clip != clip)
                 {
                     audioSource.clip = clip;
-                    
+                    audioSource.Play();
                 }
             }
 
