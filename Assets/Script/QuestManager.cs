@@ -34,6 +34,10 @@ public class QuestManager : MonoBehaviour
     [Header("Quest Data")]
     [SerializeField] private QuestData[] chapters;
 
+    [Header("Quest Start")]
+    [Tooltip("Tắt mục này nếu nhiệm vụ chỉ bắt đầu khi Player đi qua trigger cửa chính.")]
+    [SerializeField] private bool startQuestAutomatically;
+
     [Header("Quest Progress Requirements")]
     [Tooltip("Khai báo các nhiệm vụ có bộ đếm, ví dụ Chapter 0 / Sub Quest 0 / Required Amount 2")]
     [SerializeField] private QuestProgressRequirement[] progressRequirements;
@@ -71,6 +75,9 @@ public class QuestManager : MonoBehaviour
     private bool detailedHintUnlocked;
     private bool isCompletingChapter;
     private bool subQuestHintsSuppressed;
+    private bool questFlowStarted;
+
+    public bool IsQuestFlowStarted => questFlowStarted;
 
     private Coroutine chapterRoutine;
     private Coroutine questToggleRoutine;
@@ -95,11 +102,19 @@ public class QuestManager : MonoBehaviour
         HideCanvasGroupInstant(characterThoughtPanelGroup);
         HideCanvasGroupInstant(subQuestHintPanelGroup);
 
-        ShowChapterQuest(0);
+        if (startQuestAutomatically)
+        {
+            BeginQuestFlow(0);
+        }
     }
 
     private void Update()
     {
+        if (!questFlowStarted)
+        {
+            return;
+        }
+
         if (GameInputBridge.GetKeyDown(KeyCode.Tab))
         {
             if (!isShowingThought &&
@@ -166,6 +181,35 @@ public class QuestManager : MonoBehaviour
         }
 
         chapterRoutine = StartCoroutine(StartChapterRoutine(data));
+    }
+
+    public bool BeginQuestFlow(int startingChapterIndex = 0)
+    {
+        if (questFlowStarted)
+        {
+            return false;
+        }
+
+        if (chapters == null ||
+            chapters.Length == 0 ||
+            startingChapterIndex < 0 ||
+            startingChapterIndex >= chapters.Length)
+        {
+            Debug.LogWarning(
+                "Không thể bắt đầu nhiệm vụ. Starting Chapter Index không hợp lệ: " +
+                startingChapterIndex
+            );
+            return false;
+        }
+
+        questFlowStarted = true;
+        ShowChapterQuest(startingChapterIndex);
+
+        Debug.Log(
+            "Đã kích hoạt hệ thống nhiệm vụ từ Chapter Index " +
+            startingChapterIndex + "."
+        );
+        return true;
     }
 
     private IEnumerator StartChapterRoutine(QuestData data)
