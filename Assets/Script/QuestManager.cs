@@ -4,6 +4,14 @@ using UnityEngine;
 
 public class QuestManager : MonoBehaviour
 {
+    [System.Serializable]
+    private class QuestProgressRequirement
+    {
+        [Min(0)] public int chapterIndex;
+        [Min(0)] public int subQuestIndex;
+        [Min(1)] public int requiredAmount = 1;
+    }
+
     public static QuestManager Instance;
 
     [Header("Quest UI")]
@@ -25,6 +33,10 @@ public class QuestManager : MonoBehaviour
 
     [Header("Quest Data")]
     [SerializeField] private QuestData[] chapters;
+
+    [Header("Quest Progress Requirements")]
+    [Tooltip("Khai báo các nhiệm vụ có bộ đếm, ví dụ Chapter 0 / Sub Quest 0 / Required Amount 2")]
+    [SerializeField] private QuestProgressRequirement[] progressRequirements;
 
     [Header("Quest Effect")]
     [SerializeField] private float fadeDuration = 0.5f;
@@ -51,15 +63,19 @@ public class QuestManager : MonoBehaviour
     private int currentSubQuestIndex = -1;
 
     private bool[] completedSubQuests;
+    private int[] subQuestProgress;
+    private int[] requiredSubQuestProgress;
 
     private bool isQuestVisible;
     private bool isShowingThought;
     private bool detailedHintUnlocked;
+    private bool isCompletingChapter;
 
     private Coroutine chapterRoutine;
     private Coroutine questToggleRoutine;
     private Coroutine hintRoutine;
     private Coroutine detailedHintRoutine;
+    private Coroutine progressDisplayRoutine;
 
     private void Awake()
     {
@@ -85,7 +101,8 @@ public class QuestManager : MonoBehaviour
     {
         if (GameInputBridge.GetKeyDown(KeyCode.Tab))
         {
-            if (!isShowingThought)
+            if (!isShowingThought &&
+                !isCompletingChapter)
             {
                 ToggleQuestPanel();
             }
@@ -93,7 +110,8 @@ public class QuestManager : MonoBehaviour
 
         if (GameInputBridge.GetKeyDown(KeyCode.H))
         {
-            if (!isShowingThought)
+            if (!isShowingThought &&
+                !isCompletingChapter)
             {
                 ShowCurrentSubQuestHint();
             }
@@ -119,6 +137,7 @@ public class QuestManager : MonoBehaviour
         currentChapterIndex = chapterIndex;
         currentSubQuestIndex = -1;
         detailedHintUnlocked = false;
+        isCompletingChapter = false;
 
         QuestData data = chapters[currentChapterIndex];
 
@@ -127,6 +146,22 @@ public class QuestManager : MonoBehaviour
             : 0;
 
         completedSubQuests = new bool[subQuestCount];
+        subQuestProgress = new int[subQuestCount];
+        requiredSubQuestProgress = new int[subQuestCount];
+
+        for (int i = 0; i < subQuestCount; i++)
+        {
+            requiredSubQuestProgress[i] =
+                GetConfiguredRequiredAmount(
+                    currentChapterIndex,
+                    i
+                );
+        }
+
+        if (subQuestCount > 0)
+        {
+            currentSubQuestIndex = 0;
+        }
 
         chapterRoutine = StartCoroutine(StartChapterRoutine(data));
     }
@@ -149,7 +184,17 @@ public class QuestManager : MonoBehaviour
 
         chapterRoutine = null;
 
-        ActivateNextIncompleteSubQuest(true);
+        if (currentSubQuestIndex >= 0)
+        {
+            ActivateSubQuest(
+                currentSubQuestIndex,
+                true
+            );
+        }
+        else if (autoCompleteChapter)
+        {
+            CompleteCurrentChapter();
+        }
     }
 
     private void SetupQuestUI(QuestData data)
@@ -175,10 +220,7 @@ public class QuestManager : MonoBehaviour
             if (data.subQuests != null &&
                 i < data.subQuests.Length)
             {
-                subQuestTexts[i].text =
-                    "☐ " + data.subQuests[i].title;
-
-                subQuestTexts[i].color = Color.white;
+                RefreshSubQuestLine(i);
             }
             else
             {
@@ -291,6 +333,10 @@ public class QuestManager : MonoBehaviour
 
         currentSubQuestIndex = subQuestIndex;
         detailedHintUnlocked = false;
+
+        RefreshSubQuestLine(
+            currentSubQuestIndex
+        );
 
         if (detailedHintRoutine != null)
         {
@@ -440,6 +486,133 @@ public class QuestManager : MonoBehaviour
         }
     }
 
+    public void ReportProgressForChapter(
+        int chapterIndex,
+        int subQuestIndex,
+        int amount,
+        int requiredAmount)
+    {
+        if (!CanUpdateSubQuest(
+                chapterIndex,
+                subQuestIndex))
+        {
+            return;
+        }
+
+        if (amount <= 0)
+        {
+            Debug.LogWarning(
+                "Số tiến độ cộng thêm phải lớn hơn 0."
+            );
+            return;
+        }
+
+        requiredSubQuestProgress[subQuestIndex] =
+            Mathf.Max(1, requiredAmount);
+
+        subQuestProgress[subQuestIndex] =
+            Mathf.Clamp(
+                subQuestProgress[subQuestIndex] + amount,
+                0,
+                requiredSubQuestProgress[subQuestIndex]
+            );
+
+        RefreshSubQuestLine(subQuestIndex);
+
+        Debug.Log(
+            "Tiến độ nhiệm vụ: " +
+            chapters[currentChapterIndex]
+                .subQuests[subQuestIndex].title +
+            " " +
+            subQuestProgress[subQuestIndex] +
+            "/" +
+            requiredSubQuestProgress[subQuestIndex]
+        );
+
+        if (subQuestProgress[subQuestIndex] >=
+            requiredSubQuestProgress[subQuestIndex])
+        {
+            CompleteSubQuestForChapter(
+                chapterIndex,
+                subQuestIndex
+            );
+        }
+        else
+        {
+            ShowQuestProgressTemporarily();
+        }
+    }
+
+    public void CompleteSubQuestForChapter(
+        int chapterIndex,
+        int subQuestIndex)
+    {
+        if (!CanUpdateSubQuest(
+                chapterIndex,
+                subQuestIndex))
+        {
+            return;
+        }
+
+        CompleteSubQuest(subQuestIndex);
+    }
+
+    private bool CanUpdateSubQuest(
+        int chapterIndex,
+        int subQuestIndex)
+    {
+        if (chapters == null ||
+            chapterIndex < 0 ||
+            chapterIndex >= chapters.Length)
+        {
+            Debug.LogWarning(
+                "Chapter Index không hợp lệ: " +
+                chapterIndex
+            );
+            return false;
+        }
+
+        if (chapterIndex != currentChapterIndex)
+        {
+            Debug.LogWarning(
+                "Không thể cập nhật Chapter " +
+                chapterIndex +
+                " vì Chapter hiện tại là " +
+                currentChapterIndex + "."
+            );
+            return false;
+        }
+
+        if (completedSubQuests == null ||
+            subQuestIndex < 0 ||
+            subQuestIndex >= completedSubQuests.Length)
+        {
+            Debug.LogWarning(
+                "Sub Quest Index không hợp lệ: " +
+                subQuestIndex
+            );
+            return false;
+        }
+
+        if (completedSubQuests[subQuestIndex])
+        {
+            return false;
+        }
+
+        if (subQuestIndex != currentSubQuestIndex)
+        {
+            Debug.LogWarning(
+                "Không thể hoàn thành nhiệm vụ số " +
+                subQuestIndex +
+                " trước nhiệm vụ hiện tại số " +
+                currentSubQuestIndex + "."
+            );
+            return false;
+        }
+
+        return true;
+    }
+
     public void CompleteSubQuest(int index)
     {
         if (completedSubQuests == null)
@@ -463,20 +636,30 @@ public class QuestManager : MonoBehaviour
             return;
         }
 
+        if (index != currentSubQuestIndex)
+        {
+            Debug.LogWarning(
+                "Không thể hoàn thành nhiệm vụ số " +
+                index +
+                " trước nhiệm vụ hiện tại số " +
+                currentSubQuestIndex + "."
+            );
+            return;
+        }
+
         completedSubQuests[index] = true;
+
+        if (subQuestProgress != null &&
+            requiredSubQuestProgress != null)
+        {
+            subQuestProgress[index] =
+                requiredSubQuestProgress[index];
+        }
 
         QuestData chapter =
             chapters[currentChapterIndex];
 
-        if (index < subQuestTexts.Length)
-        {
-            subQuestTexts[index].text =
-                "☑ " +
-                chapter.subQuests[index].title;
-
-            subQuestTexts[index].color =
-                new Color(0.65f, 0.65f, 0.65f);
-        }
+        RefreshSubQuestLine(index);
 
         Debug.Log(
             "Hoàn thành nhiệm vụ nhỏ: " +
@@ -492,6 +675,13 @@ public class QuestManager : MonoBehaviour
         if (hintRoutine != null)
         {
             StopCoroutine(hintRoutine);
+        }
+
+        if (!AreAllSubQuestsCompleted())
+        {
+            // Mở mục tiêu kế tiếp ngay lập tức để các
+            // tương tác liên tiếp không bị mất sự kiện.
+            ActivateNextIncompleteSubQuest(false);
         }
 
         hintRoutine = StartCoroutine(
@@ -550,7 +740,7 @@ public class QuestManager : MonoBehaviour
         }
         else
         {
-            ActivateNextIncompleteSubQuest(true);
+            ShowCurrentSubQuestHint();
         }
     }
 
@@ -595,7 +785,22 @@ public class QuestManager : MonoBehaviour
 
     public void CompleteCurrentChapter()
     {
+        if (isCompletingChapter)
+        {
+            return;
+        }
+
+        if (!AreAllSubQuestsCompleted())
+        {
+            Debug.LogWarning(
+                "Không thể hoàn thành chương vì vẫn còn nhiệm vụ nhỏ chưa hoàn thành."
+            );
+            return;
+        }
+
         StopManagedCoroutines();
+
+        isCompletingChapter = true;
 
         chapterRoutine = StartCoroutine(
             CompleteChapterRoutine()
@@ -604,6 +809,10 @@ public class QuestManager : MonoBehaviour
 
     private IEnumerator CompleteChapterRoutine()
     {
+        HideCanvasGroupInstant(
+            subQuestHintPanelGroup
+        );
+
         yield return FadeCanvasGroup(
             questPanelGroup,
             1f,
@@ -631,6 +840,7 @@ public class QuestManager : MonoBehaviour
         int nextChapter = currentChapterIndex + 1;
 
         chapterRoutine = null;
+        isCompletingChapter = false;
 
         if (nextChapter < chapters.Length)
         {
@@ -646,6 +856,12 @@ public class QuestManager : MonoBehaviour
 
     private void ToggleQuestPanel()
     {
+        if (progressDisplayRoutine != null)
+        {
+            StopCoroutine(progressDisplayRoutine);
+            progressDisplayRoutine = null;
+        }
+
         if (questToggleRoutine != null)
         {
             StopCoroutine(questToggleRoutine);
@@ -670,6 +886,136 @@ public class QuestManager : MonoBehaviour
         );
 
         questToggleRoutine = null;
+    }
+
+    private void ShowQuestProgressTemporarily()
+    {
+        if (isShowingThought ||
+            chapterRoutine != null ||
+            isCompletingChapter)
+        {
+            return;
+        }
+
+        if (progressDisplayRoutine != null)
+        {
+            StopCoroutine(progressDisplayRoutine);
+        }
+
+        progressDisplayRoutine = StartCoroutine(
+            ShowQuestProgressRoutine()
+        );
+    }
+
+    private IEnumerator ShowQuestProgressRoutine()
+    {
+        yield return FadeCanvasGroup(
+            questPanelGroup,
+            1f,
+            fadeDuration
+        );
+
+        isQuestVisible = true;
+
+        yield return new WaitForSecondsRealtime(
+            autoHideTime
+        );
+
+        yield return FadeCanvasGroup(
+            questPanelGroup,
+            0f,
+            fadeDuration
+        );
+
+        isQuestVisible = false;
+        progressDisplayRoutine = null;
+    }
+
+    private void RefreshSubQuestLine(int index)
+    {
+        if (subQuestTexts == null ||
+            index < 0 ||
+            index >= subQuestTexts.Length ||
+            subQuestTexts[index] == null)
+        {
+            return;
+        }
+
+        QuestData chapter = chapters[currentChapterIndex];
+
+        if (chapter.subQuests == null ||
+            index >= chapter.subQuests.Length)
+        {
+            subQuestTexts[index].text = "";
+            return;
+        }
+
+        string title = chapter.subQuests[index].title;
+
+        if (completedSubQuests != null &&
+            completedSubQuests[index])
+        {
+            subQuestTexts[index].text =
+                "☑ " + title;
+
+            subQuestTexts[index].color =
+                new Color(0.65f, 0.65f, 0.65f);
+            return;
+        }
+
+        if (index == currentSubQuestIndex)
+        {
+            string progressText = "";
+
+            if (requiredSubQuestProgress != null &&
+                requiredSubQuestProgress[index] > 1)
+            {
+                progressText =
+                    " (" +
+                    subQuestProgress[index] +
+                    "/" +
+                    requiredSubQuestProgress[index] +
+                    ")";
+            }
+
+            subQuestTexts[index].text =
+                "▶ " + title + progressText;
+
+            subQuestTexts[index].color = Color.white;
+            return;
+        }
+
+        subQuestTexts[index].text =
+            "☐ " + title + " [Chưa mở]";
+
+        subQuestTexts[index].color =
+            new Color(0.45f, 0.45f, 0.45f);
+    }
+
+    private int GetConfiguredRequiredAmount(
+        int chapterIndex,
+        int subQuestIndex)
+    {
+        if (progressRequirements == null)
+        {
+            return 1;
+        }
+
+        foreach (QuestProgressRequirement requirement
+                 in progressRequirements)
+        {
+            if (requirement != null &&
+                requirement.chapterIndex == chapterIndex &&
+                requirement.subQuestIndex == subQuestIndex)
+            {
+                return Mathf.Max(
+                    1,
+                    requirement.requiredAmount
+                );
+            }
+        }
+
+        return 1;
     }
 
     private IEnumerator FadeCanvasGroup(
@@ -801,6 +1147,12 @@ public class QuestManager : MonoBehaviour
         {
             StopCoroutine(detailedHintRoutine);
             detailedHintRoutine = null;
+        }
+
+        if (progressDisplayRoutine != null)
+        {
+            StopCoroutine(progressDisplayRoutine);
+            progressDisplayRoutine = null;
         }
 
         isShowingThought = false;

@@ -20,6 +20,13 @@ public class PickupItem : MonoBehaviour, IInteractable
 
         PlayerInventory.Add(itemName);
         Debug.Log("Da nhat: " + itemName);
+
+        // Nhiệm vụ mở đầu (chapter 0): tìm đủ 2 can xăng.
+        if (itemName == "Xang" && QuestManager.Instance != null)
+        {
+            QuestManager.Instance.ReportProgressForChapter(0, 0, 1, 2);
+        }
+
         Destroy(gameObject);
     }
 }
