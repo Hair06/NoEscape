@@ -6,34 +6,78 @@ public class QuestManager : MonoBehaviour
 {
     public static QuestManager Instance;
 
-    [Header("UI")]
+    [Header("Quest UI")]
     [SerializeField] private CanvasGroup questPanelGroup;
     [SerializeField] private TextMeshProUGUI chapterTitleText;
     [SerializeField] private TextMeshProUGUI mainQuestText;
     [SerializeField] private TextMeshProUGUI[] subQuestTexts;
     [SerializeField] private TextMeshProUGUI questHintText;
 
+    [Header("Character Thought UI")]
+    [SerializeField] private CanvasGroup characterThoughtPanelGroup;
+    [SerializeField] private TextMeshProUGUI characterThoughtText;
+
+    [Header("Sub Quest Hint UI")]
+    [SerializeField] private CanvasGroup subQuestHintPanelGroup;
+    [SerializeField] private TextMeshProUGUI activeSubQuestText;
+    [SerializeField] private TextMeshProUGUI subQuestHintText;
+    [SerializeField] private TextMeshProUGUI hintControlText;
+
     [Header("Quest Data")]
     [SerializeField] private QuestData[] chapters;
 
-    [Header("Effect")]
+    [Header("Quest Effect")]
     [SerializeField] private float fadeDuration = 0.5f;
     [SerializeField] private float typeSpeed = 0.02f;
     [SerializeField] private float autoHideTime = 3f;
 
-    private int currentChapterIndex = 0;
+    [Header("Character Thought Effect")]
+    [SerializeField] private float thoughtFadeDuration = 0.4f;
+    [SerializeField] private float thoughtTypeSpeed = 0.035f;
+    [SerializeField] private float thoughtHoldTime = 2.5f;
+
+    [Header("Sub Quest Hint Effect")]
+    [SerializeField] private float hintFadeDuration = 0.35f;
+    [SerializeField] private float hintTypeSpeed = 0.025f;
+    [SerializeField] private float hintHoldTime = 5f;
+
+    [Tooltip("Tự động hiện gợi ý chi tiết khi người chơi bị kẹt quá lâu")]
+    [SerializeField] private bool autoShowDetailedHint = true;
+
+    [Tooltip("Tự hoàn thành chương khi toàn bộ nhiệm vụ nhỏ đã hoàn thành")]
+    [SerializeField] private bool autoCompleteChapter = true;
+
+    private int currentChapterIndex;
+    private int currentSubQuestIndex = -1;
+
     private bool[] completedSubQuests;
-    private bool isVisible = false;
-    private Coroutine currentRoutine;
+
+    private bool isQuestVisible;
+    private bool isShowingThought;
+    private bool detailedHintUnlocked;
+
+    private Coroutine chapterRoutine;
+    private Coroutine questToggleRoutine;
+    private Coroutine hintRoutine;
+    private Coroutine detailedHintRoutine;
 
     private void Awake()
     {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
         Instance = this;
     }
 
     private void Start()
     {
-        HideInstant();
+        HideCanvasGroupInstant(questPanelGroup);
+        HideCanvasGroupInstant(characterThoughtPanelGroup);
+        HideCanvasGroupInstant(subQuestHintPanelGroup);
+
         ShowChapterQuest(0);
     }
 
@@ -41,41 +85,99 @@ public class QuestManager : MonoBehaviour
     {
         if (GameInputBridge.GetKeyDown(KeyCode.Tab))
         {
-            ToggleQuestPanel();
+            if (!isShowingThought)
+            {
+                ToggleQuestPanel();
+            }
+        }
+
+        if (GameInputBridge.GetKeyDown(KeyCode.H))
+        {
+            if (!isShowingThought)
+            {
+                ShowCurrentSubQuestHint();
+            }
         }
     }
 
     public void ShowChapterQuest(int chapterIndex)
     {
-        if (chapterIndex < 0 || chapterIndex >= chapters.Length)
+        if (chapters == null || chapters.Length == 0)
+        {
+            Debug.LogWarning("QuestManager chưa có dữ liệu chương.");
             return;
+        }
+
+        if (chapterIndex < 0 || chapterIndex >= chapters.Length)
+        {
+            Debug.LogWarning("Chapter Index không hợp lệ: " + chapterIndex);
+            return;
+        }
+
+        StopManagedCoroutines();
 
         currentChapterIndex = chapterIndex;
+        currentSubQuestIndex = -1;
+        detailedHintUnlocked = false;
 
-        QuestData data = chapters[chapterIndex];
-        completedSubQuests = new bool[data.subQuests.Length];
+        QuestData data = chapters[currentChapterIndex];
 
-        if (currentRoutine != null)
-            StopCoroutine(currentRoutine);
+        int subQuestCount = data.subQuests != null
+            ? data.subQuests.Length
+            : 0;
 
-        currentRoutine = StartCoroutine(ShowQuestRoutine(data));
+        completedSubQuests = new bool[subQuestCount];
+
+        chapterRoutine = StartCoroutine(StartChapterRoutine(data));
     }
 
-    private IEnumerator ShowQuestRoutine(QuestData data)
+    private IEnumerator StartChapterRoutine(QuestData data)
     {
-        SetPanelVisible(false);
+        HideCanvasGroupInstant(questPanelGroup);
+        HideCanvasGroupInstant(subQuestHintPanelGroup);
 
-        chapterTitleText.text = data.chapterTitle;
-        mainQuestText.text = "";
+        SetupQuestUI(data);
+
+        if (!string.IsNullOrWhiteSpace(data.characterThought))
+        {
+            yield return ShowCharacterThoughtRoutine(
+                data.characterThought
+            );
+        }
+
+        yield return ShowQuestRoutine(data);
+
+        chapterRoutine = null;
+
+        ActivateNextIncompleteSubQuest(true);
+    }
+
+    private void SetupQuestUI(QuestData data)
+    {
+        if (chapterTitleText != null)
+        {
+            chapterTitleText.text = data.chapterTitle;
+        }
+
+        if (mainQuestText != null)
+        {
+            mainQuestText.text = "";
+        }
 
         if (questHintText != null)
-            questHintText.text = "TAB: Ẩn / hiện nhiệm vụ";
+        {
+            questHintText.text =
+                "TAB: Ẩn / hiện nhiệm vụ";
+        }
 
         for (int i = 0; i < subQuestTexts.Length; i++)
         {
-            if (i < data.subQuests.Length)
+            if (data.subQuests != null &&
+                i < data.subQuests.Length)
             {
-                subQuestTexts[i].text = "☐ " + data.subQuests[i];
+                subQuestTexts[i].text =
+                    "☐ " + data.subQuests[i].title;
+
                 subQuestTexts[i].color = Color.white;
             }
             else
@@ -83,59 +185,452 @@ public class QuestManager : MonoBehaviour
                 subQuestTexts[i].text = "";
             }
         }
+    }
 
-        yield return FadePanel(1f);
-        isVisible = true;
+    private IEnumerator ShowCharacterThoughtRoutine(
+        string thoughtContent)
+    {
+        if (characterThoughtPanelGroup == null ||
+            characterThoughtText == null)
+        {
+            yield break;
+        }
 
-        yield return TypeText(mainQuestText, "Nhiệm vụ chính: " + data.mainQuest);
+        isShowingThought = true;
+        characterThoughtText.text = "";
 
-        yield return new WaitForSecondsRealtime(autoHideTime);
+        yield return FadeCanvasGroup(
+            characterThoughtPanelGroup,
+            1f,
+            thoughtFadeDuration
+        );
 
-        yield return FadePanel(0f);
-        isVisible = false;
+        yield return TypeText(
+            characterThoughtText,
+            thoughtContent,
+            thoughtTypeSpeed
+        );
+
+        yield return new WaitForSecondsRealtime(
+            thoughtHoldTime
+        );
+
+        yield return FadeCanvasGroup(
+            characterThoughtPanelGroup,
+            0f,
+            thoughtFadeDuration
+        );
+
+        characterThoughtText.text = "";
+        isShowingThought = false;
+    }
+
+    private IEnumerator ShowQuestRoutine(QuestData data)
+    {
+        yield return FadeCanvasGroup(
+            questPanelGroup,
+            1f,
+            fadeDuration
+        );
+
+        isQuestVisible = true;
+
+        yield return TypeText(
+            mainQuestText,
+            "Nhiệm vụ chính: " + data.mainQuest,
+            typeSpeed
+        );
+
+        yield return new WaitForSecondsRealtime(
+            autoHideTime
+        );
+
+        yield return FadeCanvasGroup(
+            questPanelGroup,
+            0f,
+            fadeDuration
+        );
+
+        isQuestVisible = false;
+    }
+
+    private void ActivateNextIncompleteSubQuest(
+        bool showHint)
+    {
+        int nextIndex = FindFirstIncompleteSubQuest();
+
+        if (nextIndex == -1)
+        {
+            if (autoCompleteChapter)
+            {
+                CompleteCurrentChapter();
+            }
+
+            return;
+        }
+
+        ActivateSubQuest(nextIndex, showHint);
+    }
+
+    private void ActivateSubQuest(
+        int subQuestIndex,
+        bool showHint)
+    {
+        QuestData chapter = chapters[currentChapterIndex];
+
+        if (chapter.subQuests == null)
+        {
+            return;
+        }
+
+        if (subQuestIndex < 0 ||
+            subQuestIndex >= chapter.subQuests.Length)
+        {
+            return;
+        }
+
+        currentSubQuestIndex = subQuestIndex;
+        detailedHintUnlocked = false;
+
+        if (detailedHintRoutine != null)
+        {
+            StopCoroutine(detailedHintRoutine);
+        }
+
+        SubQuestData subQuest =
+            chapter.subQuests[currentSubQuestIndex];
+
+        if (!string.IsNullOrWhiteSpace(
+                subQuest.detailedHint) &&
+            subQuest.detailedHintDelay > 0f)
+        {
+            detailedHintRoutine = StartCoroutine(
+                UnlockDetailedHintRoutine(
+                    currentSubQuestIndex,
+                    subQuest.detailedHintDelay
+                )
+            );
+        }
+
+        if (showHint)
+        {
+            ShowCurrentSubQuestHint();
+        }
+    }
+
+    public void ShowCurrentSubQuestHint()
+    {
+        if (currentSubQuestIndex < 0)
+        {
+            return;
+        }
+
+        QuestData chapter = chapters[currentChapterIndex];
+
+        if (chapter.subQuests == null ||
+            currentSubQuestIndex >=
+            chapter.subQuests.Length)
+        {
+            return;
+        }
+
+        SubQuestData subQuest =
+            chapter.subQuests[currentSubQuestIndex];
+
+        string hintContent = subQuest.hint;
+
+        if (detailedHintUnlocked &&
+            !string.IsNullOrWhiteSpace(
+                subQuest.detailedHint))
+        {
+            hintContent = subQuest.detailedHint;
+        }
+
+        if (hintRoutine != null)
+        {
+            StopCoroutine(hintRoutine);
+        }
+
+        hintRoutine = StartCoroutine(
+            ShowSubQuestHintRoutine(
+                subQuest.title,
+                hintContent,
+                detailedHintUnlocked
+            )
+        );
+    }
+
+    private IEnumerator ShowSubQuestHintRoutine(
+        string objective,
+        string hint,
+        bool isDetailed)
+    {
+        if (subQuestHintPanelGroup == null)
+        {
+            yield break;
+        }
+
+        if (activeSubQuestText != null)
+        {
+            activeSubQuestText.text =
+                "MỤC TIÊU HIỆN TẠI\n" + objective;
+        }
+
+        if (subQuestHintText != null)
+        {
+            subQuestHintText.text = "";
+        }
+
+        if (hintControlText != null)
+        {
+            hintControlText.text = isDetailed
+                ? "Gợi ý chi tiết • H: Xem lại"
+                : "H: Xem lại gợi ý";
+        }
+
+        yield return FadeCanvasGroup(
+            subQuestHintPanelGroup,
+            1f,
+            hintFadeDuration
+        );
+
+        yield return TypeText(
+            subQuestHintText,
+            hint,
+            hintTypeSpeed
+        );
+
+        yield return new WaitForSecondsRealtime(
+            hintHoldTime
+        );
+
+        yield return FadeCanvasGroup(
+            subQuestHintPanelGroup,
+            0f,
+            hintFadeDuration
+        );
+
+        hintRoutine = null;
+    }
+
+    private IEnumerator UnlockDetailedHintRoutine(
+        int expectedSubQuestIndex,
+        float delay)
+    {
+        yield return new WaitForSecondsRealtime(delay);
+
+        if (currentSubQuestIndex !=
+            expectedSubQuestIndex)
+        {
+            yield break;
+        }
+
+        if (completedSubQuests[
+                expectedSubQuestIndex])
+        {
+            yield break;
+        }
+
+        detailedHintUnlocked = true;
+        detailedHintRoutine = null;
+
+        if (autoShowDetailedHint)
+        {
+            ShowCurrentSubQuestHint();
+        }
     }
 
     public void CompleteSubQuest(int index)
     {
-        if (completedSubQuests == null) return;
-        if (index < 0 || index >= completedSubQuests.Length) return;
-        if (completedSubQuests[index]) return;
+        if (completedSubQuests == null)
+        {
+            return;
+        }
+
+        if (index < 0 ||
+            index >= completedSubQuests.Length)
+        {
+            Debug.LogWarning(
+                "Sub Quest Index không hợp lệ: " +
+                index
+            );
+
+            return;
+        }
+
+        if (completedSubQuests[index])
+        {
+            return;
+        }
 
         completedSubQuests[index] = true;
 
-        QuestData data = chapters[currentChapterIndex];
+        QuestData chapter =
+            chapters[currentChapterIndex];
 
         if (index < subQuestTexts.Length)
         {
-            subQuestTexts[index].text = "☑ " + data.subQuests[index];
-            subQuestTexts[index].color = new Color(0.65f, 0.65f, 0.65f);
+            subQuestTexts[index].text =
+                "☑ " +
+                chapter.subQuests[index].title;
+
+            subQuestTexts[index].color =
+                new Color(0.65f, 0.65f, 0.65f);
         }
 
-        Debug.Log("Hoàn thành nhiệm vụ nhỏ: " + data.subQuests[index]);
+        Debug.Log(
+            "Hoàn thành nhiệm vụ nhỏ: " +
+            chapter.subQuests[index].title
+        );
+
+        if (detailedHintRoutine != null)
+        {
+            StopCoroutine(detailedHintRoutine);
+            detailedHintRoutine = null;
+        }
+
+        if (hintRoutine != null)
+        {
+            StopCoroutine(hintRoutine);
+        }
+
+        hintRoutine = StartCoroutine(
+            ShowCompletedSubQuestRoutine(index)
+        );
+    }
+
+    private IEnumerator ShowCompletedSubQuestRoutine(
+        int completedIndex)
+    {
+        QuestData chapter =
+            chapters[currentChapterIndex];
+
+        if (activeSubQuestText != null)
+        {
+            activeSubQuestText.text =
+                "ĐÃ HOÀN THÀNH";
+        }
+
+        if (subQuestHintText != null)
+        {
+            subQuestHintText.text =
+                "☑ " +
+                chapter.subQuests[
+                    completedIndex
+                ].title;
+        }
+
+        if (hintControlText != null)
+        {
+            hintControlText.text = "";
+        }
+
+        yield return FadeCanvasGroup(
+            subQuestHintPanelGroup,
+            1f,
+            hintFadeDuration
+        );
+
+        yield return new WaitForSecondsRealtime(1.5f);
+
+        yield return FadeCanvasGroup(
+            subQuestHintPanelGroup,
+            0f,
+            hintFadeDuration
+        );
+
+        hintRoutine = null;
+
+        if (AreAllSubQuestsCompleted())
+        {
+            if (autoCompleteChapter)
+            {
+                CompleteCurrentChapter();
+            }
+        }
+        else
+        {
+            ActivateNextIncompleteSubQuest(true);
+        }
+    }
+
+    private int FindFirstIncompleteSubQuest()
+    {
+        if (completedSubQuests == null)
+        {
+            return -1;
+        }
+
+        for (int i = 0;
+             i < completedSubQuests.Length;
+             i++)
+        {
+            if (!completedSubQuests[i])
+            {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    private bool AreAllSubQuestsCompleted()
+    {
+        if (completedSubQuests == null ||
+            completedSubQuests.Length == 0)
+        {
+            return false;
+        }
+
+        foreach (bool completed in completedSubQuests)
+        {
+            if (!completed)
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public void CompleteCurrentChapter()
     {
-        if (currentRoutine != null)
-            StopCoroutine(currentRoutine);
+        StopManagedCoroutines();
 
-        currentRoutine = StartCoroutine(CompleteChapterRoutine());
+        chapterRoutine = StartCoroutine(
+            CompleteChapterRoutine()
+        );
     }
 
     private IEnumerator CompleteChapterRoutine()
     {
-        yield return FadePanel(1f);
-        isVisible = true;
+        yield return FadeCanvasGroup(
+            questPanelGroup,
+            1f,
+            fadeDuration
+        );
+
+        isQuestVisible = true;
 
         if (questHintText != null)
-            questHintText.text = "Phong ấn đã được giải mã...";
+        {
+            questHintText.text =
+                "Toàn bộ mục tiêu đã hoàn thành...";
+        }
 
-        yield return new WaitForSecondsRealtime(1.2f);
+        yield return new WaitForSecondsRealtime(1.5f);
 
-        yield return FadePanel(0f);
-        isVisible = false;
+        yield return FadeCanvasGroup(
+            questPanelGroup,
+            0f,
+            fadeDuration
+        );
+
+        isQuestVisible = false;
 
         int nextChapter = currentChapterIndex + 1;
+
+        chapterRoutine = null;
 
         if (nextChapter < chapters.Length)
         {
@@ -143,68 +638,171 @@ public class QuestManager : MonoBehaviour
         }
         else
         {
-            Debug.Log("Đã hoàn thành toàn bộ nhiệm vụ.");
+            Debug.Log(
+                "Đã hoàn thành toàn bộ nhiệm vụ."
+            );
         }
     }
 
     private void ToggleQuestPanel()
     {
-        if (currentRoutine != null)
+        if (questToggleRoutine != null)
         {
-            StopCoroutine(currentRoutine);
-            currentRoutine = null;
+            StopCoroutine(questToggleRoutine);
         }
 
-        isVisible = !isVisible;
+        isQuestVisible = !isQuestVisible;
 
-        if (isVisible)
-            StartCoroutine(FadePanel(1f));
-        else
-            StartCoroutine(FadePanel(0f));
+        questToggleRoutine = StartCoroutine(
+            ToggleQuestRoutine(
+                isQuestVisible ? 1f : 0f
+            )
+        );
     }
 
-    private IEnumerator FadePanel(float targetAlpha)
+    private IEnumerator ToggleQuestRoutine(
+        float targetAlpha)
     {
-        float startAlpha = questPanelGroup.alpha;
+        yield return FadeCanvasGroup(
+            questPanelGroup,
+            targetAlpha,
+            fadeDuration
+        );
+
+        questToggleRoutine = null;
+    }
+
+    private IEnumerator FadeCanvasGroup(
+        CanvasGroup canvasGroup,
+        float targetAlpha,
+        float duration)
+    {
+        if (canvasGroup == null)
+        {
+            yield break;
+        }
+
+        float startAlpha = canvasGroup.alpha;
         float timer = 0f;
 
-        while (timer < fadeDuration)
+        if (duration <= 0f)
         {
-            timer += Time.unscaledDeltaTime;
-            questPanelGroup.alpha = Mathf.Lerp(startAlpha, targetAlpha, timer / fadeDuration);
-            yield return null;
+            canvasGroup.alpha = targetAlpha;
+        }
+        else
+        {
+            while (timer < duration)
+            {
+                timer += Time.unscaledDeltaTime;
+
+                float progress = Mathf.Clamp01(
+                    timer / duration
+                );
+
+                canvasGroup.alpha = Mathf.Lerp(
+                    startAlpha,
+                    targetAlpha,
+                    progress
+                );
+
+                yield return null;
+            }
         }
 
-        questPanelGroup.alpha = targetAlpha;
+        canvasGroup.alpha = targetAlpha;
 
-        questPanelGroup.interactable = targetAlpha > 0;
-        questPanelGroup.blocksRaycasts = targetAlpha > 0;
+        bool visible = targetAlpha > 0.01f;
+
+        canvasGroup.interactable = visible;
+        canvasGroup.blocksRaycasts = visible;
     }
 
-    private IEnumerator TypeText(TextMeshProUGUI textTarget, string content)
+    private IEnumerator TypeText(
+        TextMeshProUGUI textTarget,
+        string content,
+        float speed)
     {
+        if (textTarget == null)
+        {
+            yield break;
+        }
+
         textTarget.text = "";
 
-        foreach (char c in content)
+        if (string.IsNullOrEmpty(content))
         {
-            textTarget.text += c;
-            yield return new WaitForSecondsRealtime(typeSpeed);
+            yield break;
+        }
+
+        foreach (char character in content)
+        {
+            textTarget.text += character;
+
+            if (character == '.' ||
+                character == '!' ||
+                character == '?' ||
+                character == '…')
+            {
+                yield return new WaitForSecondsRealtime(
+                    speed * 6f
+                );
+            }
+            else if (character == ',' ||
+                     character == ';' ||
+                     character == ':')
+            {
+                yield return new WaitForSecondsRealtime(
+                    speed * 3f
+                );
+            }
+            else
+            {
+                yield return new WaitForSecondsRealtime(
+                    speed
+                );
+            }
         }
     }
 
-    private void HideInstant()
+    private void HideCanvasGroupInstant(
+        CanvasGroup canvasGroup)
     {
-        questPanelGroup.alpha = 0f;
-        questPanelGroup.interactable = false;
-        questPanelGroup.blocksRaycasts = false;
-        isVisible = false;
+        if (canvasGroup == null)
+        {
+            return;
+        }
+
+        canvasGroup.alpha = 0f;
+        canvasGroup.interactable = false;
+        canvasGroup.blocksRaycasts = false;
     }
 
-    private void SetPanelVisible(bool visible)
+    private void StopManagedCoroutines()
     {
-        questPanelGroup.alpha = visible ? 1f : 0f;
-        questPanelGroup.interactable = visible;
-        questPanelGroup.blocksRaycasts = visible;
-        isVisible = visible;
+        if (chapterRoutine != null)
+        {
+            StopCoroutine(chapterRoutine);
+            chapterRoutine = null;
+        }
+
+        if (questToggleRoutine != null)
+        {
+            StopCoroutine(questToggleRoutine);
+            questToggleRoutine = null;
+        }
+
+        if (hintRoutine != null)
+        {
+            StopCoroutine(hintRoutine);
+            hintRoutine = null;
+        }
+
+        if (detailedHintRoutine != null)
+        {
+            StopCoroutine(detailedHintRoutine);
+            detailedHintRoutine = null;
+        }
+
+        isShowingThought = false;
     }
 }
