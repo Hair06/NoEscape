@@ -21,21 +21,12 @@ public class FogBoundary : MonoBehaviour
 
         for (int i = 0; i < count; i++)
         {
-            // Thử cả 2 cách lấy position
-            Vector3 localPos = particles[i].position;
-            Vector3 worldPos = fogParticles.transform.TransformPoint(localPos);
-
-            // Debug vị trí particle đầu tiên
-            if (i == 0)
-                Debug.Log($"Particle[0] local={localPos} world={worldPos}");
+            Vector3 worldPos = fogParticles.transform.TransformPoint(particles[i].position);
 
             foreach (Collider zone in blockedZones)
             {
-                // Debug bounds của collider
-                if (i == 0)
-                    Debug.Log($"Zone bounds: center={zone.bounds.center} size={zone.bounds.size}");
-
-                if (zone.bounds.Contains(worldPos) || zone.bounds.Contains(localPos))
+                Vector3 closest = zone.ClosestPoint(worldPos);
+                if (Vector3.Distance(closest, worldPos) < 0.01f)
                 {
                     particles[i].remainingLifetime = 0f;
                     break;
