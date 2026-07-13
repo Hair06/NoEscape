@@ -2,6 +2,9 @@ using UnityEngine;
 
 public class ItemCollectible : MonoBehaviour
 {
+    [Header("Nhận diện mảnh ảnh nhiệm vụ")]
+    [SerializeField] private string pieceId;
+
     [Header("Cấu hình mẫu xem 3D")]
     [Tooltip("Kéo bản sao Prefab 3D của riêng mảnh này (mảnh ảnh có đủ kết cấu 2 mặt) vào đây")]
     [SerializeField] private GameObject itemVisualPrefab; 
@@ -29,8 +32,13 @@ public class ItemCollectible : MonoBehaviour
     {
         if (Chapter1Manager.Instance != null)
         {
-            Chapter1Manager.Instance.collectedPieces++;
-            Debug.Log($"Đã nhặt mảnh thành công! Tiến trình: {Chapter1Manager.Instance.collectedPieces}/{Chapter1Manager.Instance.totalPiecesRequired}");
+            string resolvedPieceId = string.IsNullOrWhiteSpace(pieceId)
+                ? gameObject.name + "_" + GetInstanceID()
+                : pieceId;
+
+            Chapter1Manager.Instance.RegisterCollectedPiece(
+                resolvedPieceId
+            );
         }
 
         // Hủy vĩnh viễn mảnh này ngoài môi trường vì đã bỏ vào túi thành công

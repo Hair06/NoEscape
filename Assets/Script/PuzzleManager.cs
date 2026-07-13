@@ -28,7 +28,7 @@ public class PuzzleManager : MonoBehaviour
 
         if (QuestManager.Instance != null)
         {
-            QuestManager.Instance.CompleteSubQuest(2);
+            QuestManager.Instance.CompleteSubQuestForChapter(1, 2);
         }
 
         Debug.Log("🧩 PuzzleManager: Đã xong tranh. Giao toàn quyền cho Chapter1Manager!");

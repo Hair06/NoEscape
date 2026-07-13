@@ -14,6 +14,8 @@ public class MusicBoxRestore : MonoBehaviour, IInteractable
         WindKey
     }
 
+    private const int ChapterIndex = 2;
+
     [Header("Trạng thái 4 bộ phận (chỉ xem)")]
     [SerializeField] private bool hasShuttle = false;
     [SerializeField] private bool hasSpring = false;
@@ -48,7 +50,6 @@ public class MusicBoxRestore : MonoBehaviour, IInteractable
         if (brokenVisual != null) brokenVisual.SetActive(true);
         if (fixedVisual != null) fixedVisual.SetActive(false);
 
-        // Debug kiểm tra Audio Source
         if (musicBoxAudio == null)
             Debug.LogError("MusicBoxRestore: musicBoxAudio chưa được gán!");
         else if (musicBoxAudio.clip == null)
@@ -66,6 +67,12 @@ public class MusicBoxRestore : MonoBehaviour, IInteractable
 
     public void CollectPart(MusicBoxPart part)
     {
+        if (HasPart(part))
+        {
+            Debug.LogWarning("Bộ phận đã được thu thập trước đó: " + part);
+            return;
+        }
+
         switch (part)
         {
             case MusicBoxPart.Shuttle: hasShuttle = true; break;
@@ -74,7 +81,39 @@ public class MusicBoxRestore : MonoBehaviour, IInteractable
             case MusicBoxPart.WindKey: hasWindKey = true; break;
         }
 
+        if (QuestManager.Instance != null)
+        {
+            QuestManager.Instance.CompleteSubQuestForChapter(
+                ChapterIndex,
+                GetSubQuestIndex(part)
+            );
+        }
+
         Debug.Log($"Đã thu thập: {part} | Tiến độ: {CountParts()}/4");
+    }
+
+    private bool HasPart(MusicBoxPart part)
+    {
+        switch (part)
+        {
+            case MusicBoxPart.Shuttle: return hasShuttle;
+            case MusicBoxPart.Spring: return hasSpring;
+            case MusicBoxPart.Disc: return hasDisc;
+            case MusicBoxPart.WindKey: return hasWindKey;
+            default: return false;
+        }
+    }
+
+    private int GetSubQuestIndex(MusicBoxPart part)
+    {
+        switch (part)
+        {
+            case MusicBoxPart.Shuttle: return 0;
+            case MusicBoxPart.Spring: return 1;
+            case MusicBoxPart.Disc: return 2;
+            case MusicBoxPart.WindKey: return 3;
+            default: return -1;
+        }
     }
 
     private int CountParts()
@@ -114,7 +153,6 @@ public class MusicBoxRestore : MonoBehaviour, IInteractable
         isAssembled = true;
         Debug.Log("Hộp nhạc đã được khôi phục!");
 
-        // Xoá 4 bộ phận khỏi hotbar
         PlayerInventory.RemoveAll("ConThoi");
         PlayerInventory.RemoveAll("LoXo");
         PlayerInventory.RemoveAll("DiaNhac");
@@ -124,7 +162,6 @@ public class MusicBoxRestore : MonoBehaviour, IInteractable
         if (brokenVisual != null) brokenVisual.SetActive(false);
         if (fixedVisual != null) fixedVisual.SetActive(true);
 
-        // Play âm thanh
         if (musicBoxAudio != null)
         {
             Debug.Log($"Playing clip: {musicBoxAudio.clip?.name} | Volume: {musicBoxAudio.volume}");
@@ -135,11 +172,25 @@ public class MusicBoxRestore : MonoBehaviour, IInteractable
             Debug.LogError("musicBoxAudio là null — chưa gán trong Inspector!");
         }
 
-        // Kích hoạt cutscene
+        // Nhiệm vụ lắp ráp được xác nhận khi người chơi xem hết cutscene.
+        // MapSealCutscenePlayer sẽ hoàn thành đúng sub quest đang hoạt động (mục 4).
         if (endCutscene != null)
+        {
             endCutscene.PlayCutscene();
+        }
         else
-            Debug.LogWarning("endCutscene chưa được gán!");
+        {
+            Debug.LogWarning("endCutscene chưa được gán! Hoàn thành nhiệm vụ Chapter 2 trực tiếp.");
+
+            if (QuestManager.Instance != null)
+            {
+                QuestManager.Instance.CompleteSubQuestForChapter(
+                    ChapterIndex,
+                    4
+                );
+                QuestManager.Instance.CompleteCurrentChapter();
+            }
+        }
     }
 
     private void OnTriggerEnter(Collider other)

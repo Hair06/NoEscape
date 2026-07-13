@@ -23,14 +23,16 @@ public class EmptyFrameInteract : MonoBehaviour
         if (promptCanvasObject != null)
             promptCanvasObject.SetActive(false);
 
+        bool puzzleOpened = false;
+
         if (Chapter1Manager.Instance != null)
         {
-            Chapter1Manager.Instance.TryTriggerPuzzle();
+            puzzleOpened = Chapter1Manager.Instance.TryTriggerPuzzle();
         }
 
-        if (QuestManager.Instance != null)
+        if (puzzleOpened && QuestManager.Instance != null)
         {
-            QuestManager.Instance.CompleteSubQuest(1);
+            QuestManager.Instance.CompleteSubQuestForChapter(1, 1);
         }
     }
 }
