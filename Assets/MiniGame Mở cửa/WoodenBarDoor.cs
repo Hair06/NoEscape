@@ -30,7 +30,6 @@ public class WoodenBarDoor : MonoBehaviour, IInteractable
     {
         if (promptText != null) promptText.gameObject.SetActive(false);
 
-        // Tự tìm Audio Source nếu chưa gán
         if (audioSource == null)
             audioSource = GetComponent<AudioSource>();
     }
@@ -65,6 +64,10 @@ public class WoodenBarDoor : MonoBehaviour, IInteractable
     private IEnumerator OpenDoor()
     {
         isOpened = true;
+
+        // XOA XA BENG KHOI HOTBAR (da dung xong)
+        PlayerInventory.RemoveAll(requiredItem);
+        Debug.Log("Đã dùng xà beng. Icon biến mất khỏi hotbar.");
 
         // Play sound phá gỗ
         if (audioSource != null && breakSound != null)
