@@ -2,8 +2,9 @@ using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.InputSystem;
 using ElmanGameDevTools.PlayerSystem;
-using System.Collections; // Bắt buộc để chạy Coroutine hiệu ứng mờ
-using UnityEngine.UI;      // Bắt buộc để điều khiển component Image Fade
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine.UI;
 
 public class Chapter1Manager : MonoBehaviour
 {
@@ -12,6 +13,9 @@ public class Chapter1Manager : MonoBehaviour
     [Header("Tiến trình Nhiệm vụ")]
     public int collectedPieces = 0;
     public int totalPiecesRequired = 4;
+
+    private readonly HashSet<string> collectedPieceIds =
+        new HashSet<string>();
 
     private bool isPuzzleFinished = false;
 
@@ -36,6 +40,8 @@ public class Chapter1Manager : MonoBehaviour
     [SerializeField] private Image fadeImage;
     [Tooltip("Tốc độ tối dần của màn hình")]
     [SerializeField] private float fadeSpeed = 1.5f;
+    [Tooltip("Thời gian giữ màn hình đen (giây) trước khi vào cutscene")]
+    [SerializeField] private float holdBlackTime = 1.5f;
 
     private void Awake()
     {
@@ -86,26 +92,66 @@ public class Chapter1Manager : MonoBehaviour
         }
     }
 
-    public void TryTriggerPuzzle()
+    public bool TryTriggerPuzzle()
     {
         if (isPuzzleFinished)
         {
             Debug.Log("Bạn đã hoàn thành phong ấn bức tranh này rồi, không thể mở lại!");
-            return;
+            return false;
         }
 
         if (collectedPieces >= totalPiecesRequired)
         {
             OpenPuzzleGame();
+            return true;
         }
-        else
+
+        Debug.Log($"Chưa tìm đủ số mảnh ảnh nhiệm vụ! Tiến độ hiện tại: {collectedPieces}/{totalPiecesRequired}");
+        return false;
+    }
+
+    public bool RegisterCollectedPiece(string pieceId)
+    {
+        string safeId = string.IsNullOrWhiteSpace(pieceId)
+            ? "Piece_" + (collectedPieces + 1)
+            : pieceId.Trim();
+
+        if (!collectedPieceIds.Add(safeId))
         {
-            Debug.Log($"Chưa tìm đủ số mảnh ảnh nhiệm vụ! Tiến độ hiện tại: {collectedPieces}/{totalPiecesRequired}");
+            Debug.LogWarning("Mảnh ảnh đã được tính trước đó: " + safeId);
+            return false;
         }
+
+        collectedPieces = Mathf.Min(
+            collectedPieces + 1,
+            totalPiecesRequired
+        );
+
+        Debug.Log(
+            $"Đã nhặt mảnh ảnh {safeId}. Tiến độ: " +
+            $"{collectedPieces}/{totalPiecesRequired}"
+        );
+
+        if (QuestManager.Instance != null)
+        {
+            QuestManager.Instance.ReportProgressForChapter(
+                1,
+                0,
+                1,
+                totalPiecesRequired
+            );
+        }
+
+        return true;
     }
 
     private void OpenPuzzleGame()
     {
+        if (QuestManager.Instance != null)
+        {
+            QuestManager.Instance.SetSubQuestHintsSuppressed(true);
+        }
+
         if (puzzleMiniGameUI != null)
         {
             puzzleMiniGameUI.SetActive(true);
@@ -123,7 +169,7 @@ public class Chapter1Manager : MonoBehaviour
         }
     }
 
-    // Giữ nguyên hàm ClosePuzzleGame gốc phòng trường hợp bro bấm nút "Thoát ngang" minigame khi chưa giải xong
+    // Giữ nguyên hàm ClosePuzzleGame gốc phòng trường hợp bấm nút "Thoát ngang" minigame khi chưa giải xong
     public void ClosePuzzleGame(bool isWin = false)
     {
         if (puzzleMiniGameUI != null)
@@ -138,6 +184,11 @@ public class Chapter1Manager : MonoBehaviour
 
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
+        }
+
+        if (!isWin && QuestManager.Instance != null)
+        {
+            QuestManager.Instance.SetSubQuestHintsSuppressed(false);
         }
     }
 
@@ -176,10 +227,13 @@ public class Chapter1Manager : MonoBehaviour
         // [ ĐÃ ĐEN THUI - NGƯỜI CHƠI KHÔNG NHÌN THẤY GÌ ]
         // ========================================================
 
+        // ĐOẠN NGHỈ: giữ màn hình đen một lúc cho có nhịp
+        yield return new WaitForSeconds(holdBlackTime);
+
         // 2. Tắt các UI giao diện xếp hình đi để dọn dẹp màn hình
         if (puzzleMiniGameUI != null) puzzleMiniGameUI.SetActive(false);
         if (puzzleUI != null) puzzleUI.SetActive(false);
-        
+
         // 3. Kích hoạt hiện ảnh hoàn chỉnh trên tường
         if (photoOnWall != null) photoOnWall.SetActive(true);
 

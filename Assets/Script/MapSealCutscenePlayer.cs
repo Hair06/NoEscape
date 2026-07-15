@@ -67,6 +67,11 @@ public class MapSealCutscenePlayer : MonoBehaviour
     {
         if (isPlaying) return;
 
+        if (QuestManager.Instance != null)
+        {
+            QuestManager.Instance.SetSubQuestHintsSuppressed(true);
+        }
+
         if (cutsceneRoot != null)
             cutsceneRoot.SetActive(true);
 
@@ -183,8 +188,14 @@ public class MapSealCutscenePlayer : MonoBehaviour
 
         if (QuestManager.Instance != null)
         {
-            QuestManager.Instance.CompleteSubQuest(3);
+            // Mỗi phong ấn hoàn thành nhiệm vụ đang hoạt động của chính chương đó.
+            // Chapter 1 là mục 3, Chapter 2 là mục 4; không hard-code chỉ số nữa.
+            QuestManager.Instance.CompleteCurrentSubQuest();
             QuestManager.Instance.CompleteCurrentChapter();
+            QuestManager.Instance.SetSubQuestHintsSuppressed(
+                false,
+                false
+            );
         }
 
         if (afterCutsceneScare != null)
