@@ -25292,6 +25292,43 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4263491874698800, guid: 4ca3359aecc21c6408dd95416ae42c9c, type: 3}
   m_PrefabInstance: {fileID: 172357974}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &172463947
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 172463948}
+  m_Layer: 5
+  m_Name: KinhNhinAn_Group
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!224 &172463948
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 172463947}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 373408160}
+  - {fileID: 1852770499}
+  m_Father: {fileID: 595472718}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1001 &172488199
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -53567,7 +53604,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1852770499}
+  m_Father: {fileID: 172463948}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -53586,7 +53623,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 2100000, guid: d80a1512e8f458240a4f36ef3ea59018, type: 2}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
@@ -67608,6 +67645,7 @@ MonoBehaviour:
   handClosedTexture: {fileID: 2800000, guid: ea24373d75d575447b471a64635a6b28, type: 3}
   fadeImage: {fileID: 397784299}
   fadeSpeed: 1
+  holdBlackTime: 1.5
 --- !u!4 &476064914
 Transform:
   m_ObjectHideFlags: 0
@@ -67820,7 +67858,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   eyeInHandObject: {fileID: 41383219}
-  scopeMaskUI: {fileID: 1852770495}
+  scopeMaskUI: {fileID: 172463947}
   hiddenSignObject: {fileID: 453551406}
   roomLight: {fileID: 0}
   horrorColor: {r: 0.4, g: 0, b: 0, a: 1}
@@ -82878,7 +82916,7 @@ RectTransform:
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1852770499}
+  - {fileID: 172463948}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -138378,24 +138416,68 @@ MonoBehaviour:
   - {fileID: 339191430}
   - {fileID: 695596725}
   questHintText: {fileID: 142220469}
+  characterThoughtPanelGroup: {fileID: 0}
+  characterThoughtText: {fileID: 0}
+  subQuestHintPanelGroup: {fileID: 0}
+  activeSubQuestText: {fileID: 0}
+  subQuestHintText: {fileID: 0}
+  hintControlText: {fileID: 0}
   chapters:
   - chapterTitle: "CH\u01AF\u01A0NG 1 - PHONG \u1EA4N C\u1EE6A H\u1EA0NH PH\xDAC"
+    characterThought: 
     mainQuest: "Gi\u1EA3i m\xE3 phong \u1EA5n trong ph\xF2ng kh\xE1ch."
+    allowOutOfOrderCompletion: 0
     subQuests:
-    - "T\xECm c\xE1c m\u1EA3nh \u1EA3nh gia \u0111\xECnh"
-    - "\u0110\u1EB7t \u1EA3nh v\xE0o khung tranh"
-    - "Gh\xE9p l\u1EA1i b\u1EE9c \u1EA3nh ho\xE0n ch\u1EC9nh"
-    - "Xem k\xFD \u1EE9c \u0111\u1EA7u ti\xEAn c\u1EE7a Alex"
+    - title: 
+      hint: 
+      detailedHint: 
+      detailedHintDelay: 45
+    - title: 
+      hint: 
+      detailedHint: 
+      detailedHintDelay: 45
+    - title: 
+      hint: 
+      detailedHint: 
+      detailedHintDelay: 45
+    - title: 
+      hint: 
+      detailedHint: 
+      detailedHintDelay: 45
   - chapterTitle: "CH\u01AF\u01A0NG 2 - PHONG \u1EA4N C\u1EE6A L\u1EDCI H\u1EE8A"
+    characterThought: 
     mainQuest: "Kh\xF4i ph\u1EE5c H\u1ED9p Nh\u1EA1c"
+    allowOutOfOrderCompletion: 0
     subQuests:
-    - "T\xECm con thoi nh\u1EA1c"
-    - "T\xECm l\xF2 xo nh\u1EA1c"
-    - "S\u1EEDa \u0111\u1ECBa nh\u1EA1c b\u1ECB h\u1ECFng"
-    - "Thu th\u1EADp ch\xECa v\u1EB7n h\u1ED9p nh\u1EA1c"
+    - title: 
+      hint: 
+      detailedHint: 
+      detailedHintDelay: 45
+    - title: 
+      hint: 
+      detailedHint: 
+      detailedHintDelay: 45
+    - title: 
+      hint: 
+      detailedHint: 
+      detailedHintDelay: 45
+    - title: 
+      hint: 
+      detailedHint: 
+      detailedHintDelay: 45
+  startQuestAutomatically: 0
+  progressRequirements: []
   fadeDuration: 0.5
   typeSpeed: 0.02
   autoHideTime: 2
+  thoughtFadeDuration: 0.4
+  thoughtTypeSpeed: 0.035
+  thoughtHoldTime: 2.5
+  hintFadeDuration: 0.35
+  hintTypeSpeed: 0.025
+  hintHoldTime: 5
+  autoShowDetailedHint: 1
+  autoCompleteChapter: 1
 --- !u!224 &982221154
 RectTransform:
   m_ObjectHideFlags: 0
@@ -259012,27 +259094,13 @@ GameObject:
   - component: {fileID: 1852770499}
   - component: {fileID: 1852770498}
   - component: {fileID: 1852770497}
-  - component: {fileID: 1852770496}
   m_Layer: 5
   m_Name: KinhNhinAn_Mask
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!114 &1852770496
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1852770495}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 31a19414c41e5ae4aae2af33fee712f6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_ShowMaskGraphic: 1
+  m_IsActive: 1
 --- !u!114 &1852770497
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -259045,7 +259113,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 2100000, guid: 1a4c6a0815dd4e044b56fc2d9b1a60af, type: 2}
   m_Color: {r: 0, g: 0, b: 0, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
@@ -259078,13 +259146,12 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1852770495}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 373408160}
-  m_Father: {fileID: 595472718}
+  m_Children: []
+  m_Father: {fileID: 172463948}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
