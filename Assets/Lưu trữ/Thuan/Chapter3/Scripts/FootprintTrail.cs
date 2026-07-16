@@ -18,23 +18,21 @@ public class FootprintTrail : MonoBehaviour
     [SerializeField] private GameObject[] rewards;
 
     [Header("Âm thanh bước chân (random)")]
-    [Tooltip("Kéo NHIỀU tiếng bước chân vào đây - mỗi lần hiện dấu chân sẽ phát ngẫu nhiên 1 tiếng")]
+    [Tooltip("Kéo NHIỀU tiếng bước chân vào đây - mỗi lần hiện dấu chân phát ngẫu nhiên 1 tiếng")]
     [SerializeField] private AudioClip[] stepSounds;
     [Range(0f, 1f)]
     [SerializeField] private float stepVolume = 0.8f;
 
     [Header("Âm thanh khi hoàn thành (có thể để trống)")]
-    [Tooltip("Tiếng khi đi hết chuỗi, vật phẩm lộ diện")]
     [SerializeField] private AudioClip completeSound;
 
     [Header("Debug")]
-    [Tooltip("Bật để in log chẩn đoán ra Console")]
     [SerializeField] private bool showDebugLog = false;
 
     private Transform player;
     private int currentIndex = 0;
     private bool isComplete = false;
-    private int lastSoundIndex = -1;   // tránh phát lại đúng tiếng vừa phát
+    private int lastSoundIndex = -1;
 
     private void Start()
     {
@@ -43,11 +41,11 @@ public class FootprintTrail : MonoBehaviour
         {
             player = p.transform;
             if (showDebugLog)
-                Debug.Log($"[FootprintTrail] Tim thay Player: '{p.name}' tai vi tri {p.transform.position}");
+                Debug.Log($"[FootprintTrail] Tim thay Player: '{p.name}'");
         }
         else
         {
-            Debug.LogError("[FootprintTrail] KHONG tim thay Player! Kiem tra Tag cua Player.");
+            Debug.LogError("[FootprintTrail] KHONG tim thay Player! Kiem tra Tag cua Player la 'Player'.");
             return;
         }
 
@@ -57,24 +55,19 @@ public class FootprintTrail : MonoBehaviour
             return;
         }
 
-        // Ẩn hết dấu chân lúc đầu
+        // An het dau chan luc dau
         foreach (GameObject f in footprints)
-        {
             if (f != null) f.SetActive(false);
-        }
 
-        // Ẩn hết phần thưởng lúc đầu
+        // An het phan thuong luc dau
         foreach (GameObject r in rewards)
-        {
             if (r != null) r.SetActive(false);
-        }
 
-        // Hiện dấu chân đầu tiên
+        // Hien dau chan dau tien
         if (footprints[0] != null)
         {
             footprints[0].SetActive(true);
-            if (showDebugLog)
-                Debug.Log($"[FootprintTrail] Da hien dau chan dau tien.");
+            if (showDebugLog) Debug.Log("[FootprintTrail] Da hien dau chan dau tien.");
         }
     }
 
@@ -98,14 +91,10 @@ public class FootprintTrail : MonoBehaviour
         float dist = Vector3.Distance(a, b);
 
         if (showDebugLog && Time.frameCount % 60 == 0)
-        {
             Debug.Log($"[FootprintTrail] Khoang cach ngang = {dist:F2} (can <= {triggerRadius})");
-        }
 
         if (dist <= triggerRadius)
-        {
             AdvanceToNext();
-        }
     }
 
     private void AdvanceToNext()
@@ -115,15 +104,11 @@ public class FootprintTrail : MonoBehaviour
         if (currentIndex < footprints.Length)
         {
             GameObject next = footprints[currentIndex];
-
             if (next != null)
             {
                 next.SetActive(true);
-
-                // Phat tieng buoc chan ngau nhien NGAY TAI vi tri dau chan moi
                 PlayRandomStepSound(next.transform.position);
             }
-
             if (showDebugLog)
                 Debug.Log($"[FootprintTrail] Hien dau chan so: {currentIndex + 1}/{footprints.Length}");
         }
@@ -133,20 +118,17 @@ public class FootprintTrail : MonoBehaviour
         }
     }
 
-    // Chon ngau nhien 1 tieng buoc chan, tranh lap lai tieng vua phat
     private void PlayRandomStepSound(Vector3 position)
     {
         if (stepSounds == null || stepSounds.Length == 0) return;
 
         int index;
-
         if (stepSounds.Length == 1)
         {
             index = 0;
         }
         else
         {
-            // Chon ngau nhien nhung khong trung tieng vua phat
             int safety = 0;
             do
             {
@@ -155,7 +137,6 @@ public class FootprintTrail : MonoBehaviour
             }
             while (index == lastSoundIndex && safety < 10);
         }
-
         lastSoundIndex = index;
 
         AudioClip clip = stepSounds[index];
@@ -172,9 +153,7 @@ public class FootprintTrail : MonoBehaviour
             AudioSource.PlayClipAtPoint(completeSound, transform.position);
 
         foreach (GameObject r in rewards)
-        {
             if (r != null) r.SetActive(true);
-        }
     }
 
     private void OnDrawGizmosSelected()
@@ -182,9 +161,7 @@ public class FootprintTrail : MonoBehaviour
         if (footprints == null) return;
         Gizmos.color = Color.cyan;
         foreach (GameObject f in footprints)
-        {
             if (f != null)
                 Gizmos.DrawWireSphere(f.transform.position, triggerRadius);
-        }
     }
 }

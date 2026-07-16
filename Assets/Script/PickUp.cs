@@ -6,6 +6,10 @@ public class PickUp : MonoBehaviour
     [SerializeField] private GameObject itemInHand;
     [SerializeField] private float pickupDistance = 3.0f;
 
+    [Header("Tên item trên hotbar")]
+    [Tooltip("Tên phải khớp với AltarSeal và Icon Library, ví dụ: ConMat")]
+    [SerializeField] private string itemName = "ConMat";
+
     private Transform playerTransform;
     private bool isPlayerNearby = false;
 
@@ -48,17 +52,15 @@ public class PickUp : MonoBehaviour
 
     private bool CheckKeyE()
     {
-        // Nếu dùng Input System mới, CHỈ biên dịch code mới, bỏ qua hoàn toàn code cũ
-        #if ENABLE_INPUT_SYSTEM
+#if ENABLE_INPUT_SYSTEM
         if (UnityEngine.InputSystem.Keyboard.current != null)
         {
             return UnityEngine.InputSystem.Keyboard.current.eKey.wasPressedThisFrame;
         }
         return false;
-        // Nếu không dùng Input System mới, mới chạy code cũ
-        #else
+#else
         return Input.GetKeyDown(KeyCode.E);
-        #endif
+#endif
     }
 
     void PickUpItem()
@@ -68,7 +70,10 @@ public class PickUp : MonoBehaviour
             itemInHand.SetActive(true);
         }
 
-        Debug.Log("🎒 Đã nhặt vật phẩm thành công!");
+        // Them vao hotbar
+        PlayerInventory.Add(itemName);
+
+        Debug.Log("🎒 Đã nhặt vật phẩm thành công: " + itemName);
         Destroy(gameObject);
     }
 }
