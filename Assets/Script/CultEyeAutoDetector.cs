@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class CultEyeAutoDetector : MonoBehaviour
 {
+    public static CultEyeAutoDetector Instance;
+
     [Header("THAM CHIẾU VẬT THỂ TRÊN TAY PLAYER")]
     [SerializeField] private GameObject eyeInHandObject;
 
@@ -16,6 +18,14 @@ public class CultEyeAutoDetector : MonoBehaviour
     private Color originalRoomColor;
     private bool isHoldingEye = false;
     private bool isAiming = false;
+
+    // Cho script khac biet dang soi ky tu hay khong
+    public bool IsAiming => isAiming;
+
+    private void Awake()
+    {
+        if (Instance == null) Instance = this;
+    }
 
     void Start()
     {
@@ -39,7 +49,6 @@ public class CultEyeAutoDetector : MonoBehaviour
     {
         if (eyeInHandObject == null) return;
 
-        // Tự động kiểm tra xem con mắt trên tay đang Bật hay Tắt
         isHoldingEye = eyeInHandObject.activeInHierarchy;
 
         if (isHoldingEye)
@@ -73,17 +82,15 @@ public class CultEyeAutoDetector : MonoBehaviour
 
     private bool CheckRightClick()
     {
-        // 1. Nếu dự án đang dùng Input System mới
-        #if ENABLE_INPUT_SYSTEM
+#if ENABLE_INPUT_SYSTEM
         if (UnityEngine.InputSystem.Mouse.current != null)
         {
             return UnityEngine.InputSystem.Mouse.current.rightButton.isPressed;
         }
         return false;
-        // 2. Nếu dự án dùng Input System cũ (để đề phòng lỗi build)
-        #else
+#else
         return Input.GetMouseButton(1);
-        #endif
+#endif
     }
 
     private void ApplyCultVision(bool state)
