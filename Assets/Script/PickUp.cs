@@ -1,4 +1,5 @@
 using UnityEngine;
+using TMPro;
 
 public class PickUp : MonoBehaviour
 {
@@ -10,6 +11,16 @@ public class PickUp : MonoBehaviour
     [Tooltip("Tên phải khớp với AltarSeal và Icon Library, ví dụ: ConMat")]
     [SerializeField] private string itemName = "ConMat";
 
+    [Header("UI hướng dẫn (TextMeshPro)")]
+    [Tooltip("Kéo Canvas prompt dùng chung vào đây")]
+    [SerializeField] private TextMeshProUGUI promptText;
+    [SerializeField] private string interactMessage = "Nhấn [E] để nhặt Con Mắt Giáo Phái";
+
+    [Header("Âm thanh khi nhặt (có thể để trống)")]
+    [SerializeField] private AudioClip collectSound;
+    [Range(0f, 1f)]
+    [SerializeField] private float collectVolume = 1f;
+
     private Transform playerTransform;
     private bool isPlayerNearby = false;
 
@@ -20,6 +31,8 @@ public class PickUp : MonoBehaviour
         {
             playerTransform = player.transform;
         }
+
+        if (promptText != null) promptText.gameObject.SetActive(false);
     }
 
     void Update()
@@ -33,6 +46,14 @@ public class PickUp : MonoBehaviour
             if (!isPlayerNearby)
             {
                 isPlayerNearby = true;
+
+                // Hien chu goi y
+                if (promptText != null)
+                {
+                    promptText.text = interactMessage;
+                    promptText.gameObject.SetActive(true);
+                }
+
                 Debug.Log("👉 Đến gần vật phẩm. Nhấn E để nhặt!");
             }
 
@@ -46,6 +67,9 @@ public class PickUp : MonoBehaviour
             if (isPlayerNearby)
             {
                 isPlayerNearby = false;
+
+                // An chu goi y khi di xa
+                if (promptText != null) promptText.gameObject.SetActive(false);
             }
         }
     }
@@ -70,8 +94,15 @@ public class PickUp : MonoBehaviour
             itemInHand.SetActive(true);
         }
 
+        // Phat tieng nhat
+        if (collectSound != null)
+            AudioSource.PlayClipAtPoint(collectSound, transform.position, collectVolume);
+
         // Them vao hotbar
         PlayerInventory.Add(itemName);
+
+        // An chu goi y
+        if (promptText != null) promptText.gameObject.SetActive(false);
 
         Debug.Log("🎒 Đã nhặt vật phẩm thành công: " + itemName);
         Destroy(gameObject);

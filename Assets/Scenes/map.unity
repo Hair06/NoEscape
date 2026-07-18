@@ -34607,6 +34607,10 @@ MonoBehaviour:
   itemInHand: {fileID: 809666588}
   pickupDistance: 3
   itemName: ConMat
+  promptText: {fileID: 2025166744}
+  interactMessage: "Nh\u1EA5n [E] \u0111\u1EC3 nh\u1EB7t Con M\u1EAFt Gi\xE1o Ph\xE1i"
+  collectSound: {fileID: 8300000, guid: 03d8c310e0947884ba576344da862fc3, type: 3}
+  collectVolume: 1
 --- !u!65 &233251787
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -64580,7 +64584,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4275353874267448, guid: 9f4f95afe3490ab4f9d5448b9ea1242e, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -166.78
+      value: -166.61
       objectReference: {fileID: 0}
     - target: {fileID: 4275353874267448, guid: 9f4f95afe3490ab4f9d5448b9ea1242e, type: 3}
       propertyPath: m_LocalPosition.y
@@ -64624,7 +64628,10 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 4275353874267448, guid: 9f4f95afe3490ab4f9d5448b9ea1242e, type: 3}
       insertIndex: -1
       addedObject: {fileID: 814805582}
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1966911896957582, guid: 9f4f95afe3490ab4f9d5448b9ea1242e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 453551410}
   m_SourcePrefab: {fileID: 100100000, guid: 9f4f95afe3490ab4f9d5448b9ea1242e, type: 3}
 --- !u!1 &453551406 stripped
 GameObject:
@@ -64636,6 +64643,23 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4275353874267448, guid: 9f4f95afe3490ab4f9d5448b9ea1242e, type: 3}
   m_PrefabInstance: {fileID: 453551405}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &453551410
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 453551406}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0dd77726f6073f942b8b6a451ed74677, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemName: KiTu
+  pickupDistance: 3
+  promptText: {fileID: 2025166744}
+  interactMessage: "Nh\u1EA5n [E] \u0111\u1EC3 nh\u1EB7t K\xFD T\u1EF1 Gi\xE1o Ph\xE1i"
+  collectSound: {fileID: 8300000, guid: 03d8c310e0947884ba576344da862fc3, type: 3}
 --- !u!1001 &453701093
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -72622,6 +72646,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1838647445}
     m_Modifications:
+    - target: {fileID: 2040843980582315674, guid: d3361452d99370e46b7903d43ecef184, type: 3}
+      propertyPath: m_fontSize
+      value: 22
+      objectReference: {fileID: 0}
+    - target: {fileID: 2040843980582315674, guid: d3361452d99370e46b7903d43ecef184, type: 3}
+      propertyPath: m_fontSizeBase
+      value: 22
+      objectReference: {fileID: 0}
+    - target: {fileID: 2040843980582315674, guid: d3361452d99370e46b7903d43ecef184, type: 3}
+      propertyPath: m_HorizontalAlignment
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 4705096174435524984, guid: d3361452d99370e46b7903d43ecef184, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -79780,6 +79816,8 @@ MonoBehaviour:
     icon: {fileID: 21300000, guid: 94a0227937b51174dbc9906e5ae52ab9, type: 3}
   - itemName: ConMat
     icon: {fileID: 21300000, guid: 7a744ac376e97d5448f2f5d4613c6a19, type: 3}
+  - itemName: KiTu
+    icon: {fileID: 21300000, guid: 11d8a16bed2a3444d95dcb52855b53cd, type: 3}
   slots:
   - {fileID: 1329098340}
   - {fileID: 1857262648}
