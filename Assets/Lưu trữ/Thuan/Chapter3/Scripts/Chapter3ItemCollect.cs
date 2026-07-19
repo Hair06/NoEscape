@@ -2,16 +2,20 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using TMPro;
 
-// Gan vao Trai Tim / Giot Mau (vat pham chuong 3).
-// Nguoi choi toi gan, hien chu, nhan E de nhat.
+// Gắn vào Trái Tim / Giọt Máu (vật phẩm Chương 3).
 public class Chapter3ItemCollect : MonoBehaviour
 {
-    [Header("Cau hinh vat pham")]
-    [Tooltip("Ten item tren hotbar: TraiTim hoac GiotMau")]
+    [Header("Cấu hình vật phẩm")]
+    [Tooltip("Tên item trên hotbar: TraiTim hoặc GiotMau")]
     [SerializeField] private string itemName = "TraiTim";
 
+    [Header("Liên kết bảng nhiệm vụ")]
+    [SerializeField, Min(0)] private int questChapterIndex = 3;
+    [Tooltip("Trái Tim và Giọt Máu cùng thuộc nhiệm vụ khám phá mê cung.")]
+    [SerializeField, Min(0)] private int questSubQuestIndex = 3;
+    [SerializeField, Min(1)] private int requiredProgress = 2;
+
     [Header("UI hướng dẫn (TextMeshPro)")]
-    [Tooltip("Keo Canvas prompt (cai dung o chuong 2) vao day")]
     [SerializeField] private TextMeshProUGUI promptText;
     [SerializeField] private string interactMessage = "Nhấn [E] để nhặt Trái Tim Giáo Phái";
 
@@ -20,11 +24,6 @@ public class Chapter3ItemCollect : MonoBehaviour
 
     private bool isPlayerInside = false;
     private bool taken = false;
-
-    private void Start()
-    {
-        if (promptText != null) promptText.gameObject.SetActive(false);
-    }
 
     private void Update()
     {
@@ -44,17 +43,28 @@ public class Chapter3ItemCollect : MonoBehaviour
         if (collectSound != null)
             AudioSource.PlayClipAtPoint(collectSound, transform.position);
 
-        // Them vao hotbar
         PlayerInventory.Add(itemName);
-
-        // Bao ve ban tho phong an (se lam o buoc sau)
-        // if (AltarSeal.Instance != null)
-        //     AltarSeal.Instance.CollectItem(itemName);
-
+        ReportQuestProgress();
         Debug.Log("Đã nhặt: " + itemName);
 
         if (promptText != null) promptText.gameObject.SetActive(false);
         Destroy(gameObject);
+    }
+
+    private void ReportQuestProgress()
+    {
+        if (QuestManager.Instance == null)
+        {
+            Debug.LogWarning("Chapter3ItemCollect: Không tìm thấy QuestManager để cập nhật Chương 3.");
+            return;
+        }
+
+        QuestManager.Instance.ReportProgressForChapter(
+            questChapterIndex,
+            questSubQuestIndex,
+            1,
+            requiredProgress
+        );
     }
 
     private void OnTriggerEnter(Collider other)
