@@ -1,8 +1,8 @@
 using UnityEngine;
 
-// Quan ly chuoi dau chan dan duong trong me cung.
-// Dau chan hien lan luot: toi gan cai nay thi cai tiep theo moi hien ra.
-// Di het chuoi -> vat pham hien ra tren ban da de nhat.
+// Chuoi dau chan trong me cung.
+// Chi NHIN THAY khi cam Con Mat va giu chuot phai (soi).
+// Van phai DI HET chuoi thi vat pham moi hien ra tren ban da.
 public class FootprintTrail : MonoBehaviour
 {
     [Header("Danh sách dấu chân (kéo theo thứ tự đường đi)")]
@@ -10,7 +10,7 @@ public class FootprintTrail : MonoBehaviour
     [SerializeField] private GameObject[] footprints;
 
     [Header("Bán kính phát hiện Player")]
-    [Tooltip("Player vào trong bán kính này (đo ngang, bỏ qua độ cao) thì dấu chân kế tiếp hiện ra")]
+    [Tooltip("Player vào trong bán kính này (đo ngang) thì tính là đã đi qua dấu chân")]
     [SerializeField] private float triggerRadius = 3f;
 
     [Header("Phần thưởng khi đi hết chuỗi")]
@@ -18,7 +18,7 @@ public class FootprintTrail : MonoBehaviour
     [SerializeField] private GameObject[] rewards;
 
     [Header("Âm thanh bước chân (random)")]
-    [Tooltip("Kéo NHIỀU tiếng bước chân vào đây - mỗi lần hiện dấu chân phát ngẫu nhiên 1 tiếng")]
+    [Tooltip("Mỗi lần đi qua 1 dấu chân sẽ phát ngẫu nhiên 1 tiếng")]
     [SerializeField] private AudioClip[] stepSounds;
     [Range(0f, 1f)]
     [SerializeField] private float stepVolume = 0.8f;
@@ -33,6 +33,7 @@ public class FootprintTrail : MonoBehaviour
     private int currentIndex = 0;
     private bool isComplete = false;
     private int lastSoundIndex = -1;
+    private bool wasVisible = false;   // trang thai hien tai cua chuoi dau chan
 
     private void Start()
     {
@@ -40,12 +41,10 @@ public class FootprintTrail : MonoBehaviour
         if (p != null)
         {
             player = p.transform;
-            if (showDebugLog)
-                Debug.Log($"[FootprintTrail] Tim thay Player: '{p.name}'");
         }
         else
         {
-            Debug.LogError("[FootprintTrail] KHONG tim thay Player! Kiem tra Tag cua Player la 'Player'.");
+            Debug.LogError("[FootprintTrail] KHONG tim thay Player! Kiem tra Tag.");
             return;
         }
 
@@ -55,26 +54,32 @@ public class FootprintTrail : MonoBehaviour
             return;
         }
 
-        // An het dau chan luc dau
-        foreach (GameObject f in footprints)
-            if (f != null) f.SetActive(false);
+        // An het dau chan luc dau (chi hien khi soi bang Con Mat)
+        SetTrailVisible(false);
 
         // An het phan thuong luc dau
         foreach (GameObject r in rewards)
             if (r != null) r.SetActive(false);
-
-        // Hien dau chan dau tien
-        if (footprints[0] != null)
-        {
-            footprints[0].SetActive(true);
-            if (showDebugLog) Debug.Log("[FootprintTrail] Da hien dau chan dau tien.");
-        }
     }
 
     private void Update()
     {
-        if (isComplete || player == null) return;
-        if (footprints == null || currentIndex >= footprints.Length) return;
+        if (player == null || footprints == null) return;
+
+        // 1. HIEN THI: chuoi dau chan chi thay khi dang soi bang Con Mat
+        bool shouldBeVisible = IsAimingWithEye() && !isComplete;
+
+        if (shouldBeVisible != wasVisible)
+        {
+            SetTrailVisible(shouldBeVisible);
+            wasVisible = shouldBeVisible;
+
+            if (showDebugLog)
+                Debug.Log($"[FootprintTrail] Chuoi dau chan {(shouldBeVisible ? "HIEN" : "AN")}");
+        }
+
+        // 2. TIEN DO: van theo doi du khong soi, de biet khi nao di het chuoi
+        if (isComplete || currentIndex >= footprints.Length) return;
 
         GameObject current = footprints[currentIndex];
         if (current == null)
@@ -91,31 +96,38 @@ public class FootprintTrail : MonoBehaviour
         float dist = Vector3.Distance(a, b);
 
         if (showDebugLog && Time.frameCount % 60 == 0)
-            Debug.Log($"[FootprintTrail] Khoang cach ngang = {dist:F2} (can <= {triggerRadius})");
+            Debug.Log($"[FootprintTrail] Dau chan {currentIndex} | Khoang cach = {dist:F2} (can <= {triggerRadius})");
 
         if (dist <= triggerRadius)
-            AdvanceToNext();
+            AdvanceToNext(current.transform.position);
     }
 
-    private void AdvanceToNext()
+    // Kiem tra nguoi choi co dang soi bang Con Mat khong
+    private bool IsAimingWithEye()
+    {
+        if (CultEyeAutoDetector.Instance == null) return false;
+        return CultEyeAutoDetector.Instance.IsAiming;
+    }
+
+    // Bat/tat toan bo chuoi dau chan cung luc
+    private void SetTrailVisible(bool visible)
+    {
+        foreach (GameObject f in footprints)
+            if (f != null) f.SetActive(visible);
+    }
+
+    private void AdvanceToNext(Vector3 stepPosition)
     {
         currentIndex++;
 
-        if (currentIndex < footprints.Length)
-        {
-            GameObject next = footprints[currentIndex];
-            if (next != null)
-            {
-                next.SetActive(true);
-                PlayRandomStepSound(next.transform.position);
-            }
-            if (showDebugLog)
-                Debug.Log($"[FootprintTrail] Hien dau chan so: {currentIndex + 1}/{footprints.Length}");
-        }
-        else
-        {
+        // Phat tieng buoc chan tai vi tri vua di qua
+        PlayRandomStepSound(stepPosition);
+
+        if (showDebugLog)
+            Debug.Log($"[FootprintTrail] Da di qua dau chan {currentIndex}/{footprints.Length}");
+
+        if (currentIndex >= footprints.Length)
             CompleteTrail();
-        }
     }
 
     private void PlayRandomStepSound(Vector3 position)
@@ -148,6 +160,10 @@ public class FootprintTrail : MonoBehaviour
     {
         isComplete = true;
         Debug.Log("[FootprintTrail] Da di het chuoi dau chan! Vat pham hien ra tren ban da.");
+
+        // An han chuoi dau chan (da xong nhiem vu dan duong)
+        SetTrailVisible(false);
+        wasVisible = false;
 
         if (completeSound != null)
             AudioSource.PlayClipAtPoint(completeSound, transform.position);
