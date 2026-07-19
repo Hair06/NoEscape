@@ -2,14 +2,18 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using TMPro;
 
-// Gan vao object Ky Tu Giao Phai (hiddenSignObject).
-// Chi nhat duoc khi dang soi bang Con Mat (giu chuot phai).
+// Gắn vào object Ký Tự Giáo Phái (hiddenSignObject).
+// Chỉ nhặt được khi đang soi bằng Con Mắt (giữ chuột phải).
 public class CultSignCollect : MonoBehaviour
 {
     [Header("Cấu hình vật phẩm")]
     [Tooltip("Tên item trên hotbar - phải khớp AltarSeal")]
     [SerializeField] private string itemName = "KiTu";
     [SerializeField] private float pickupDistance = 3f;
+
+    [Header("Liên kết bảng nhiệm vụ")]
+    [SerializeField, Min(0)] private int questChapterIndex = 3;
+    [SerializeField, Min(0)] private int questSubQuestIndex = 2;
 
     [Header("UI hướng dẫn (TextMeshPro)")]
     [SerializeField] private TextMeshProUGUI promptText;
@@ -32,21 +36,15 @@ public class CultSignCollect : MonoBehaviour
 
     private void Update()
     {
-        if (taken || playerTransform == null) return;
-
-        // Chi hoat dong khi object dang hien (tuc dang soi bang Con Mat)
-        if (!gameObject.activeInHierarchy) return;
+        if (taken || playerTransform == null || !gameObject.activeInHierarchy) return;
 
         float dist = Vector3.Distance(transform.position, playerTransform.position);
-
         if (dist <= pickupDistance)
         {
             ShowPrompt(true);
 
             if (Keyboard.current != null && Keyboard.current.eKey.wasPressedThisFrame)
-            {
                 CollectItem();
-            }
         }
         else
         {
@@ -68,7 +66,6 @@ public class CultSignCollect : MonoBehaviour
 
     private void OnDisable()
     {
-        // Khi tha chuot phai, ky tu an di -> an luon prompt
         ShowPrompt(false);
     }
 
@@ -81,9 +78,24 @@ public class CultSignCollect : MonoBehaviour
             AudioSource.PlayClipAtPoint(collectSound, transform.position);
 
         PlayerInventory.Add(itemName);
+        ReportQuestProgress();
         Debug.Log("Đã nhặt: " + itemName);
 
         ShowPrompt(false);
         Destroy(gameObject);
+    }
+
+    private void ReportQuestProgress()
+    {
+        if (QuestManager.Instance == null)
+        {
+            Debug.LogWarning("CultSignCollect: Không tìm thấy QuestManager để cập nhật Chương 3.");
+            return;
+        }
+
+        QuestManager.Instance.CompleteSubQuestForChapter(
+            questChapterIndex,
+            questSubQuestIndex
+        );
     }
 }

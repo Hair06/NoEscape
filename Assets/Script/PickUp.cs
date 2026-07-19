@@ -11,6 +11,10 @@ public class PickUp : MonoBehaviour
     [Tooltip("Tên phải khớp với AltarSeal và Icon Library, ví dụ: ConMat")]
     [SerializeField] private string itemName = "ConMat";
 
+    [Header("Liên kết bảng nhiệm vụ")]
+    [SerializeField, Min(0)] private int questChapterIndex = 3;
+    [SerializeField, Min(0)] private int questSubQuestIndex = 1;
+
     [Header("UI hướng dẫn (TextMeshPro)")]
     [Tooltip("Kéo Canvas prompt dùng chung vào đây")]
     [SerializeField] private TextMeshProUGUI promptText;
@@ -27,10 +31,7 @@ public class PickUp : MonoBehaviour
     void Start()
     {
         GameObject player = GameObject.FindWithTag("Player");
-        if (player != null)
-        {
-            playerTransform = player.transform;
-        }
+        if (player != null) playerTransform = player.transform;
 
         if (promptText != null) promptText.gameObject.SetActive(false);
     }
@@ -46,42 +47,27 @@ public class PickUp : MonoBehaviour
             if (!isPlayerNearby)
             {
                 isPlayerNearby = true;
-
-                // Hien chu goi y
                 if (promptText != null)
                 {
                     promptText.text = interactMessage;
                     promptText.gameObject.SetActive(true);
                 }
-
-                Debug.Log("👉 Đến gần vật phẩm. Nhấn E để nhặt!");
             }
 
-            if (CheckKeyE())
-            {
-                PickUpItem();
-            }
+            if (CheckKeyE()) PickUpItem();
         }
-        else
+        else if (isPlayerNearby)
         {
-            if (isPlayerNearby)
-            {
-                isPlayerNearby = false;
-
-                // An chu goi y khi di xa
-                if (promptText != null) promptText.gameObject.SetActive(false);
-            }
+            isPlayerNearby = false;
+            if (promptText != null) promptText.gameObject.SetActive(false);
         }
     }
 
     private bool CheckKeyE()
     {
 #if ENABLE_INPUT_SYSTEM
-        if (UnityEngine.InputSystem.Keyboard.current != null)
-        {
-            return UnityEngine.InputSystem.Keyboard.current.eKey.wasPressedThisFrame;
-        }
-        return false;
+        return UnityEngine.InputSystem.Keyboard.current != null
+            && UnityEngine.InputSystem.Keyboard.current.eKey.wasPressedThisFrame;
 #else
         return Input.GetKeyDown(KeyCode.E);
 #endif
@@ -89,22 +75,31 @@ public class PickUp : MonoBehaviour
 
     void PickUpItem()
     {
-        if (itemInHand != null)
-        {
-            itemInHand.SetActive(true);
-        }
+        if (itemInHand != null) itemInHand.SetActive(true);
 
-        // Phat tieng nhat
         if (collectSound != null)
             AudioSource.PlayClipAtPoint(collectSound, transform.position, collectVolume);
 
-        // Them vao hotbar
         PlayerInventory.Add(itemName);
+        ReportQuestProgress();
 
-        // An chu goi y
         if (promptText != null) promptText.gameObject.SetActive(false);
 
         Debug.Log("🎒 Đã nhặt vật phẩm thành công: " + itemName);
         Destroy(gameObject);
+    }
+
+    private void ReportQuestProgress()
+    {
+        if (QuestManager.Instance == null)
+        {
+            Debug.LogWarning("PickUp: Không tìm thấy QuestManager để cập nhật Chương 3.");
+            return;
+        }
+
+        QuestManager.Instance.CompleteSubQuestForChapter(
+            questChapterIndex,
+            questSubQuestIndex
+        );
     }
 }

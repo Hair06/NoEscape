@@ -34606,6 +34606,8 @@ MonoBehaviour:
   itemInHand: {fileID: 809666588}
   pickupDistance: 3
   itemName: ConMat
+  questChapterIndex: 3
+  questSubQuestIndex: 1
   promptText: {fileID: 2025166744}
   interactMessage: "Nh\u1EA5n [E] \u0111\u1EC3 nh\u1EB7t Con M\u1EAFt Gi\xE1o Ph\xE1i"
   collectSound: {fileID: 8300000, guid: 03d8c310e0947884ba576344da862fc3, type: 3}
@@ -64806,6 +64808,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemName: KiTu
   pickupDistance: 3
+  questChapterIndex: 3
+  questSubQuestIndex: 1
   promptText: {fileID: 2025166744}
   interactMessage: "Nh\u1EA5n [E] \u0111\u1EC3 nh\u1EB7t K\xFD T\u1EF1 Gi\xE1o Ph\xE1i"
   collectSound: {fileID: 8300000, guid: 03d8c310e0947884ba576344da862fc3, type: 3}
@@ -73285,6 +73289,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 93b3bc1035106c247b9ccb8b5322ab9c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  questChapterIndex: 3
+  altarSubQuestIndex: 4
+  requiredItemCount: 4
   hasConMat: 0
   hasKiTu: 0
   hasTraiTim: 0
@@ -140155,6 +140162,70 @@ MonoBehaviour:
       hintShowDelay: 0
       hintHoldTime: -1
       detailedHintDelay: 30
+  - chapterTitle: "CH\u01AF\u01A0NG 3 - NGHI L\u1EC4 B\u1ECA CH\xD4N V\xD9I"
+    characterThought: "Kh\xFAc nh\u1EA1c cu\u1ED1i c\xF9ng t\u1EEB h\u1ED9p nh\u1EA1c
+      \u0111\xE3 d\u1EABn m\xECnh \u0111\u1EBFn khu nh\xE0 k\xEDnh c\u0169. C\xE1nh
+      c\u1EEDa b\xEAn trong b\u1ECB \u0111\xF3ng k\xEDn... C\xF3 l\u1EBD m\u1EB9
+      \u0111\xE3 c\u1ED1 ch\xF4n gi\u1EA5u m\u1ED9t b\xED m\u1EADt \u1EDF n\u01A1i
+      n\xE0y."
+    characterThoughtDelay: 1.2
+    characterThoughtHoldTime: 6
+    mainQuest: "M\u1EDF c\u0103n ph\xF2ng b\u1ECB ni\xEAm phong, t\xECm b\u1ED1n
+      v\u1EADt ph\u1EA9m gi\xE1o ph\xE1i v\xE0 ho\xE0n th\xE0nh b\xE0n th\u1EDD nghi
+      l\u1EC5."
+    waitForTransitionSignal: 1
+    nextChapterStartDelay: 0.8
+    chapterCompleteMessage: "B\u1ED1n v\u1EADt ph\u1EA9m \u0111\xE3 tr\u1EDF v\u1EC1
+      b\xE0n th\u1EDD. K\xFD \u1EE9c v\u1EC1 \u0111\xEAm nghi l\u1EC5 n\u0103m x\u01B0a
+      \u0111ang \u0111\u01B0\u1EE3c gi\u1EA3i ph\xF3ng..."
+    allowOutOfOrderCompletion: 1
+    subQuests:
+    - title: "M\u1EDF kh\xF3a c\u0103n ph\xF2ng b\u1ECB ch\u1EB7n."
+      hint: "C\xE1nh c\u1EEDa c\u0103n ph\xF2ng c\u0169 \u0111\xE3 b\u1ECB \u0111\xF3ng
+        k\xEDn b\u1EB1ng nh\u1EEFng t\u1EA5m g\u1ED7."
+      detailedHint: "T\xECm c\xE2y x\xE0 beng quanh nh\xE0 kho, sau \u0111\xF3 mang
+        n\xF3 \u0111\u1EBFn c\xE1nh c\u1EEDa b\u1ECB ch\u1EB7n v\xE0 nh\u1EA5n E
+        \u0111\u1EC3 ph\xE1 c\xE1c t\u1EA5m g\u1ED7."
+      hintShowDelay: 1
+      hintHoldTime: 3
+      detailedHintDelay: 35
+    - title: "T\xECm Con M\u1EAFt Gi\xE1o Ph\xE1i"
+      hint: "C\u0103n ph\xF2ng v\u1EEBa m\u1EDF \u0111ang c\u1EA5t gi\u1EA5u m\u1ED9t
+        c\u1ED5 v\u1EADt c\xF3 h\xECnh con m\u1EAFt."
+      detailedHint: "\u0110i v\xE0o c\u0103n ph\xF2ng v\u1EEBa ph\xE1 c\u1EEDa. Ki\u1EC3m
+        tra c\xE1c k\u1EC7 \u0111\u1ED3 v\xE0 v\u1EADt tr\u01B0ng b\xE0y, sau \u0111\xF3
+        nh\u1EA5n E \u0111\u1EC3 nh\u1EB7t Con M\u1EAFt."
+      hintShowDelay: 0.8
+      hintHoldTime: -1
+      detailedHintDelay: 35
+    - title: "D\xF9ng Con M\u1EAFt t\xECm K\xFD T\u1EF1 Gi\xE1o Ph\xE1i"
+      hint: "Con M\u1EAFt c\xF3 th\u1EC3 nh\xECn th\u1EA5y nh\u1EEFng d\u1EA5u v\u1EBFt
+        m\xE0 m\u1EAFt th\u01B0\u1EDDng kh\xF4ng th\u1EC3 nh\u1EADn ra."
+      detailedHint: "C\u1EA7m Con M\u1EAFt, gi\u1EEF chu\u1ED9t ph\u1EA3i \u0111\u1EC3
+        k\xEDch ho\u1EA1t t\u1EA7m nh\xECn gi\xE1o ph\xE1i. T\xECm k\xFD t\u1EF1
+        ph\xE1t s\xE1ng b\xEAn trong c\u0103n nh\xE0 r\u1ED3i nh\u1EA5n E \u0111\u1EC3
+        thu th\u1EADp."
+      hintShowDelay: 0.8
+      hintHoldTime: -1
+      detailedHintDelay: 35
+    - title: "T\xECm Tr\xE1i Tim v\xE0 Gi\u1ECDt M\xE1u "
+      hint: "Hai v\u1EADt hi\u1EBFn t\u1EBF c\xF2n l\u1EA1i \u0111\u01B0\u1EE3c c\u1EA5t
+        gi\u1EA5u trong m\xEA cung \u1EDF s\xE2n tr\u01B0\u1EDBc."
+      detailedHint: "Kh\xE1m ph\xE1 nh\u1EEFng nh\xE1nh kh\xE1c nhau c\u1EE7a m\xEA
+        cung. T\xECm Tr\xE1i Tim v\xE0 Gi\u1ECDt M\xE1u r\u1ED3i nh\u1EA5n E \u0111\u1EC3
+        thu th\u1EADp."
+      hintShowDelay: 0.8
+      hintHoldTime: -1
+      detailedHintDelay: 45
+    - title: "\u0110\u1EB7t 4 v\u1EADt ph\u1EA9m l\xEAn b\xE0n th\u1EDD"
+      hint: "B\xE0n th\u1EDD \u0111ang ch\u1EDD Con M\u1EAFt, K\xFD T\u1EF1, Tr\xE1i
+        Tim v\xE0 Gi\u1ECDt M\xE1u."
+      detailedHint: "Mang c\xE1c v\u1EADt ph\u1EA9m tr\u1EDF l\u1EA1i b\xE0n th\u1EDD
+        phong \u1EA5n v\xE0 nh\u1EA5n E. B\u1EA1n c\xF3 th\u1EC3 \u0111\u1EB7t t\u1EEBng
+        m\xF3n ho\u1EB7c nhi\u1EC1u m\xF3n c\xF9ng l\xFAc."
+      hintShowDelay: 0.8
+      hintHoldTime: -1
+      detailedHintDelay: 35
   startQuestAutomatically: 0
   progressRequirements:
   - chapterIndex: 0
@@ -140165,7 +140236,7 @@ MonoBehaviour:
     requiredAmount: 4
   - chapterIndex: 2
     subQuestIndex: 0
-    requiredAmount: 5
+    requiredAmount: 1
   fadeDuration: 0.5
   typeSpeed: 0.02
   autoHideTime: 2
@@ -146451,6 +146522,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemName: GiotMau
+  questChapterIndex: 3
+  questSubQuestIndex: 2
+  requiredProgress: 2
   promptText: {fileID: 2025166744}
   interactMessage: "Nh\u1EA5n [E] \u0111\u1EC3 nh\u1EB7t Tr\xE1i Tim Gi\xE1o Ph\xE1i"
   collectSound: {fileID: 8300000, guid: 03d8c310e0947884ba576344da862fc3, type: 3}
@@ -171169,6 +171243,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemName: Crowbar
+  questChapterIndex: 3
+  questSubQuestIndex: 0
+  requiredProgress: 2
   pickupRange: 3
   collectSound: {fileID: 0}
 --- !u!65 &1195790911
@@ -225757,6 +225834,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemName: TraiTim
+  questChapterIndex: 3
+  questSubQuestIndex: 2
+  requiredProgress: 2
   promptText: {fileID: 2025166744}
   interactMessage: "Nh\u1EA5n [E] \u0111\u1EC3 nh\u1EB7t Tr\xE1i Tim Gi\xE1o Ph\xE1i"
   collectSound: {fileID: 8300000, guid: 03d8c310e0947884ba576344da862fc3, type: 3}
@@ -284906,6 +284986,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   requiredItem: Crowbar
+  questChapterIndex: 3
+  questSubQuestIndex: 0
+  requiredProgress: 2
   woodenBars:
   - {fileID: 203534999}
   - {fileID: 22431486}

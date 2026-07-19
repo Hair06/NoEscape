@@ -2,21 +2,24 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using TMPro;
 
-// Ban tho co phong an chuong 3.
-// Nguoi choi toi gan bam E -> dat het vat pham dang cam len ban tho.
-// Du 4 vat pham -> phong an mo -> cutscene.
+// Bàn thờ có phong ấn Chương 3.
+// Đặt đủ 4 vật phẩm sẽ hoàn thành nhiệm vụ và chạy cutscene.
 public class AltarSeal : MonoBehaviour
 {
     public static AltarSeal Instance;
 
-    // 4 vat pham can thiet (ten phai khop voi PlayerInventory)
     private static readonly string[] REQUIRED_ITEMS =
     {
-        "ConMat",    // Con mat giao phai
-        "KiTu",      // Ki tu giao phai
-        "TraiTim",   // Trai tim giao phai
-        "GiotMau"    // Giot mau giao phai
+        "ConMat",
+        "KiTu",
+        "TraiTim",
+        "GiotMau"
     };
+
+    [Header("Liên kết bảng nhiệm vụ")]
+    [SerializeField, Min(0)] private int questChapterIndex = 3;
+    [SerializeField, Min(0)] private int altarSubQuestIndex = 4;
+    [SerializeField, Min(1)] private int requiredItemCount = 4;
 
     [Header("Trạng thái 4 vật phẩm (chỉ xem)")]
     [SerializeField] private bool hasConMat = false;
@@ -26,31 +29,24 @@ public class AltarSeal : MonoBehaviour
 
     [Header("UI hướng dẫn (TextMeshPro)")]
     [SerializeField] private TextMeshProUGUI promptText;
-    [Tooltip("Chữ hiện khi không cầm vật phẩm nào")]
     [SerializeField] private string notReadyMessage = "Bàn thờ cổ... còn thiếu vật phẩm";
-    [Tooltip("Chữ hiện khi đang cầm vật phẩm có thể đặt")]
     [SerializeField] private string placeMessage = "Nhấn [E] để đặt vật phẩm lên bàn thờ";
 
-    [Header("Model vật phẩm hiện trên bàn thờ (có thể để trống)")]
+    [Header("Model vật phẩm hiện trên bàn thờ")]
     [SerializeField] private GameObject conMatVisual;
     [SerializeField] private GameObject kiTuVisual;
     [SerializeField] private GameObject traiTimVisual;
     [SerializeField] private GameObject giotMauVisual;
 
     [Header("Âm thanh & Hiệu ứng khi hoàn thành")]
-    [Tooltip("Tiếng khi đặt 1 vật phẩm lên bàn")]
     [SerializeField] private AudioSource placeAudio;
-    [Tooltip("Tiếng khi đủ 4 vật phẩm, phong ấn mở")]
     [SerializeField] private AudioSource sealCompleteAudio;
-    [Tooltip("Khói tím / VFX khi phong ấn mở")]
     [SerializeField] private ParticleSystem sealVFX;
 
     [Header("Xích cửa mở ra khi đủ 4 vật phẩm")]
-    [Tooltip("Kéo object xích khóa cửa vào đây (sẽ tắt đi khi phong ấn mở)")]
     [SerializeField] private GameObject doorChain;
 
     [Header("Cutscene kết thúc Chapter 3")]
-    [Tooltip("Kéo object cutscene (MapSealCutscenePlayer) vào đây")]
     [SerializeField] private MapSealCutscenePlayer endCutscene;
 
     private bool isPlayerInside = false;
@@ -66,7 +62,6 @@ public class AltarSeal : MonoBehaviour
     {
         if (promptText != null) promptText.gameObject.SetActive(false);
 
-        // Ẩn hết model vật phẩm lúc đầu (chưa đặt gì lên bàn)
         if (conMatVisual != null) conMatVisual.SetActive(false);
         if (kiTuVisual != null) kiTuVisual.SetActive(false);
         if (traiTimVisual != null) traiTimVisual.SetActive(false);
@@ -78,28 +73,25 @@ public class AltarSeal : MonoBehaviour
         if (isComplete || !isPlayerInside) return;
 
         if (Keyboard.current != null && Keyboard.current.eKey.wasPressedThisFrame)
-        {
             PlaceItems();
-        }
     }
 
-    // Đặt HẾT vật phẩm đang cầm lên bàn thờ (1, 2, hoặc cả 4 đều được)
     private void PlaceItems()
     {
-        int placedCount = 0;
+        int placedThisTime = 0;
 
         foreach (string item in REQUIRED_ITEMS)
         {
             if (PlayerInventory.Count(item) > 0 && !IsPlaced(item))
             {
                 MarkPlaced(item);
-                PlayerInventory.RemoveAll(item);   // bỏ khỏi hotbar
-                placedCount++;
+                PlayerInventory.RemoveAll(item);
+                placedThisTime++;
                 Debug.Log("Đã đặt vật phẩm lên bàn thờ: " + item);
             }
         }
 
-        if (placedCount == 0)
+        if (placedThisTime == 0)
         {
             Debug.Log("Bạn không cầm vật phẩm nào để đặt.");
             return;
@@ -107,14 +99,29 @@ public class AltarSeal : MonoBehaviour
 
         if (placeAudio != null) placeAudio.Play();
 
-        Debug.Log($"Tiến độ phong ấn: {CountPlaced()}/4");
+        int totalPlaced = CountPlaced();
+        ReportAltarProgress(placedThisTime);
+        Debug.Log($"Tiến độ phong ấn: {totalPlaced}/{requiredItemCount}");
 
         if (promptText != null) promptText.text = GetCurrentPrompt();
 
-        if (CountPlaced() >= 4)
+        if (totalPlaced >= requiredItemCount) CompleteSeal();
+    }
+
+    private void ReportAltarProgress(int placedThisTime)
+    {
+        if (QuestManager.Instance == null)
         {
-            CompleteSeal();
+            Debug.LogWarning("AltarSeal: Không tìm thấy QuestManager để cập nhật Chương 3.");
+            return;
         }
+
+        QuestManager.Instance.ReportProgressForChapter(
+            questChapterIndex,
+            altarSubQuestIndex,
+            placedThisTime,
+            requiredItemCount
+        );
     }
 
     private bool IsPlaced(string item)
@@ -125,8 +132,8 @@ public class AltarSeal : MonoBehaviour
             case "KiTu": return hasKiTu;
             case "TraiTim": return hasTraiTim;
             case "GiotMau": return hasGiotMau;
+            default: return false;
         }
-        return false;
     }
 
     private void MarkPlaced(string item)
@@ -154,12 +161,12 @@ public class AltarSeal : MonoBehaviour
 
     private int CountPlaced()
     {
-        int n = 0;
-        if (hasConMat) n++;
-        if (hasKiTu) n++;
-        if (hasTraiTim) n++;
-        if (hasGiotMau) n++;
-        return n;
+        int count = 0;
+        if (hasConMat) count++;
+        if (hasKiTu) count++;
+        if (hasTraiTim) count++;
+        if (hasGiotMau) count++;
+        return count;
     }
 
     public bool IsComplete()
@@ -170,24 +177,18 @@ public class AltarSeal : MonoBehaviour
     private void CompleteSeal()
     {
         isComplete = true;
-        Debug.Log("ĐỦ 4 VẬT PHẨM! Phong ấn đã được mở. Xích cửa tháo ra...");
+        Debug.Log("ĐỦ 4 VẬT PHẨM! Phong ấn đã được mở.");
 
         if (promptText != null) promptText.gameObject.SetActive(false);
-
-        // Phát tiếng phong ấn mở
         if (sealCompleteAudio != null) sealCompleteAudio.Play();
 
-        // Bùng khói tím
         if (sealVFX != null)
         {
             sealVFX.gameObject.SetActive(true);
             sealVFX.Play();
         }
 
-        // Tháo xích cửa
         if (doorChain != null) doorChain.SetActive(false);
-
-        // Kích hoạt cutscene hồi tưởng kết chương
         if (endCutscene != null) endCutscene.PlayCutscene();
     }
 

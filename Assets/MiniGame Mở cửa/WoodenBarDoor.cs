@@ -7,6 +7,11 @@ public class WoodenBarDoor : MonoBehaviour, IInteractable
     [Header("Yêu cầu item")]
     public string requiredItem = "Crowbar";
 
+    [Header("Liên kết bảng nhiệm vụ")]
+    [SerializeField, Min(0)] private int questChapterIndex = 3;
+    [SerializeField, Min(0)] private int questSubQuestIndex = 0;
+    [SerializeField, Min(1)] private int requiredProgress = 2;
+
     [Header("Thanh gỗ chặn cửa")]
     public GameObject[] woodenBars;
 
@@ -29,9 +34,7 @@ public class WoodenBarDoor : MonoBehaviour, IInteractable
     private void Start()
     {
         if (promptText != null) promptText.gameObject.SetActive(false);
-
-        if (audioSource == null)
-            audioSource = GetComponent<AudioSource>();
+        if (audioSource == null) audioSource = GetComponent<AudioSource>();
     }
 
     private void Update()
@@ -44,8 +47,8 @@ public class WoodenBarDoor : MonoBehaviour, IInteractable
     {
         if (isOpened) return "";
         if (PlayerInventory.Count(requiredItem) > 0)
-            return "Nhấn [E] để phá thanh gỗ";
-        return "Cần xà beng để phá cửa";
+            return "Nhấn [E] để dùng xà beng phá các tấm gỗ";
+        return "Cần tìm xà beng để phá cửa";
     }
 
     public void Interact()
@@ -64,19 +67,14 @@ public class WoodenBarDoor : MonoBehaviour, IInteractable
     private IEnumerator OpenDoor()
     {
         isOpened = true;
-
-        // XOA XA BENG KHOI HOTBAR (da dung xong)
         PlayerInventory.RemoveAll(requiredItem);
-        Debug.Log("Đã dùng xà beng. Icon biến mất khỏi hotbar.");
 
-        // Play sound phá gỗ
         if (audioSource != null && breakSound != null)
         {
             audioSource.clip = breakSound;
             audioSource.Play();
         }
 
-        // Thanh gỗ bay ra
         foreach (GameObject bar in woodenBars)
         {
             if (bar == null) continue;
@@ -96,20 +94,17 @@ public class WoodenBarDoor : MonoBehaviour, IInteractable
 
         yield return new WaitForSeconds(0.5f);
 
-        // Destroy thanh gỗ sau 2 giây
         foreach (GameObject bar in woodenBars)
         {
             if (bar != null) Destroy(bar, 2f);
         }
 
-        // Play sound cửa mở
         if (audioSource != null && doorSound != null)
         {
             audioSource.clip = doorSound;
             audioSource.Play();
         }
 
-        // Mở cửa xoay
         if (door != null)
         {
             float elapsed = 0f;
@@ -126,13 +121,31 @@ public class WoodenBarDoor : MonoBehaviour, IInteractable
 
         if (promptText != null) promptText.gameObject.SetActive(false);
 
-        Debug.Log("Cửa đã mở!");
+        ReportQuestProgress();
+        Debug.Log("Đã phá các tấm gỗ và mở cửa phòng chứa Con Mắt!");
+    }
+
+    private void ReportQuestProgress()
+    {
+        if (QuestManager.Instance == null)
+        {
+            Debug.LogWarning("WoodenBarDoor: Không tìm thấy QuestManager.");
+            return;
+        }
+
+        QuestManager.Instance.ReportProgressForChapter(
+            questChapterIndex,
+            questSubQuestIndex,
+            1,
+            requiredProgress
+        );
     }
 
     private void OnTriggerEnter(Collider other)
     {
         if (!other.CompareTag("Player")) return;
         isPlayerInside = true;
+
         if (promptText != null && !isOpened)
         {
             promptText.text = GetInteractPrompt();
@@ -143,6 +156,7 @@ public class WoodenBarDoor : MonoBehaviour, IInteractable
     private void OnTriggerStay(Collider other)
     {
         if (!other.CompareTag("Player")) return;
+
         if (promptText != null && !isOpened)
         {
             promptText.text = GetInteractPrompt();
