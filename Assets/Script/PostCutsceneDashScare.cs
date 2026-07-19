@@ -28,6 +28,14 @@ public class PostCutsceneDashScare : MonoBehaviour
     [SerializeField] private AudioClip scareSound;
     [SerializeField] private float volume = 1f;
 
+    [Header("Hộp nhạc sau khi Ghoul lướt qua")]
+    [Tooltip("Đoạn nhạc hộp nhạc dùng để dẫn vào Chương 2.")]
+    [SerializeField] private AudioClip musicBoxClip;
+    [SerializeField, Min(0f)] private float musicBoxDelay = 0.25f;
+    [SerializeField, Min(0.1f)] private float musicBoxDuration = 3f;
+    [SerializeField, Range(0f, 1f)] private float musicBoxVolume = 0.65f;
+    [SerializeField, Min(0f)] private float musicBoxFadeOutDuration = 0.4f;
+
     [Header("Đèn chớp")]
     [SerializeField] private Light[] lightsToFlicker;
     [SerializeField] private GameObject[] lightObjectsToDisable;
@@ -116,10 +124,11 @@ public class PostCutsceneDashScare : MonoBehaviour
 
         yield return StartCoroutine(FlickerLightsAndDash());
 
-        yield return new WaitForSecondsRealtime(holdCameraAfterDash);
-
         if (!keepGhoulVisibleAfterDash && ghoulVisual != null)
             ghoulVisual.SetActive(false);
+
+        if (holdCameraAfterDash > 0f)
+            yield return new WaitForSecondsRealtime(holdCameraAfterDash);
 
         forceLockCamera = false;
 
@@ -127,6 +136,12 @@ public class PostCutsceneDashScare : MonoBehaviour
             yield return StartCoroutine(ReturnCamera());
 
         SetGameplayControl(true);
+
+        // Camera và điều khiển đã trở lại bình thường trước khi nhạc hộp nhạc phát.
+        if (musicBoxDelay > 0f)
+            yield return new WaitForSecondsRealtime(musicBoxDelay);
+
+        yield return StartCoroutine(PlayMusicBoxCue());
 
         if (menuAfterScare != null)
             menuAfterScare.SetActive(true);
@@ -310,6 +325,51 @@ public class PostCutsceneDashScare : MonoBehaviour
             r.enabled = true;
             r.gameObject.SetActive(true);
         }
+    }
+
+    private IEnumerator PlayMusicBoxCue()
+    {
+        if (musicBoxClip == null)
+        {
+            Debug.LogWarning(
+                "Chưa gán Music Box Clip; bỏ qua đoạn nhạc chuyển sang Chương 2."
+            );
+            yield break;
+        }
+
+        GameObject audioObj = new GameObject("MusicBoxTransitionCue");
+        AudioSource source = audioObj.AddComponent<AudioSource>();
+
+        source.clip = musicBoxClip;
+        source.volume = musicBoxVolume;
+        source.spatialBlend = 0f;
+        source.loop = false;
+        source.Play();
+
+        float duration = Mathf.Min(musicBoxDuration, musicBoxClip.length);
+        float fadeDuration = Mathf.Min(musicBoxFadeOutDuration, duration);
+        float fadeStart = duration - fadeDuration;
+        float timer = 0f;
+
+        while (timer < duration)
+        {
+            timer += Time.unscaledDeltaTime;
+
+            if (fadeDuration > 0f && timer >= fadeStart)
+            {
+                float fadeT = Mathf.InverseLerp(
+                    duration,
+                    fadeStart,
+                    timer
+                );
+                source.volume = musicBoxVolume * fadeT;
+            }
+
+            yield return null;
+        }
+
+        source.Stop();
+        Destroy(audioObj);
     }
 
     private void PlaySound()
