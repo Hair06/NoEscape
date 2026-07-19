@@ -58,7 +58,11 @@ public class CutscenePlayer : MonoBehaviour
 
     void HandleHoldSkip()
     {
-        if (frames == null || _currentIndex >= skipToFrameIndex) return;
+        if (frames == null || frames.Length <= 1) return;
+
+        int safeSkipIndex = GetSafeSkipFrameIndex();
+
+        if (_currentIndex >= safeSkipIndex) return;
         if (Keyboard.current == null) return;
 
         if (Keyboard.current.eKey.isPressed)
@@ -84,6 +88,17 @@ public class CutscenePlayer : MonoBehaviour
             yield break;
         }
 
+        int safeSkipFrameIndex = GetSafeSkipFrameIndex();
+
+        if (skipToFrameIndex != safeSkipFrameIndex)
+        {
+            Debug.LogWarning(
+                "Skip To Frame Index " + skipToFrameIndex +
+                " vượt phạm vi Frames. Tự điều chỉnh thành " +
+                safeSkipFrameIndex + "."
+            );
+        }
+
         // Tắt nhạc nền
         if (bgMusic != null) bgMusic.Pause();
 
@@ -98,8 +113,19 @@ public class CutscenePlayer : MonoBehaviour
         {
             if (_skipRequested)
             {
-                i = skipToFrameIndex;
+                // Không bao giờ cho i vượt quá frames.Length - 1.
+                // Mathf.Max tránh nhảy ngược nếu người chơi đã đi qua frame đích.
+                i = Mathf.Max(i, safeSkipFrameIndex);
                 _skipRequested = false;
+            }
+
+            if (i < 0 || i >= frames.Length)
+            {
+                Debug.LogError(
+                    "Frame Index không hợp lệ: " + i +
+                    ". Tổng số frame: " + frames.Length
+                );
+                break;
             }
 
             _currentIndex = i;
@@ -108,6 +134,22 @@ public class CutscenePlayer : MonoBehaviour
         }
 
         EndCutscene();
+    }
+
+    private int GetSafeSkipFrameIndex()
+    {
+        if (frames == null || frames.Length <= 1)
+        {
+            return 0;
+        }
+
+        // Frame 0 đã được phát riêng trước vòng lặp,
+        // nên frame skip hợp lệ nằm từ 1 đến phần tử cuối.
+        return Mathf.Clamp(
+            skipToFrameIndex,
+            1,
+            frames.Length - 1
+        );
     }
 
     IEnumerator ShowFrame(CutsceneFrame frame)

@@ -578,7 +578,7 @@ MonoBehaviour:
   - image: {fileID: 1437148735, guid: 43f24e4e486986c4b947d72f2d228b5c, type: 3}
     dialogue: "Alex ch\u01B0a t\u1EEBng bi\u1EBFt r\u1EB1ng d\xEC \u0111ang che gi\u1EA5u
       m\u1ED9t b\xED m\u1EADt kinh ho\xE0ng."
-    waitTime: 1.5
+    waitTime: 2
     voiceClip: {fileID: 8300000, guid: 7fb034616f0978244a2a159a648c5a07, type: 3}
   - image: {fileID: 18621508, guid: 43f24e4e486986c4b947d72f2d228b5c, type: 3}
     dialogue: "R\u1ED3i m\u1ED9t ng\xE0y, m\u1ECDi th\u1EE9 b\u1EAFt \u0111\u1EA7u
@@ -602,7 +602,7 @@ MonoBehaviour:
     voiceClip: {fileID: 8300000, guid: fb53707a1d7508846be084164b4afc66, type: 3}
   - image: {fileID: -752387339, guid: 43f24e4e486986c4b947d72f2d228b5c, type: 3}
     dialogue: "V\xE0 r\u1ED3i ng\xE0y \u1EA5y c\u0169ng \u0111\u1EBFn..."
-    waitTime: 1.5
+    waitTime: 2
     voiceClip: {fileID: 8300000, guid: 37f135d6c34f09a42aaabd89d30982d8, type: 3}
   - image: {fileID: 515402463, guid: 43f24e4e486986c4b947d72f2d228b5c, type: 3}
     dialogue: "Tr\u01B0\u1EDBc khi r\u1EDDi xa th\u1EBF gi\u1EDBi n\xE0y, Sona quy\u1EBFt
@@ -617,19 +617,19 @@ MonoBehaviour:
   - image: {fileID: 1443869683, guid: 43f24e4e486986c4b947d72f2d228b5c, type: 3}
     dialogue: "Trong \u0111\xF3 c\xF3 m\u1ED9t cu\u1ED1n b\u0103ng cassette... v\xE0
       l\u1EDDi d\u1EB7n cu\u1ED1i c\xF9ng."
-    waitTime: 1.5
+    waitTime: 2.5
     voiceClip: {fileID: 8300000, guid: f6f99908e8aacd1458fd005617ae6ed0, type: 3}
   - image: {fileID: -575623803, guid: 43f24e4e486986c4b947d72f2d228b5c, type: 3}
     dialogue: "\u0110\xEAm h\xF4m \u1EA5y, Alex mang cu\u1ED1n b\u0103ng tr\u1EDF
       v\u1EC1 nh\xE0. C\u1EADu kh\xF4ng h\u1EC1 bi\u1EBFt r\u1EB1ng m\xECnh s\u1EAFp
       b\u01B0\u1EDBc v\xE0o v\xF9ng \u0111\u1EA5t k\xFD \u1EE9c b\u1ECB nguy\u1EC1n
       r\u1EE7a..."
-    waitTime: 1.5
+    waitTime: 4
     voiceClip: {fileID: 8300000, guid: 9c6eae4f0b990bc4a8cc45b1f6287c2a, type: 3}
   - image: {fileID: -755513450, guid: 3c603c68ccce251418130fcd23784625, type: 3}
     dialogue: "Alex ng\u1ED3i tr\u01B0\u1EDBc m\xE0n h\xECnh TV v\u1EDBi cu\u1ED1n
       b\u0103ng \u0111ang \u0111\u01B0\u1EE3c ph\xE1t v\xE0 sau \u0111\xF3..."
-    waitTime: 1.5
+    waitTime: 2.2
     voiceClip: {fileID: 8300000, guid: 05ed5e38c37433845856f96d2a78f435, type: 3}
   - image: {fileID: 1257150700, guid: 3c603c68ccce251418130fcd23784625, type: 3}
     dialogue: 
@@ -660,7 +660,7 @@ MonoBehaviour:
   typeSpeed: 0.04
   nextSceneName: map
   holdSkipTime: 1
-  skipToFrameIndex: 26
+  skipToFrameIndex: 18
 --- !u!4 &1054741063
 Transform:
   m_ObjectHideFlags: 0
@@ -689,8 +689,8 @@ AudioSource:
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
   m_PlayOnAwake: 0
-  m_Volume: 1
-  m_Pitch: 1
+  m_Volume: 0.3
+  m_Pitch: 0.85
   Loop: 0
   Mute: 0
   Spatialize: 0
