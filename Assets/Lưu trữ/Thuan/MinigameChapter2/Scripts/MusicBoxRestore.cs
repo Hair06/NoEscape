@@ -1,6 +1,7 @@
+using System.Collections;
+using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using TMPro;
 
 public class MusicBoxRestore : MonoBehaviour, IInteractable
 {
@@ -15,6 +16,7 @@ public class MusicBoxRestore : MonoBehaviour, IInteractable
     }
 
     private const int ChapterIndex = 2;
+    private const int AssembleSubQuestIndex = 4;
 
     [Header("Trạng thái 4 bộ phận (chỉ xem)")]
     [SerializeField] private bool hasShuttle = false;
@@ -24,11 +26,22 @@ public class MusicBoxRestore : MonoBehaviour, IInteractable
 
     [Header("UI hướng dẫn (TextMeshPro)")]
     [SerializeField] private TextMeshProUGUI promptText;
-    [SerializeField] private string notReadyMessage = "Hộp nhạc còn thiếu bộ phận...";
-    [SerializeField] private string readyMessage = "Nhấn [E] để lắp ráp hộp nhạc";
 
-    [Header("Âm thanh & Hiệu ứng khi hoàn thành")]
+    [SerializeField]
+    private string notReadyMessage =
+        "Hộp nhạc còn thiếu bộ phận...";
+
+    [SerializeField]
+    private string readyMessage =
+        "Nhấn [E] để lắp ráp hộp nhạc";
+
+    [Header("Âm thanh và hiệu ứng khi hoàn thành")]
     [SerializeField] private AudioSource musicBoxAudio;
+
+    [Tooltip("Thời gian nhạc hộp nhạc phát từ lúc cutscene bắt đầu.")]
+    [SerializeField, Min(0.1f)]
+    private float musicDuringCutsceneDuration = 3f;
+
     [SerializeField] private GameObject brokenVisual;
     [SerializeField] private GameObject fixedVisual;
 
@@ -37,29 +50,60 @@ public class MusicBoxRestore : MonoBehaviour, IInteractable
 
     private bool isPlayerInside = false;
     private bool isAssembled = false;
+    private Coroutine musicRoutine;
 
     private void Awake()
     {
-        if (Instance == null) Instance = this;
-        else Destroy(gameObject);
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
     }
 
     private void Start()
     {
-        if (promptText != null) promptText.gameObject.SetActive(false);
-        if (brokenVisual != null) brokenVisual.SetActive(true);
-        if (fixedVisual != null) fixedVisual.SetActive(false);
+        if (promptText != null)
+        {
+            promptText.gameObject.SetActive(false);
+        }
+
+        if (brokenVisual != null)
+        {
+            brokenVisual.SetActive(true);
+        }
+
+        if (fixedVisual != null)
+        {
+            fixedVisual.SetActive(false);
+        }
 
         if (musicBoxAudio == null)
-            Debug.LogError("MusicBoxRestore: musicBoxAudio chưa được gán!");
+        {
+            Debug.LogError(
+                "MusicBoxRestore: Music Box Audio chưa được gán!"
+            );
+        }
         else if (musicBoxAudio.clip == null)
-            Debug.LogError("MusicBoxRestore: Audio Source chưa có clip!");
+        {
+            Debug.LogError(
+                "MusicBoxRestore: AudioSource chưa có AudioClip!"
+            );
+        }
     }
 
     private void Update()
     {
-        if (isPlayerInside && !isAssembled
-            && Keyboard.current != null && Keyboard.current.eKey.wasPressedThisFrame)
+        if (!isPlayerInside || isAssembled)
+        {
+            return;
+        }
+
+        if (Keyboard.current != null &&
+            Keyboard.current.eKey.wasPressedThisFrame)
         {
             Interact();
         }
@@ -69,16 +113,29 @@ public class MusicBoxRestore : MonoBehaviour, IInteractable
     {
         if (HasPart(part))
         {
-            Debug.LogWarning("Bộ phận đã được thu thập trước đó: " + part);
+            Debug.LogWarning(
+                "Bộ phận đã được thu thập trước đó: " + part
+            );
             return;
         }
 
         switch (part)
         {
-            case MusicBoxPart.Shuttle: hasShuttle = true; break;
-            case MusicBoxPart.Spring: hasSpring = true; break;
-            case MusicBoxPart.Disc: hasDisc = true; break;
-            case MusicBoxPart.WindKey: hasWindKey = true; break;
+            case MusicBoxPart.Shuttle:
+                hasShuttle = true;
+                break;
+
+            case MusicBoxPart.Spring:
+                hasSpring = true;
+                break;
+
+            case MusicBoxPart.Disc:
+                hasDisc = true;
+                break;
+
+            case MusicBoxPart.WindKey:
+                hasWindKey = true;
+                break;
         }
 
         if (QuestManager.Instance != null)
@@ -88,19 +145,36 @@ public class MusicBoxRestore : MonoBehaviour, IInteractable
                 GetSubQuestIndex(part)
             );
         }
+        else
+        {
+            Debug.LogWarning(
+                "MusicBoxRestore: Không tìm thấy QuestManager."
+            );
+        }
 
-        Debug.Log($"Đã thu thập: {part} | Tiến độ: {CountParts()}/4");
+        Debug.Log(
+            $"Đã thu thập: {part} | Tiến độ: {CountParts()}/4"
+        );
     }
 
     private bool HasPart(MusicBoxPart part)
     {
         switch (part)
         {
-            case MusicBoxPart.Shuttle: return hasShuttle;
-            case MusicBoxPart.Spring: return hasSpring;
-            case MusicBoxPart.Disc: return hasDisc;
-            case MusicBoxPart.WindKey: return hasWindKey;
-            default: return false;
+            case MusicBoxPart.Shuttle:
+                return hasShuttle;
+
+            case MusicBoxPart.Spring:
+                return hasSpring;
+
+            case MusicBoxPart.Disc:
+                return hasDisc;
+
+            case MusicBoxPart.WindKey:
+                return hasWindKey;
+
+            default:
+                return false;
         }
     }
 
@@ -108,40 +182,67 @@ public class MusicBoxRestore : MonoBehaviour, IInteractable
     {
         switch (part)
         {
-            case MusicBoxPart.Shuttle: return 0;
-            case MusicBoxPart.Spring: return 1;
-            case MusicBoxPart.Disc: return 2;
-            case MusicBoxPart.WindKey: return 3;
-            default: return -1;
+            case MusicBoxPart.Shuttle:
+                return 0;
+
+            case MusicBoxPart.Spring:
+                return 1;
+
+            case MusicBoxPart.Disc:
+                return 2;
+
+            case MusicBoxPart.WindKey:
+                return 3;
+
+            default:
+                return -1;
         }
     }
 
     private int CountParts()
     {
         int count = 0;
+
         if (hasShuttle) count++;
         if (hasSpring) count++;
         if (hasDisc) count++;
         if (hasWindKey) count++;
+
         return count;
     }
 
-    public bool IsComplete() =>
-        hasShuttle && hasSpring && hasDisc && hasWindKey;
+    public bool IsComplete()
+    {
+        return hasShuttle &&
+               hasSpring &&
+               hasDisc &&
+               hasWindKey;
+    }
 
     public string GetInteractPrompt()
     {
-        if (isAssembled) return "";
-        return IsComplete() ? readyMessage : notReadyMessage;
+        if (isAssembled)
+        {
+            return "";
+        }
+
+        return IsComplete()
+            ? readyMessage
+            : notReadyMessage;
     }
 
     public void Interact()
     {
-        if (isAssembled) return;
+        if (isAssembled)
+        {
+            return;
+        }
 
         if (!IsComplete())
         {
-            Debug.Log($"Chưa đủ bộ phận! Hiện có {CountParts()}/4");
+            Debug.Log(
+                $"Chưa đủ bộ phận! Hiện có {CountParts()}/4"
+            );
             return;
         }
 
@@ -151,6 +252,7 @@ public class MusicBoxRestore : MonoBehaviour, IInteractable
     private void AssembleMusicBox()
     {
         isAssembled = true;
+
         Debug.Log("Hộp nhạc đã được khôi phục!");
 
         PlayerInventory.RemoveAll("ConThoi");
@@ -158,46 +260,99 @@ public class MusicBoxRestore : MonoBehaviour, IInteractable
         PlayerInventory.RemoveAll("DiaNhac");
         PlayerInventory.RemoveAll("ChiaVan");
 
-        if (promptText != null) promptText.gameObject.SetActive(false);
-        if (brokenVisual != null) brokenVisual.SetActive(false);
-        if (fixedVisual != null) fixedVisual.SetActive(true);
+        if (promptText != null)
+        {
+            promptText.gameObject.SetActive(false);
+        }
+
+        if (brokenVisual != null)
+        {
+            brokenVisual.SetActive(false);
+        }
+
+        if (fixedVisual != null)
+        {
+            fixedVisual.SetActive(true);
+        }
+
+        // Bắt đầu phát nhạc trước.
+        // StartCoroutine chạy đến lệnh yield đầu tiên ngay trong frame này.
+        if (musicBoxAudio != null &&
+            musicBoxAudio.clip != null)
+        {
+            musicRoutine = StartCoroutine(
+                PlayMusicDuringCutscene()
+            );
+        }
+        else
+        {
+            Debug.LogWarning(
+                "MusicBoxRestore: Không thể phát nhạc vì chưa gán AudioSource hoặc AudioClip."
+            );
+        }
+
+        // Cutscene bắt đầu trong cùng frame với âm thanh hộp nhạc.
+        StartEndCutscene();
+    }
+
+    private IEnumerator PlayMusicDuringCutscene()
+    {
+        musicBoxAudio.Stop();
+        musicBoxAudio.loop = false;
+        musicBoxAudio.Play();
+
+        Debug.Log(
+            "Bắt đầu phát nhạc hộp nhạc trong 3 giây đầu cutscene."
+        );
+
+        yield return new WaitForSecondsRealtime(
+            musicDuringCutsceneDuration
+        );
 
         if (musicBoxAudio != null)
         {
-            Debug.Log($"Playing clip: {musicBoxAudio.clip?.name} | Volume: {musicBoxAudio.volume}");
-            musicBoxAudio.Play();
-        }
-        else
-        {
-            Debug.LogError("musicBoxAudio là null — chưa gán trong Inspector!");
+            musicBoxAudio.Stop();
         }
 
-        // Nhiệm vụ lắp ráp được xác nhận khi người chơi xem hết cutscene.
-        // MapSealCutscenePlayer sẽ hoàn thành đúng sub quest đang hoạt động (mục 4).
+        musicRoutine = null;
+
+        Debug.Log(
+            "Đã dừng nhạc hộp nhạc sau 3 giây."
+        );
+    }
+
+    private void StartEndCutscene()
+    {
         if (endCutscene != null)
         {
             endCutscene.PlayCutscene();
+            return;
         }
-        else
-        {
-            Debug.LogWarning("endCutscene chưa được gán! Hoàn thành nhiệm vụ Chapter 2 trực tiếp.");
 
-            if (QuestManager.Instance != null)
-            {
-                QuestManager.Instance.CompleteSubQuestForChapter(
-                    ChapterIndex,
-                    4
-                );
-                QuestManager.Instance.CompleteCurrentChapter();
-            }
+        Debug.LogWarning(
+            "End Cutscene chưa được gán. Hoàn thành Chương 2 trực tiếp."
+        );
+
+        if (QuestManager.Instance != null)
+        {
+            QuestManager.Instance.CompleteSubQuestForChapter(
+                ChapterIndex,
+                AssembleSubQuestIndex
+            );
+
+            QuestManager.Instance.CompleteCurrentChapter();
         }
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        if (!other.CompareTag("Player")) return;
+        if (!other.CompareTag("Player"))
+        {
+            return;
+        }
 
         isPlayerInside = true;
+
         if (promptText != null && !isAssembled)
         {
             promptText.text = GetInteractPrompt();
@@ -207,9 +362,16 @@ public class MusicBoxRestore : MonoBehaviour, IInteractable
 
     private void OnTriggerExit(Collider other)
     {
-        if (!other.CompareTag("Player")) return;
+        if (!other.CompareTag("Player"))
+        {
+            return;
+        }
 
         isPlayerInside = false;
-        if (promptText != null) promptText.gameObject.SetActive(false);
+
+        if (promptText != null)
+        {
+            promptText.gameObject.SetActive(false);
+        }
     }
 }

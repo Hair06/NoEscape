@@ -8495,6 +8495,11 @@ MonoBehaviour:
   menuAfterScare: {fileID: 654073367}
   scareSound: {fileID: 8300000, guid: b68b8d55bd484354e872ec0cf49834d9, type: 3}
   volume: 1
+  musicBoxClip: {fileID: 8300000, guid: 55cb7affa0a528d47bb390f18690224d, type: 3}
+  musicBoxDelay: 0.25
+  musicBoxDuration: 3
+  musicBoxVolume: 0.65
+  musicBoxFadeOutDuration: 0.4
   lightsToFlicker:
   - {fileID: 1855031014}
   - {fileID: 1542698795}
@@ -64809,7 +64814,7 @@ MonoBehaviour:
   itemName: KiTu
   pickupDistance: 3
   questChapterIndex: 3
-  questSubQuestIndex: 1
+  questSubQuestIndex: 2
   promptText: {fileID: 2025166744}
   interactMessage: "Nh\u1EA5n [E] \u0111\u1EC3 nh\u1EB7t K\xFD T\u1EF1 Gi\xE1o Ph\xE1i"
   collectSound: {fileID: 8300000, guid: 03d8c310e0947884ba576344da862fc3, type: 3}
@@ -73300,10 +73305,10 @@ MonoBehaviour:
   notReadyMessage: "B\xE0n th\u1EDD c\u1ED5... c\xF2n thi\u1EBFu v\u1EADt ph\u1EA9m"
   placeMessage: "Nh\u1EA5n [E] \u0111\u1EC3 \u0111\u1EB7t v\u1EADt ph\u1EA9m l\xEAn
     b\xE0n th\u1EDD"
-  conMatVisual: {fileID: 133205746}
-  kiTuVisual: {fileID: 453551406}
-  traiTimVisual: {fileID: 1585203650}
-  giotMauVisual: {fileID: 1022101187}
+  conMatVisual: {fileID: 0}
+  kiTuVisual: {fileID: 0}
+  traiTimVisual: {fileID: 0}
+  giotMauVisual: {fileID: 0}
   placeAudio: {fileID: 0}
   sealCompleteAudio: {fileID: 0}
   sealVFX: {fileID: 0}
@@ -140100,7 +140105,7 @@ MonoBehaviour:
       t\u1EEBng nghe n\xF3 khi c\xF2n nh\u1ECF. N\xF3 ph\xE1t ra t\u1EEB chi\u1EBFc
       h\u1ED9p nh\u1EA1c c\u1EE7a m\u1EB9. C\xF3 l\u1EBD n\u01A1i n\xE0y \u0111ang
       mu\u1ED1n m\xECnh t\xECm l\u1EA1i nh\u1EEFng b\u1ED9 ph\u1EADn \u0111\xE3 m\u1EA5t."
-    characterThoughtDelay: 5
+    characterThoughtDelay: 10
     characterThoughtHoldTime: -1
     mainQuest: "T\xECm c\xE1c b\u1ED9 ph\u1EADn th\u1EA5t l\u1EA1c v\xE0 kh\xF4i
       ph\u1EE5c chi\u1EBFc h\u1ED9p nh\u1EA1c c\u1EE7a m\u1EB9."
@@ -189765,6 +189770,14 @@ PrefabInstance:
       propertyPath: musicBoxAudio
       value: 
       objectReference: {fileID: 1327656923}
+    - target: {fileID: 2223632770451406756, guid: 9a8f210322ee9df46ae960d1a9363dbd, type: 3}
+      propertyPath: musicPreviewDuration
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2223632770451406756, guid: 9a8f210322ee9df46ae960d1a9363dbd, type: 3}
+      propertyPath: musicDuringCutsceneDuration
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 5160378225533204091, guid: 9a8f210322ee9df46ae960d1a9363dbd, type: 3}
       propertyPath: m_Name
       value: MusicBox Variant
@@ -293601,7 +293614,7 @@ MonoBehaviour:
   frames:
   - image: {fileID: -792926701, guid: 6af53c91a4157014989a67b52f7c1dec, type: 3}
     dialogue: 
-    waitTime: 4
+    waitTime: 5
     voiceClip: {fileID: 0}
   - image: {fileID: 1103857415, guid: e53c24c2a2d1e874f97e3fe4b857dbb4, type: 3}
     dialogue: "Sau c\xFA s\u1ED1c m\u1EA5t \u0111i ng\u01B0\u1EDDi ch\u1ED3ng, c\xF4
