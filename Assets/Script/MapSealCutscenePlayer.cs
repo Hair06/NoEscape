@@ -186,22 +186,36 @@ public class MapSealCutscenePlayer : MonoBehaviour
         if (Chapter1Manager.Instance != null)
             Chapter1Manager.Instance.OnCutsceneFinished();
 
-        if (QuestManager.Instance != null)
+        QuestManager questManager = QuestManager.Instance;
+
+        if (questManager != null)
         {
-            // Mỗi phong ấn hoàn thành nhiệm vụ đang hoạt động của chính chương đó.
-            // Chapter 1 là mục 3, Chapter 2 là mục 4; không hard-code chỉ số nữa.
-            QuestManager.Instance.CompleteCurrentSubQuest();
-            QuestManager.Instance.CompleteCurrentChapter();
-            QuestManager.Instance.SetSubQuestHintsSuppressed(
-                false,
-                false
-            );
+            // Khóa chương cũ sau khi cutscene kết thúc, nhưng chưa mở chương mới.
+            // Chương mới sẽ chờ jumpscare hoặc chuyển cảnh gửi tín hiệu bàn giao.
+            questManager.CompleteCurrentSubQuest();
+            questManager.CompleteCurrentChapter();
         }
 
         if (afterCutsceneScare != null)
+        {
             StartCoroutine(StartScareAfterDelay());
+        }
         else
-            Debug.LogWarning("Chưa gán After Cutscene Scare.");
+        {
+            // Không có jumpscare: cutscene chính là điểm kết thúc chuyển cảnh.
+            if (questManager != null)
+            {
+                questManager.SetSubQuestHintsSuppressed(
+                    false,
+                    false
+                );
+                questManager.RequestStartNextChapter();
+            }
+
+            Debug.LogWarning(
+                "Chưa gán After Cutscene Scare; chương kế tiếp sẽ bắt đầu sau cutscene."
+            );
+        }
     }
 
     private IEnumerator StartScareAfterDelay()

@@ -85,7 +85,13 @@ public class PostCutsceneDashScare : MonoBehaviour
         if (!ValidateReferences())
         {
             triggered = false;
+            FinishQuestTransition();
             yield break;
+        }
+
+        if (QuestManager.Instance != null)
+        {
+            QuestManager.Instance.SetSubQuestHintsSuppressed(true);
         }
 
         if (menuAfterScare != null)
@@ -125,7 +131,25 @@ public class PostCutsceneDashScare : MonoBehaviour
         if (menuAfterScare != null)
             menuAfterScare.SetActive(true);
 
-        Debug.Log("Jumpscare kết thúc, trả lại điều khiển cho Player và hiện menu.");
+        FinishQuestTransition();
+
+        Debug.Log(
+            "Jumpscare kết thúc, trả lại điều khiển và bắt đầu chương kế tiếp."
+        );
+    }
+
+    private void FinishQuestTransition()
+    {
+        if (QuestManager.Instance == null)
+        {
+            return;
+        }
+
+        QuestManager.Instance.SetSubQuestHintsSuppressed(
+            false,
+            false
+        );
+        QuestManager.Instance.RequestStartNextChapter();
     }
 
     private bool ValidateReferences()
