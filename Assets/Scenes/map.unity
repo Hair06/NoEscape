@@ -172646,8 +172646,9 @@ MonoBehaviour:
   crouchTiltMultiplier: 0.5
   turnTiltAmount: 1.5
   maxTotalTilt: 5
-  crouchHeight: 1.2
+  crouchHeight: 2
   crouchSmoothTime: 0.1
+  crouchCameraHeightBoost: 0.15
   enableRunFov: 1
   normalFov: 60
   runFov: 70
@@ -172662,6 +172663,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 2048
   groundCheckDistance: 0.5
+  maxFallSpeed: -40
 --- !u!143 &1205354185
 CharacterController:
   m_ObjectHideFlags: 0

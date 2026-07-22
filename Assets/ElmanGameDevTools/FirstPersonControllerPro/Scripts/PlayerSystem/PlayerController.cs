@@ -1,5 +1,5 @@
 using UnityEngine;
-using UnityEngine.InputSystem; // Sử dụng thư viện Input mới để sửa hoàn toàn lỗi crash game
+using UnityEngine.InputSystem; // Dùng Input System mới để tương thích tốt hơn với các asset/animator khác (vd Invector)
 
 namespace ElmanGameDevTools.PlayerSystem
 {
@@ -51,6 +51,8 @@ namespace ElmanGameDevTools.PlayerSystem
         [Header("CROUCH SETTINGS")]
         public float crouchHeight = 1.2f;
         public float crouchSmoothTime = 0.1f;
+        [Tooltip("Cộng thêm độ cao camera khi crouch nếu thấy camera quá thấp so với capsule. Tăng giá trị này để nâng camera lên.")]
+        public float crouchCameraHeightBoost = 0.15f;
 
         [Header("FOV SETTINGS")]
         public bool enableRunFov = true;
@@ -66,6 +68,10 @@ namespace ElmanGameDevTools.PlayerSystem
         public LayerMask groundLayer = 1;
         public float groundCheckDistance = 0.5f;
 
+        [Header("PHYSICS SAFETY")]
+        [Tooltip("Giới hạn vận tốc rơi tối đa để tránh xuyên sàn (tunneling) khi rơi từ độ cao lớn")]
+        public float maxFallSpeed = -40f;
+
         private Vector3 _velocity;
         private float _currentTilt;
         private float _timer;
@@ -78,9 +84,16 @@ namespace ElmanGameDevTools.PlayerSystem
         private bool _isGrounded;
         private bool _isCrouching;
         private bool _hasJumped;
-        
+
         // BIẾN QUẢN LÝ KHÓA CAMERA KHI CHƠI MINI-GAME VÀ JUMPSCARE
-        private bool _isCameraLocked = false; 
+        private bool _isCameraLocked = false;
+
+        // Cache Camera component thay vì gọi GetComponent mỗi frame
+        private Camera _playerCameraComponent;
+
+        // Input di chuyển được lấy 1 lần duy nhất mỗi Update() rồi truyền xuống các hàm khác
+        private Vector2 _moveInput;
+        private bool _isRunKeyHeld;
 
         public enum MovementState { Walking, Running, Crouching, Jumping }
         private MovementState _currentMovementState = MovementState.Walking;
@@ -94,6 +107,9 @@ namespace ElmanGameDevTools.PlayerSystem
         {
             if (controller == null) controller = GetComponent<CharacterController>();
             if (anim == null) anim = GetComponentInChildren<Animator>(); // Tự động dò tìm Animator ở mô hình con nhân vật
+
+            if (playerCamera != null)
+                _playerCameraComponent = playerCamera.GetComponent<Camera>();
 
             Cursor.lockState = CursorLockMode.Locked;
             _originalHeight = controller.height;
@@ -111,6 +127,10 @@ namespace ElmanGameDevTools.PlayerSystem
 
         private void Update()
         {
+            // Đọc input di chuyển 1 lần duy nhất mỗi frame, dùng chung cho toàn bộ các hàm bên dưới
+            _moveInput = ReadMoveInput();
+            _isRunKeyHeld = Keyboard.current != null && Keyboard.current.leftShiftKey.isPressed;
+
             CheckGroundStatus();
             HandleCrouchLogic();
             UpdateMovementState();
@@ -136,10 +156,15 @@ namespace ElmanGameDevTools.PlayerSystem
             }
         }
 
+        private bool IsRunning()
+        {
+            // Nguồn duy nhất xác định "đang chạy nhanh", dùng chung cho animation, tốc độ và FOV
+            return _isRunKeyHeld && _moveInput.y > 0.1f;
+        }
+
         private void UpdateMovementState()
         {
-            // Nhận diện trạng thái giữ Shift (Chạy nhanh) từ phần cứng mới
-            bool wantsToRun = Keyboard.current != null && Keyboard.current.leftShiftKey.isPressed && GetMoveInput().y > 0.1f;
+            bool wantsToRun = IsRunning();
 
             if (!_isGrounded)
             {
@@ -160,8 +185,7 @@ namespace ElmanGameDevTools.PlayerSystem
             // KÍCH HOẠT ANIMATION: Đồng bộ hoàn toàn với các Parameter của Invector Animator
             if (anim != null)
             {
-                Vector2 input = GetMoveInput();
-                float moveMag = input.magnitude;
+                float moveMag = _moveInput.magnitude;
 
                 // Nếu đang trạng thái chạy nhanh (Running), ta nhân đôi Magnitude để Blend Tree chuyển sang hoạt ảnh Run
                 float targetMag = moveMag;
@@ -171,10 +195,10 @@ namespace ElmanGameDevTools.PlayerSystem
                 }
 
                 // Truyền mượt mà các giá trị vào Animator (Dùng thêm Lerp/Damp để chuyển trạng thái mượt hơn)
-                anim.SetFloat("InputHoriz", input.x, 0.1f, Time.deltaTime);
-                anim.SetFloat("InputVert", input.y, 0.1f, Time.deltaTime);
+                anim.SetFloat("InputHoriz", _moveInput.x, 0.1f, Time.deltaTime);
+                anim.SetFloat("InputVert", _moveInput.y, 0.1f, Time.deltaTime);
                 anim.SetFloat("InputMag", targetMag, 0.1f, Time.deltaTime);
-                
+
                 // Đồng bộ các biến Bool (Lưu ý chữ I viết hoa trong "IsMoving")
                 anim.SetBool("IsMoving", moveMag > 0.1f);
                 anim.SetBool("IsGrounded", _isGrounded);
@@ -184,8 +208,7 @@ namespace ElmanGameDevTools.PlayerSystem
 
         private void HandleMovement()
         {
-            Vector2 input = GetMoveInput();
-            Vector3 moveDirection = transform.right * input.x + transform.forward * input.y;
+            Vector3 moveDirection = transform.right * _moveInput.x + transform.forward * _moveInput.y;
             if (moveDirection.magnitude > 1f) moveDirection.Normalize();
 
             // Nhận diện phím Space để nhảy bằng hệ thống Input mới
@@ -201,6 +224,10 @@ namespace ElmanGameDevTools.PlayerSystem
 
             controller.Move(moveDirection * _currentMovementSpeed * Time.deltaTime);
             _velocity.y += gravity * Time.deltaTime;
+
+            // Giới hạn vận tốc rơi tối đa để tránh xuyên sàn khi rơi từ độ cao lớn
+            if (_velocity.y < maxFallSpeed) _velocity.y = maxFallSpeed;
+
             controller.Move(_velocity * Time.deltaTime);
         }
 
@@ -214,19 +241,38 @@ namespace ElmanGameDevTools.PlayerSystem
 
         private void HandleHeightAndCamera()
         {
-            float prevHeight = controller.height;
             controller.height = Mathf.Lerp(controller.height, _targetHeight, Time.deltaTime * (1f / crouchSmoothTime));
 
-            if (_isGrounded)
-            {
-                float heightDiff = controller.height - prevHeight;
-                if (heightDiff > 0) controller.Move(Vector3.up * heightDiff);
-            }
+            // QUAN TRỌNG: neo đáy capsule tại gốc transform bằng cách luôn set center.y = height/2.
+            // Nếu không làm việc này, khi height co lại (crouch) mà center không đổi thì đáy capsule
+            // sẽ tự động nâng lên khỏi mặt đất -> player/camera bị "nổi" lên, gây giật/lệch camera lúc ngồi.
+            Vector3 center = controller.center;
+            center.y = controller.height / 2f;
+            controller.center = center;
 
-            float currentRelativeHeight = _cameraBaseHeight * (controller.height / _originalHeight);
+            float currentRelativeHeight = GetCameraRelativeHeight();
             Vector3 camPos = playerCamera.localPosition;
             camPos.y = Mathf.Lerp(camPos.y, currentRelativeHeight, Time.deltaTime * (1f / crouchSmoothTime));
             playerCamera.localPosition = camPos;
+        }
+
+        /// <summary>
+        /// Tính chiều cao camera tương ứng với chiều cao capsule hiện tại.
+        /// Khi crouch, cộng thêm crouchCameraHeightBoost để camera không bị hạ quá thấp,
+        /// đồng thời clamp để camera không vượt quá đỉnh capsule hiện tại.
+        /// </summary>
+        private float GetCameraRelativeHeight()
+        {
+            float proportional = _cameraBaseHeight * (controller.height / _originalHeight);
+
+            if (_isCrouching)
+            {
+                proportional += crouchCameraHeightBoost;
+                float maxAllowed = controller.height - 0.1f; // chừa khoảng hở nhỏ để camera không lú ra khỏi đỉnh đầu
+                proportional = Mathf.Min(proportional, maxAllowed);
+            }
+
+            return proportional;
         }
 
         private void HandleCameraControl()
@@ -266,7 +312,7 @@ namespace ElmanGameDevTools.PlayerSystem
         {
             if (!enableCameraTilt) { _currentTilt = 0; return; }
 
-            float keyboardTilt = -GetMoveInput().x * tiltAmount;
+            float keyboardTilt = -_moveInput.x * tiltAmount;
             float mouseTilt = -_smoothInputX * turnTiltAmount;
             float targetTiltTotal = keyboardTilt + mouseTilt;
 
@@ -279,16 +325,15 @@ namespace ElmanGameDevTools.PlayerSystem
 
         private void HandleFovChange()
         {
-            if (!enableRunFov || playerCamera.GetComponent<Camera>() == null) return;
-            bool isActuallyRunning = Keyboard.current != null && Keyboard.current.leftShiftKey.isPressed && GetMoveInput().y > 0.1f;
-            Camera cam = playerCamera.GetComponent<Camera>();
-            cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, isActuallyRunning ? runFov : normalFov, Time.deltaTime * fovChangeSpeed);
+            if (!enableRunFov || _playerCameraComponent == null) return;
+            bool isActuallyRunning = _currentMovementState == MovementState.Running;
+            _playerCameraComponent.fieldOfView = Mathf.Lerp(_playerCameraComponent.fieldOfView, isActuallyRunning ? runFov : normalFov, Time.deltaTime * fovChangeSpeed);
         }
 
         private void HandleHeadBob()
         {
-            float moveMag = GetMoveInput().magnitude;
-            float currentCamH = _cameraBaseHeight * (controller.height / _originalHeight);
+            float moveMag = _moveInput.magnitude;
+            float currentCamH = GetCameraRelativeHeight();
 
             if (!_isGrounded || moveMag <= 0.1f)
             {
@@ -308,7 +353,7 @@ namespace ElmanGameDevTools.PlayerSystem
             playerCamera.localPosition = Vector3.Lerp(playerCamera.localPosition, newPos, Time.deltaTime * bobSmoothness);
         }
 
-        private Vector2 GetMoveInput()
+        private Vector2 ReadMoveInput()
         {
             if (Keyboard.current == null) return Vector2.zero;
             float x = 0f;
@@ -342,7 +387,7 @@ namespace ElmanGameDevTools.PlayerSystem
         }
 
         // ==========================================
-        // CÁC HÀM QUẢN LÝ KHÓA/MỞ KHÓA CAMERA 
+        // CÁC HÀM QUẢN LÝ KHÓA/MỞ KHÓA CAMERA
         // ==========================================
 
         /// <summary>
