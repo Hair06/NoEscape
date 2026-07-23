@@ -9,6 +9,8 @@ using ElmanGameDevTools.PlayerSystem; // để tự tìm PlayerController Elman
 // Mỗi số gõ vào: vòng tương ứng xoay mượt tới số đó. Đủ 4 số tự kiểm tra.
 public class CombinationLock : MonoBehaviour, IInteractable
 {
+    private const int ChapterIndex = 2;
+
     [Header("UI hướng dẫn (TextMeshPro)")]
     [SerializeField] private TextMeshProUGUI promptText;
     [SerializeField] private string interactMessage = "Nhấn [E] để chỉnh khóa số";
@@ -79,6 +81,9 @@ public class CombinationLock : MonoBehaviour, IInteractable
     // ===== IInteractable: Player mới gọi qua raycast + GameInputBridge =====
     public string GetInteractPrompt()
     {
+        if (!MiniGameFlowManager.IsChapterActive(ChapterIndex))
+            return "";
+
         if (isUnlocked && !isUnlockedWaitingLid && !isLidOpen) return "";
         if (isUnlockedWaitingLid && !isLidOpen) return openLidMessage;
         if (isAdjusting) return ""; // đang chỉnh thì không hiện prompt
@@ -87,6 +92,11 @@ public class CombinationLock : MonoBehaviour, IInteractable
 
     public void Interact()
     {
+        if (!MiniGameFlowManager.IsChapterActive(ChapterIndex))
+        {
+            return;
+        }
+
         // Chưa mở khóa -> vào chế độ chỉnh (nếu chưa đang chỉnh)
         if (!isUnlocked && !isAdjusting)
         {
@@ -165,6 +175,19 @@ public class CombinationLock : MonoBehaviour, IInteractable
 
     private void EnterAdjustMode()
     {
+        GameObject modalRoot =
+            inputDisplay != null
+                ? inputDisplay.gameObject
+                : null;
+
+        if (!MiniGameFlowManager.TryOpen(
+                this,
+                modalRoot,
+                ChapterIndex))
+        {
+            return;
+        }
+
         isAdjusting = true;
         currentDigitIndex = 0;
 
@@ -321,6 +344,13 @@ public class CombinationLock : MonoBehaviour, IInteractable
 
     private void ExitAdjustMode()
     {
+        MiniGameFlowManager.Close(
+            this,
+            inputDisplay != null
+                ? inputDisplay.gameObject
+                : null
+        );
+
         isAdjusting = false;
 
         Cursor.lockState = CursorLockMode.Locked;
@@ -345,6 +375,13 @@ public class CombinationLock : MonoBehaviour, IInteractable
 
     private void Unlock()
     {
+        MiniGameFlowManager.Close(
+            this,
+            inputDisplay != null
+                ? inputDisplay.gameObject
+                : null
+        );
+
         isUnlocked = true;
         Debug.Log("Đúng tổ hợp! Khóa số đã mở.");
 

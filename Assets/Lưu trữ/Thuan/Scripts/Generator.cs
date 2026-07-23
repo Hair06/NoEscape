@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using ElmanGameDevTools.PlayerSystem;
 
 public class Generator : MonoBehaviour, IInteractable
 {
@@ -14,6 +15,9 @@ public class Generator : MonoBehaviour, IInteractable
 
     [Header("Thanh đổ xăng")]
     [SerializeField] private Slider fuelBar;
+
+    [Header("Khóa Player khi đổ xăng")]
+    [SerializeField] private PlayerController playerController;
 
     [Tooltip("Lượng xăng tăng sau mỗi lần bấm chuột trái")]
     [SerializeField, Range(0.01f, 1f)]
@@ -41,6 +45,12 @@ public class Generator : MonoBehaviour, IInteractable
 
     private void Start()
     {
+        if (playerController == null)
+        {
+            playerController =
+                FindFirstObjectByType<PlayerController>();
+        }
+
         fillAmount = 0f;
         isFilling = false;
 
@@ -96,6 +106,11 @@ public class Generator : MonoBehaviour, IInteractable
 
     public string GetInteractPrompt()
     {
+        if (!MiniGameFlowManager.IsChapterActive(chapterIndex))
+        {
+            return "";
+        }
+
         if (isPowered)
         {
             return "";
@@ -154,8 +169,21 @@ public class Generator : MonoBehaviour, IInteractable
             return;
         }
 
+        if (!MiniGameFlowManager.TryOpen(
+                this,
+                fuelBar.gameObject,
+                chapterIndex))
+        {
+            return;
+        }
+
         isFilling = true;
         fillAmount = 0f;
+
+        if (playerController != null)
+        {
+            playerController.enabled = false;
+        }
 
         fuelBar.value = 0f;
         fuelBar.gameObject.SetActive(true);
@@ -180,6 +208,16 @@ public class Generator : MonoBehaviour, IInteractable
         {
             fuelBar.value = 1f;
             fuelBar.gameObject.SetActive(false);
+        }
+
+        MiniGameFlowManager.Close(
+            this,
+            fuelBar != null ? fuelBar.gameObject : null
+        );
+
+        if (playerController != null)
+        {
+            playerController.enabled = true;
         }
 
         // Xóa các can xăng khỏi kho sau khi sử dụng.

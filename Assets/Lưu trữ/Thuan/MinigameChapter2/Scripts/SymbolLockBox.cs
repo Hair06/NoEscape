@@ -9,6 +9,8 @@ using System.Collections.Generic;
 //        -> nắp xoay lên -> chìa vặn hiện ra -> nhấn E nhặt (script WindKeyCollect lo).
 public class SymbolLockBox : MonoBehaviour
 {
+    private const int ChapterIndex = 2;
+
     [Header("UI hướng dẫn (TextMeshPro)")]
     [SerializeField] private TextMeshProUGUI promptText;
     [SerializeField] private string interactMessage = "Nhấn [E] để mở hộp khóa";
@@ -120,6 +122,13 @@ public class SymbolLockBox : MonoBehaviour
         if (lidHinge != null)
             lidHinge.localRotation = Quaternion.Slerp(lidHinge.localRotation, lidTargetRot, Time.deltaTime * lidSpeed);
 
+        if (!MiniGameFlowManager.IsChapterActive(ChapterIndex))
+        {
+            if (promptText != null)
+                promptText.gameObject.SetActive(false);
+            return;
+        }
+
         if (!isPlayerInside) return;
         if (Keyboard.current == null || !Keyboard.current.eKey.wasPressedThisFrame) return;
 
@@ -136,6 +145,14 @@ public class SymbolLockBox : MonoBehaviour
 
     private void OpenLockPanel()
     {
+        if (!MiniGameFlowManager.TryOpen(
+                this,
+                lockPanel,
+                ChapterIndex))
+        {
+            return;
+        }
+
         isPanelOpen = true;
         currentStep = 0;
 
@@ -179,6 +196,8 @@ public class SymbolLockBox : MonoBehaviour
 
     private void Unlock()
     {
+        MiniGameFlowManager.Close(this, lockPanel);
+
         state = State.Unlocked;
         isPanelOpen = false;
         Debug.Log("Mở khóa đúng! Giờ nhấn E để mở nắp hòm.");
@@ -221,7 +240,8 @@ public class SymbolLockBox : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player"))
+        if (other.CompareTag("Player") &&
+            MiniGameFlowManager.IsChapterActive(ChapterIndex))
         {
             isPlayerInside = true;
             if (promptText != null && !isPanelOpen && state != State.LidOpen)

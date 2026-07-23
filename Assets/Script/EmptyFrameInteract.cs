@@ -18,6 +18,13 @@ public class EmptyFrameInteract : MonoBehaviour
 
     private void Update()
 {
+    if (!MiniGameFlowManager.IsChapterActive(1))
+    {
+        if (promptCanvasObject != null)
+            promptCanvasObject.SetActive(false);
+        return;
+    }
+
     if (isPlayerInside && GameInputBridge.GetKeyDown(KeyCode.E))
     {
         if (promptCanvasObject != null)
@@ -40,7 +47,8 @@ public class EmptyFrameInteract : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         // Kiểm tra xem có đúng là Player bước vào không dựa vào Tag
-        if (other.CompareTag("Player"))
+        if (other.CompareTag("Player") &&
+            MiniGameFlowManager.IsChapterActive(1))
         {
             isPlayerInside = true;
 

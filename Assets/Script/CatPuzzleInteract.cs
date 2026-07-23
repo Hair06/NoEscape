@@ -44,6 +44,13 @@ public class CatPuzzleInteract : MonoBehaviour
 
     private void Update()
     {
+        if (!MiniGameFlowManager.IsChapterActive(1))
+        {
+            if (promptText != null)
+                promptText.gameObject.SetActive(false);
+            return;
+        }
+
         // 1. Đọc sự kiện nhấn nút E để kích hoạt dịch chuyển mèo
         if (isPlayerInside && !isInteracted && Keyboard.current != null && Keyboard.current.eKey.wasPressedThisFrame)
         {
@@ -80,7 +87,9 @@ public class CatPuzzleInteract : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player") && !isInteracted)
+        if (other.CompareTag("Player") &&
+            !isInteracted &&
+            MiniGameFlowManager.IsChapterActive(1))
         {
             isPlayerInside = true;
             if (promptText != null) 

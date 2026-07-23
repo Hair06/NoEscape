@@ -102,8 +102,7 @@ public class Chapter1Manager : MonoBehaviour
 
         if (collectedPieces >= totalPiecesRequired)
         {
-            OpenPuzzleGame();
-            return true;
+            return OpenPuzzleGame();
         }
 
         Debug.Log($"Chưa tìm đủ số mảnh ảnh nhiệm vụ! Tiến độ hiện tại: {collectedPieces}/{totalPiecesRequired}");
@@ -145,11 +144,14 @@ public class Chapter1Manager : MonoBehaviour
         return true;
     }
 
-    private void OpenPuzzleGame()
+    private bool OpenPuzzleGame()
     {
-        if (QuestManager.Instance != null)
+        if (!MiniGameFlowManager.TryOpen(
+                this,
+                puzzleMiniGameUI,
+                1))
         {
-            QuestManager.Instance.SetSubQuestHintsSuppressed(true);
+            return false;
         }
 
         if (puzzleMiniGameUI != null)
@@ -167,11 +169,19 @@ public class Chapter1Manager : MonoBehaviour
 
             ResetCursorToDefaultHand();
         }
+
+        return true;
     }
 
     // Giữ nguyên hàm ClosePuzzleGame gốc phòng trường hợp bấm nút "Thoát ngang" minigame khi chưa giải xong
     public void ClosePuzzleGame(bool isWin = false)
     {
+        MiniGameFlowManager.Close(
+            this,
+            puzzleMiniGameUI,
+            !isWin
+        );
+
         if (puzzleMiniGameUI != null)
         {
             puzzleMiniGameUI.SetActive(false);
@@ -186,10 +196,6 @@ public class Chapter1Manager : MonoBehaviour
             Cursor.visible = false;
         }
 
-        if (!isWin && QuestManager.Instance != null)
-        {
-            QuestManager.Instance.SetSubQuestHintsSuppressed(false);
-        }
     }
 
     // =========================================================================
@@ -231,6 +237,12 @@ public class Chapter1Manager : MonoBehaviour
         yield return new WaitForSeconds(holdBlackTime);
 
         // 2. Tắt các UI giao diện xếp hình đi để dọn dẹp màn hình
+        MiniGameFlowManager.Close(
+            this,
+            puzzleMiniGameUI,
+            false
+        );
+
         if (puzzleMiniGameUI != null) puzzleMiniGameUI.SetActive(false);
         if (puzzleUI != null) puzzleUI.SetActive(false);
 

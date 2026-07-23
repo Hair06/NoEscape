@@ -20,6 +20,13 @@ public class DiscPartCollect : MonoBehaviour
 
     private void Update()
     {
+        if (!MiniGameFlowManager.IsChapterActive(2))
+        {
+            if (promptText != null)
+                promptText.gameObject.SetActive(false);
+            return;
+        }
+
         if (isPlayerInside
             && Keyboard.current != null
             && Keyboard.current.eKey.wasPressedThisFrame)
@@ -46,7 +53,8 @@ public class DiscPartCollect : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player"))
+        if (other.CompareTag("Player") &&
+            MiniGameFlowManager.IsChapterActive(2))
         {
             isPlayerInside = true;
             if (promptText != null)

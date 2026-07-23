@@ -5,6 +5,8 @@ using ElmanGameDevTools.PlayerSystem; // tự tìm PlayerController Elman
 // Gắn vào Panel UI chứa các miếng băng keo (TapePiece).
 public class TapePeelPuzzle : MonoBehaviour
 {
+    private const int ChapterIndex = 2;
+
     [Header("Bảng mini game")]
     [Tooltip("Kéo chính Panel UI mini game vào đây (cái chứa các miếng băng)")]
     [SerializeField] private GameObject puzzlePanel;
@@ -56,7 +58,13 @@ public class TapePeelPuzzle : MonoBehaviour
     {
         if (isComplete) return;
 
-        if (puzzlePanel != null) puzzlePanel.SetActive(true);
+        if (!MiniGameFlowManager.TryOpen(
+                this,
+                puzzlePanel,
+                ChapterIndex))
+        {
+            return;
+        }
 
         // Rải băng ngẫu nhiên (chỉ lần đầu mở, để không xáo trộn miếng đã gỡ)
         if (scatterOnOpen && !hasScattered)
@@ -105,6 +113,8 @@ public class TapePeelPuzzle : MonoBehaviour
         Debug.Log("Đã gỡ hết băng keo! Con Thoi Nhạc lộ ra.");
 
         // Đóng bảng mini game, khóa chuột lại để tiếp tục chơi
+        MiniGameFlowManager.Close(this, puzzlePanel);
+
         if (puzzlePanel != null) puzzlePanel.SetActive(false);
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;

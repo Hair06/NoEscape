@@ -39,12 +39,24 @@ public class WoodenBarDoor : MonoBehaviour, IInteractable
 
     private void Update()
     {
+        if (!MiniGameFlowManager.IsChapterActive(
+                questChapterIndex))
+        {
+            if (promptText != null)
+                promptText.gameObject.SetActive(false);
+            return;
+        }
+
         if (isPlayerInside && !isOpened && GameInputBridge.GetKeyDown(KeyCode.E))
             Interact();
     }
 
     public string GetInteractPrompt()
     {
+        if (!MiniGameFlowManager.IsChapterActive(
+                questChapterIndex))
+            return "";
+
         if (isOpened) return "";
         if (PlayerInventory.Count(requiredItem) > 0)
             return "Nhấn [E] để dùng xà beng phá các tấm gỗ";
@@ -53,6 +65,10 @@ public class WoodenBarDoor : MonoBehaviour, IInteractable
 
     public void Interact()
     {
+        if (!MiniGameFlowManager.IsChapterActive(
+                questChapterIndex))
+            return;
+
         if (isOpened) return;
 
         if (PlayerInventory.Count(requiredItem) <= 0)
@@ -143,7 +159,10 @@ public class WoodenBarDoor : MonoBehaviour, IInteractable
 
     private void OnTriggerEnter(Collider other)
     {
-        if (!other.CompareTag("Player")) return;
+        if (!other.CompareTag("Player") ||
+            !MiniGameFlowManager.IsChapterActive(
+                questChapterIndex))
+            return;
         isPlayerInside = true;
 
         if (promptText != null && !isOpened)

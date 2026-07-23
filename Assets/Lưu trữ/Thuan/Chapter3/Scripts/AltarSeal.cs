@@ -70,6 +70,14 @@ public class AltarSeal : MonoBehaviour
 
     private void Update()
     {
+        if (!MiniGameFlowManager.IsChapterActive(
+                questChapterIndex))
+        {
+            if (promptText != null)
+                promptText.gameObject.SetActive(false);
+            return;
+        }
+
         if (isComplete || !isPlayerInside) return;
 
         if (Keyboard.current != null && Keyboard.current.eKey.wasPressedThisFrame)
@@ -194,6 +202,10 @@ public class AltarSeal : MonoBehaviour
 
     private string GetCurrentPrompt()
     {
+        if (!MiniGameFlowManager.IsChapterActive(
+                questChapterIndex))
+            return "";
+
         if (isComplete) return "";
 
         int holding = 0;
@@ -207,7 +219,10 @@ public class AltarSeal : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player") && !isComplete)
+        if (other.CompareTag("Player") &&
+            !isComplete &&
+            MiniGameFlowManager.IsChapterActive(
+                questChapterIndex))
         {
             isPlayerInside = true;
             if (promptText != null)

@@ -10,11 +10,16 @@ public class SpringPartCollect : MonoBehaviour, IInteractable
 
     public string GetInteractPrompt()
     {
-        return interactMessage;
+        return MiniGameFlowManager.IsChapterActive(2)
+            ? interactMessage
+            : "";
     }
 
     public void Interact()
     {
+        if (!MiniGameFlowManager.IsChapterActive(2))
+            return;
+
         if (collectSound != null)
             AudioSource.PlayClipAtPoint(collectSound, transform.position);
 

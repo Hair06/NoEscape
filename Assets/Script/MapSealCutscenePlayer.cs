@@ -69,7 +69,7 @@ public class MapSealCutscenePlayer : MonoBehaviour
 
         if (QuestManager.Instance != null)
         {
-            QuestManager.Instance.SetSubQuestHintsSuppressed(true);
+            QuestManager.Instance.SetGameplayUiSuppressed(true);
         }
 
         if (cutsceneRoot != null)
@@ -205,7 +205,7 @@ public class MapSealCutscenePlayer : MonoBehaviour
             // Không có jumpscare: cutscene chính là điểm kết thúc chuyển cảnh.
             if (questManager != null)
             {
-                questManager.SetSubQuestHintsSuppressed(
+                questManager.SetGameplayUiSuppressed(
                     false,
                     false
                 );
