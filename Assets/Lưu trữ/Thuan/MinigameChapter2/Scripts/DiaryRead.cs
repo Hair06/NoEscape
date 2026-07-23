@@ -31,6 +31,7 @@ public class DiaryRead : MonoBehaviour
     [SerializeField] private GameObject diaryPanel;
 
     [Header("Mini game băng keo (nối tiếp sau khi đọc nhật ký)")]
+    [Tooltip("BẮT BUỘC kéo object TapePeelPuzzle vào đây, nếu trống mini game sẽ không tự mở")]
     [SerializeField] private TapePeelPuzzle tapePuzzle;
 
     [Header("Âm thanh (có thể để trống)")]
@@ -63,6 +64,10 @@ public class DiaryRead : MonoBehaviour
             closedPos = drawer.localPosition;
             openPos = closedPos + openOffset;
         }
+
+        // Cảnh báo nếu quên kéo TapePeelPuzzle vào Inspector
+        if (tapePuzzle == null)
+            Debug.LogError("[DiaryRead] Ô 'Tape Puzzle' đang TRỐNG! Kéo object TapePeelPuzzle vào Inspector, nếu không mini game sẽ không tự mở.");
     }
 
     private void Update()
@@ -141,7 +146,7 @@ public class DiaryRead : MonoBehaviour
             if (autoFoundPlayer != null) autoFoundPlayer.enabled = false;
         }
 
-        // Ẩn chữ hướng dẫn khi đang xem nhật ký
+        // Ẩn chữ prompt chung (chữ "đóng nhật ký" nên đặt riêng trong DiaryPanel)
         if (promptText != null) promptText.gameObject.SetActive(false);
 
         Debug.Log("Đang đọc nhật ký Kiều Hoa...");
@@ -153,19 +158,29 @@ public class DiaryRead : MonoBehaviour
 
         if (diaryPanel != null) diaryPanel.SetActive(false);
 
-        // Khóa chuột lại để tiếp tục chơi
+        // Đánh dấu đã đọc xong
+        hasReadDiary = true;
+        Debug.Log("Đã đọc xong nhật ký. Vào thẳng mini game gỡ băng keo.");
+
+        // Ẩn chữ hướng dẫn
+        if (promptText != null) promptText.gameObject.SetActive(false);
+
+        // ===== VÀO THẲNG MINI GAME, KHÔNG CẦN BẤM E LẦN NỮA =====
+        if (tapePuzzle != null)
+        {
+            tapePuzzle.OpenPuzzle();
+            return;   // TapePeelPuzzle tự lo chuột và camera
+        }
+
+        // Nếu ô Tape Puzzle bị trống thì trả lại điều khiển như cũ
+        Debug.LogError("[DiaryRead] Không mở được mini game vì ô 'Tape Puzzle' đang TRỐNG!");
+
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
 
-        // Mở lại điều khiển Player
         if (cameraScript != null) cameraScript.enabled = true;
         else if (autoFoundPlayer != null) autoFoundPlayer.enabled = true;
 
-        // Đánh dấu đã đọc xong -> mở khóa cho mini game băng keo
-        hasReadDiary = true;
-        Debug.Log("Đã đọc xong nhật ký. Giờ nhấn E để gỡ băng keo.");
-
-        // Sau khi đọc xong, chữ đổi sang "gỡ băng keo"
         if (promptText != null)
         {
             promptText.text = peelTapeMessage;
