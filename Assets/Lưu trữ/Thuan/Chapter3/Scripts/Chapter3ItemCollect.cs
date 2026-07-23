@@ -27,6 +27,14 @@ public class Chapter3ItemCollect : MonoBehaviour
 
     private void Update()
     {
+        if (!MiniGameFlowManager.IsChapterActive(
+                questChapterIndex))
+        {
+            if (promptText != null)
+                promptText.gameObject.SetActive(false);
+            return;
+        }
+
         if (isPlayerInside && !taken
             && Keyboard.current != null
             && Keyboard.current.eKey.wasPressedThisFrame)
@@ -69,7 +77,10 @@ public class Chapter3ItemCollect : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player") && !taken)
+        if (other.CompareTag("Player") &&
+            !taken &&
+            MiniGameFlowManager.IsChapterActive(
+                questChapterIndex))
         {
             isPlayerInside = true;
             if (promptText != null)

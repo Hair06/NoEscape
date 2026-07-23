@@ -7,6 +7,8 @@ using ElmanGameDevTools.PlayerSystem; // để tự tìm PlayerController Elman
 // Gắn vào Object đĩa vỡ gần cửa sổ (có Collider trigger để bắt [E]).
 public class DiscPuzzleManager : MonoBehaviour
 {
+    private const int ChapterIndex = 2;
+
     [Header("UI hướng dẫn (TextMeshPro)")]
     [SerializeField] private TextMeshProUGUI promptText;
     [SerializeField] private string interactMessage = "Nhấn [E] để sửa đĩa nhạc";
@@ -66,6 +68,13 @@ public class DiscPuzzleManager : MonoBehaviour
 
     private void Update()
     {
+        if (!MiniGameFlowManager.IsChapterActive(ChapterIndex))
+        {
+            if (promptText != null)
+                promptText.gameObject.SetActive(false);
+            return;
+        }
+
         if (isPlayerInside && !isOpen && !isComplete
             && Keyboard.current != null && Keyboard.current.eKey.wasPressedThisFrame)
         {
@@ -75,9 +84,16 @@ public class DiscPuzzleManager : MonoBehaviour
 
     private void OpenPuzzle()
     {
+        if (!MiniGameFlowManager.TryOpen(
+                this,
+                puzzlePanel,
+                ChapterIndex))
+        {
+            return;
+        }
+
         isOpen = true;
 
-        if (puzzlePanel != null) puzzlePanel.SetActive(true);
         if (promptText != null) promptText.gameObject.SetActive(false);
 
         if (scatterOnOpen && !hasScattered)
@@ -124,6 +140,8 @@ public class DiscPuzzleManager : MonoBehaviour
         Debug.Log("Đã ghép xong đĩa nhạc! Giai điệu vang lên. Hãy tới nhặt đĩa.");
 
         // Đóng bảng, khóa chuột lại
+        MiniGameFlowManager.Close(this, puzzlePanel);
+
         if (puzzlePanel != null) puzzlePanel.SetActive(false);
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
@@ -145,7 +163,9 @@ public class DiscPuzzleManager : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player") && !isComplete)
+        if (other.CompareTag("Player") &&
+            !isComplete &&
+            MiniGameFlowManager.IsChapterActive(ChapterIndex))
         {
             isPlayerInside = true;
             if (promptText != null && !isOpen)

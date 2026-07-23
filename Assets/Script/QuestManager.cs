@@ -79,12 +79,16 @@ public class QuestManager : MonoBehaviour
     private bool detailedHintUnlocked;
     private bool isCompletingChapter;
     private bool subQuestHintsSuppressed;
+    private bool gameplayUiSuppressed;
     private bool questFlowStarted;
 
     private int pendingNextChapterIndex = -1;
     private bool nextChapterStartRequested;
 
     public bool IsQuestFlowStarted => questFlowStarted;
+    public int CurrentChapterIndex => currentChapterIndex;
+    public bool IsChapterTransitioning =>
+        isCompletingChapter || pendingNextChapterIndex >= 0;
 
     private Coroutine chapterRoutine;
     private Coroutine questToggleRoutine;
@@ -128,7 +132,7 @@ public class QuestManager : MonoBehaviour
     {
         RefreshHintControlVisibility();
 
-        if (!questFlowStarted)
+        if (!questFlowStarted || gameplayUiSuppressed)
         {
             return;
         }
@@ -238,6 +242,54 @@ public class QuestManager : MonoBehaviour
             startingChapterIndex + "."
         );
         return true;
+    }
+
+    public bool CanOpenMiniGameForChapter(int chapterIndex)
+    {
+        return questFlowStarted &&
+               currentChapterIndex == chapterIndex &&
+               chapterRoutine == null &&
+               !isShowingThought &&
+               !isCompletingChapter &&
+               pendingNextChapterIndex < 0 &&
+               !gameplayUiSuppressed;
+    }
+
+    public void SetGameplayUiSuppressed(
+        bool suppressed,
+        bool showCurrentHintOnResume = true)
+    {
+        gameplayUiSuppressed = suppressed;
+
+        if (suppressed)
+        {
+            if (questToggleRoutine != null)
+            {
+                StopCoroutine(questToggleRoutine);
+                questToggleRoutine = null;
+            }
+
+            if (progressDisplayRoutine != null)
+            {
+                StopCoroutine(progressDisplayRoutine);
+                progressDisplayRoutine = null;
+            }
+
+            isQuestVisible = false;
+
+            HideCanvasGroupInstant(questPanelGroup);
+            HideCanvasGroupInstant(characterThoughtPanelGroup);
+            HideCanvasGroupInstant(subQuestHintPanelGroup);
+            HideCanvasGroupInstant(hintControlPanelGroup);
+
+            SetSubQuestHintsSuppressed(true, false);
+            return;
+        }
+
+        SetSubQuestHintsSuppressed(
+            false,
+            showCurrentHintOnResume
+        );
     }
 
     private IEnumerator StartChapterRoutine(QuestData data)
@@ -1311,7 +1363,8 @@ public class QuestManager : MonoBehaviour
 
     private void ShowQuestProgressTemporarily()
     {
-        if (isShowingThought ||
+        if (gameplayUiSuppressed ||
+            isShowingThought ||
             chapterRoutine != null ||
             isCompletingChapter)
         {

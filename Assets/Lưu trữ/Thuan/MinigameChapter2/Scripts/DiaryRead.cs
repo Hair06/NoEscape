@@ -5,6 +5,8 @@ using ElmanGameDevTools.PlayerSystem; // tự tìm PlayerController Elman
 
 public class DiaryRead : MonoBehaviour
 {
+    private const int ChapterIndex = 2;
+
     // 3 trạng thái của chuỗi tương tác
     private enum State
     {
@@ -79,6 +81,15 @@ public class DiaryRead : MonoBehaviour
             drawer.localPosition = Vector3.Lerp(drawer.localPosition, targetPos, Time.deltaTime * drawerSpeed);
         }
 
+        if (!MiniGameFlowManager.CanContinue(
+                this,
+                ChapterIndex))
+        {
+            if (promptText != null)
+                promptText.gameObject.SetActive(false);
+            return;
+        }
+
         // Nhận phím E
         if (isPlayerInside
             && Keyboard.current != null
@@ -126,6 +137,14 @@ public class DiaryRead : MonoBehaviour
 
     private void OpenDiary()
     {
+        if (!MiniGameFlowManager.TryOpen(
+                this,
+                diaryPanel,
+                ChapterIndex))
+        {
+            return;
+        }
+
         currentState = State.ReadingDiary;
 
         if (diaryPanel != null) diaryPanel.SetActive(true);
@@ -155,6 +174,8 @@ public class DiaryRead : MonoBehaviour
     private void CloseDiary()
     {
         currentState = State.DrawerOpen;
+
+        MiniGameFlowManager.Close(this, diaryPanel);
 
         if (diaryPanel != null) diaryPanel.SetActive(false);
 
@@ -190,7 +211,8 @@ public class DiaryRead : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player"))
+        if (other.CompareTag("Player") &&
+            MiniGameFlowManager.IsChapterActive(ChapterIndex))
         {
             isPlayerInside = true;
             if (promptText != null)

@@ -47,6 +47,16 @@ public class CultEyeAutoDetector : MonoBehaviour
 
     void Update()
     {
+        if (!MiniGameFlowManager.IsChapterActive(3))
+        {
+            if (isAiming)
+            {
+                isAiming = false;
+                ApplyCultVision(false);
+            }
+            return;
+        }
+
         if (eyeInHandObject == null) return;
 
         isHoldingEye = eyeInHandObject.activeInHierarchy;

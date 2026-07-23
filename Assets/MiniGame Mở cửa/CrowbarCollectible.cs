@@ -26,6 +26,13 @@ public class CrowbarCollectible : MonoBehaviour, IInteractable
 
     private void Update()
     {
+        if (!MiniGameFlowManager.IsChapterActive(
+                questChapterIndex))
+        {
+            isLookingAt = false;
+            return;
+        }
+
         CheckLookAt();
     }
 
@@ -43,11 +50,19 @@ public class CrowbarCollectible : MonoBehaviour, IInteractable
 
     public string GetInteractPrompt()
     {
+        if (!MiniGameFlowManager.IsChapterActive(
+                questChapterIndex))
+            return "";
+
         return isLookingAt ? "Nhấn [E] để nhặt xà beng" : "";
     }
 
     public void Interact()
     {
+        if (!MiniGameFlowManager.IsChapterActive(
+                questChapterIndex))
+            return;
+
         PlayerInventory.Add(itemName);
         ReportQuestProgress();
         Debug.Log("Đã nhặt Crowbar!");

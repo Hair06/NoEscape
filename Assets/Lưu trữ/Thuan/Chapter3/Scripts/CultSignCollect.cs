@@ -36,6 +36,13 @@ public class CultSignCollect : MonoBehaviour
 
     private void Update()
     {
+        if (!MiniGameFlowManager.IsChapterActive(
+                questChapterIndex))
+        {
+            ShowPrompt(false);
+            return;
+        }
+
         if (taken || playerTransform == null || !gameObject.activeInHierarchy) return;
 
         float dist = Vector3.Distance(transform.position, playerTransform.position);

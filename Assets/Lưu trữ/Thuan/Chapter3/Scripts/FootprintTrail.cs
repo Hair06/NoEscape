@@ -66,6 +66,16 @@ public class FootprintTrail : MonoBehaviour
     {
         if (player == null || footprints == null) return;
 
+        if (!MiniGameFlowManager.IsChapterActive(3))
+        {
+            if (wasVisible)
+            {
+                SetTrailVisible(false);
+                wasVisible = false;
+            }
+            return;
+        }
+
         // 1. HIEN THI: chuoi dau chan chi thay khi dang soi bang Con Mat
         bool shouldBeVisible = IsAimingWithEye() && !isComplete;
 

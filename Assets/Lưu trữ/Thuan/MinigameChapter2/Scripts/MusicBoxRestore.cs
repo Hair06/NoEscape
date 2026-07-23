@@ -97,6 +97,13 @@ public class MusicBoxRestore : MonoBehaviour, IInteractable
 
     private void Update()
     {
+        if (!MiniGameFlowManager.IsChapterActive(ChapterIndex))
+        {
+            if (promptText != null)
+                promptText.gameObject.SetActive(false);
+            return;
+        }
+
         if (!isPlayerInside || isAssembled)
         {
             return;
@@ -221,6 +228,11 @@ public class MusicBoxRestore : MonoBehaviour, IInteractable
 
     public string GetInteractPrompt()
     {
+        if (!MiniGameFlowManager.IsChapterActive(ChapterIndex))
+        {
+            return "";
+        }
+
         if (isAssembled)
         {
             return "";
@@ -233,6 +245,11 @@ public class MusicBoxRestore : MonoBehaviour, IInteractable
 
     public void Interact()
     {
+        if (!MiniGameFlowManager.IsChapterActive(ChapterIndex))
+        {
+            return;
+        }
+
         if (isAssembled)
         {
             return;
@@ -346,7 +363,8 @@ public class MusicBoxRestore : MonoBehaviour, IInteractable
 
     private void OnTriggerEnter(Collider other)
     {
-        if (!other.CompareTag("Player"))
+        if (!other.CompareTag("Player") ||
+            !MiniGameFlowManager.IsChapterActive(ChapterIndex))
         {
             return;
         }

@@ -36,6 +36,13 @@ public class CollectiblePiece : MonoBehaviour
 
     private void Update()
     {
+        if (!MiniGameFlowManager.IsChapterActive(1))
+        {
+            if (promptText != null)
+                promptText.gameObject.SetActive(false);
+            return;
+        }
+
         if (isPlayerInside && GameInputBridge.GetKeyDown(KeyCode.E))
         {
             CollectThisPiece();
@@ -80,7 +87,8 @@ public class CollectiblePiece : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player"))
+        if (other.CompareTag("Player") &&
+            MiniGameFlowManager.IsChapterActive(1))
         {
             isPlayerInside = true;
             promptSuppressedUntilExit = false;
@@ -94,7 +102,8 @@ public class CollectiblePiece : MonoBehaviour
 
     private void OnTriggerStay(Collider other)
     {
-        if (other.CompareTag("Player"))
+        if (other.CompareTag("Player") &&
+            MiniGameFlowManager.IsChapterActive(1))
         {
             isPlayerInside = true;
             if (!promptSuppressedUntilExit && promptText != null && !promptText.gameObject.activeSelf)
@@ -117,6 +126,11 @@ public class CollectiblePiece : MonoBehaviour
 
     private void CheckIfPlayerIsAlreadyInside()
     {
+        if (!MiniGameFlowManager.IsChapterActive(1))
+        {
+            return;
+        }
+
         Collider[] hitColliders = Physics.OverlapSphere(transform.position, detectionRadius);
         foreach (var hitCollider in hitColliders)
         {

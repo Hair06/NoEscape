@@ -99,7 +99,7 @@ public class PostCutsceneDashScare : MonoBehaviour
 
         if (QuestManager.Instance != null)
         {
-            QuestManager.Instance.SetSubQuestHintsSuppressed(true);
+            QuestManager.Instance.SetGameplayUiSuppressed(true);
         }
 
         if (menuAfterScare != null)
@@ -160,7 +160,7 @@ public class PostCutsceneDashScare : MonoBehaviour
             return;
         }
 
-        QuestManager.Instance.SetSubQuestHintsSuppressed(
+        QuestManager.Instance.SetGameplayUiSuppressed(
             false,
             false
         );

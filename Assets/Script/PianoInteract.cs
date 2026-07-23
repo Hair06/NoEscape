@@ -23,6 +23,13 @@ public class PianoInteract : MonoBehaviour
 
     private void Update()
     {
+        if (!MiniGameFlowManager.IsChapterActive(1))
+        {
+            if (promptCanvasObject != null)
+                promptCanvasObject.SetActive(false);
+            return;
+        }
+
         // SỬA TẠI ĐÂY: Dùng Keyboard.current để check phím theo hệ thống mới thay cho Input.GetKeyDown
         if (isPlayerInside && !isPianoPlayed && Keyboard.current != null && Keyboard.current.eKey.wasPressedThisFrame)
         {
@@ -47,7 +54,9 @@ public class PianoInteract : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player") && !isPianoPlayed)
+        if (other.CompareTag("Player") &&
+            !isPianoPlayed &&
+            MiniGameFlowManager.IsChapterActive(1))
         {
             isPlayerInside = true;
             if (promptCanvasObject != null) promptCanvasObject.SetActive(true);

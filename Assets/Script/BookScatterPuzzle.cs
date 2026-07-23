@@ -46,6 +46,13 @@ public class BookScatterPuzzle : MonoBehaviour
 
     private void Update()
     {
+        if (!MiniGameFlowManager.IsChapterActive(1))
+        {
+            if (promptText != null)
+                promptText.gameObject.SetActive(false);
+            return;
+        }
+
         // 1. Nhận diện người chơi nhấn phím E để lục sách
         if (isPlayerInside && !isInteracted && Keyboard.current != null && Keyboard.current.eKey.wasPressedThisFrame)
         {
@@ -96,7 +103,9 @@ public class BookScatterPuzzle : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player") && !isInteracted)
+        if (other.CompareTag("Player") &&
+            !isInteracted &&
+            MiniGameFlowManager.IsChapterActive(1))
         {
             isPlayerInside = true;
             if (promptText != null)
