@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Rendering; // Đã thêm thư viện này để dùng Volume
 
 public class CultEyeAutoDetector : MonoBehaviour
 {
@@ -14,6 +15,9 @@ public class CultEyeAutoDetector : MonoBehaviour
     [SerializeField] private GameObject hiddenSignObject;
     [SerializeField] private Light roomLight;
     [SerializeField] private Color horrorColor = new Color(0.4f, 0f, 0f);
+
+    [Header("CẤU HÌNH HIỆU ỨNG NHIỄU (GLITCH)")]
+    [SerializeField] private Volume glitchVolume; // Mới thêm: Kéo CameraGlitchVolume vào đây
 
     private Color originalRoomColor;
     private bool isHoldingEye = false;
@@ -42,6 +46,12 @@ public class CultEyeAutoDetector : MonoBehaviour
         if (scopeMaskUI != null)
         {
             scopeMaskUI.SetActive(false);
+        }
+
+        // Tắt nhiễu khi bắt đầu game
+        if (glitchVolume != null)
+        {
+            glitchVolume.weight = 0f;
         }
     }
 
@@ -118,6 +128,12 @@ public class CultEyeAutoDetector : MonoBehaviour
         if (roomLight != null)
         {
             roomLight.color = state ? horrorColor : originalRoomColor;
+        }
+
+        // BẬT HIỆU ỨNG NHIỄU KHI BẤM GIỮ CHUỘT PHẢI - TẮT KHI NHẢ CHUỘT
+        if (glitchVolume != null)
+        {
+            glitchVolume.weight = state ? 1f : 0f;
         }
     }
 }
