@@ -17,6 +17,19 @@ public class FootprintTrail : MonoBehaviour
     [Tooltip("Vật phẩm hiện ra trên bàn đá (Trái tim hoặc Giọt máu)")]
     [SerializeField] private GameObject[] rewards;
 
+    [Header("VFX ánh sáng xanh lá cho dấu chân")]
+    [Tooltip("Bật để tự tạo ánh sáng cho mỗi dấu chân")]
+    [SerializeField] private bool useGlowLight = true;
+    [SerializeField] private Color glowColor = new Color(0.2f, 1f, 0.3f);
+    [Tooltip("Độ sáng")]
+    [SerializeField] private float glowIntensity = 3f;
+    [Tooltip("Bán kính lan của ánh sáng (mét)")]
+    [SerializeField] private float glowRange = 2.5f;
+    [Tooltip("Nhấc ánh sáng lên khỏi sàn bao nhiêu mét")]
+    [SerializeField] private float glowHeightOffset = 0.3f;
+    [Tooltip("Tùy chọn: kéo prefab particle xanh lá vào đây")]
+    [SerializeField] private GameObject glowVFXPrefab;
+
     [Header("Âm thanh bước chân (random)")]
     [Tooltip("Mỗi lần đi qua 1 dấu chân sẽ phát ngẫu nhiên 1 tiếng")]
     [SerializeField] private AudioClip[] stepSounds;
@@ -34,6 +47,7 @@ public class FootprintTrail : MonoBehaviour
     private bool isComplete = false;
     private int lastSoundIndex = -1;
     private bool wasVisible = false;   // trang thai hien tai cua chuoi dau chan
+    private bool glowAttached = false; // da gan anh sang chua
 
     private void Start()
     {
@@ -53,6 +67,9 @@ public class FootprintTrail : MonoBehaviour
             Debug.LogError("[FootprintTrail] Mang Footprints dang TRONG!");
             return;
         }
+
+        // Gan anh sang xanh la cho tat ca dau chan ngay tu dau
+        AttachGlowToAll();
 
         // An het dau chan luc dau (chi hien khi soi bang Con Mat)
         SetTrailVisible(false);
@@ -110,6 +127,47 @@ public class FootprintTrail : MonoBehaviour
 
         if (dist <= triggerRadius)
             AdvanceToNext(current.transform.position);
+    }
+
+    // ===== VFX ANH SANG =====
+
+    // Gan anh sang xanh la cho tat ca dau chan (chi lam 1 lan)
+    private void AttachGlowToAll()
+    {
+        if (glowAttached) return;
+        glowAttached = true;
+
+        foreach (GameObject f in footprints)
+            AttachGlow(f);
+    }
+
+    private void AttachGlow(GameObject footprint)
+    {
+        if (footprint == null) return;
+
+        // Neu da co anh sang roi thi khong tao lai
+        if (footprint.GetComponentInChildren<Light>(true) != null) return;
+
+        if (useGlowLight)
+        {
+            GameObject lightObj = new GameObject("GlowLight");
+            lightObj.transform.SetParent(footprint.transform, false);
+            lightObj.transform.localPosition = new Vector3(0f, glowHeightOffset, 0f);
+
+            Light l = lightObj.AddComponent<Light>();
+            l.type = LightType.Point;
+            l.color = glowColor;
+            l.intensity = glowIntensity;
+            l.range = glowRange;
+            l.shadows = LightShadows.None;   // tat bong de nhe may
+        }
+
+        // Neu co prefab particle thi tao them
+        if (glowVFXPrefab != null)
+        {
+            GameObject vfx = Instantiate(glowVFXPrefab, footprint.transform);
+            vfx.transform.localPosition = Vector3.zero;
+        }
     }
 
     // Kiem tra nguoi choi co dang soi bang Con Mat khong
