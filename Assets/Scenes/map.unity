@@ -93,7 +93,7 @@ LightmapSettings:
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
-  m_LightingDataAsset: {fileID: 112000000, guid: e002cb26356b7704e902d009d780be14, type: 2}
+  m_LightingDataAsset: {fileID: 112000000, guid: 370b178adaec2aa45a5d5045a0720e22, type: 2}
   m_LightingSettings: {fileID: 4890085278179872738, guid: a1f2d116a2168484cb1cc52fd1d7f567, type: 2}
 --- !u!196 &4
 NavMeshSettings:
@@ -106800,8 +106800,14 @@ MonoBehaviour:
   - {fileID: 392835239}
   - {fileID: 258666619}
   - {fileID: 1072155006}
+  flickerCountMin: 4
+  flickerCountMax: 6
+  flickerSpeed: 0.7
+  darkTimeMin: 3
+  darkTimeMax: 5
   flickerAudio: {fileID: 753904997}
   flickerClip: {fileID: 8300000, guid: 557dacef56aef9c4b87a4d0e265d6bc6, type: 3}
+  flickerVolume: 0.7
   sparkVFXs:
   - {fileID: 486565846}
   - {fileID: 2126427458}
@@ -106809,13 +106815,6 @@ MonoBehaviour:
   - {fileID: 1932995745}
   - {fileID: 27019310}
   - {fileID: 883500511}
-  steadyMin: 1.5
-  steadyMax: 4
-  flickerMin: 0.3
-  flickerMax: 1.2
-  blackoutMin: 0.2
-  blackoutMax: 0.8
-  flickerSpeed: 4
 --- !u!4 &753904996
 Transform:
   m_ObjectHideFlags: 0
