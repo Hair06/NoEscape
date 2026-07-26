@@ -34,6 +34,8 @@ public class Chapter1Manager : MonoBehaviour
     [SerializeField] private Texture2D handOpenTexture;
     [Tooltip("Ảnh bàn tay nắm chặt lại khi nhấn giữ chuột trái để kéo ảnh")]
     [SerializeField] private Texture2D handClosedTexture;
+    [Tooltip("Tọa độ điểm nhấp trên con trỏ chuột (Ví dụ X: 32, Y: 10 cho đầu ngón trỏ)")]
+    [SerializeField] private Vector2 cursorHotspot = new Vector2(32f, 10f);
 
     [Header("CẤU HÌNH HIỆU ỨNG CHUYỂN CẢNH (FADE EFFECT)")]
     [Tooltip("Kéo Object ảnh đen (FadeScreen) vào đây")]
@@ -79,14 +81,16 @@ public class Chapter1Manager : MonoBehaviour
             {
                 if (handClosedTexture != null)
                 {
-                    Cursor.SetCursor(handClosedTexture, Vector2.zero, CursorMode.Auto);
+                    // Đã sửa Vector2.zero -> cursorHotspot (32, 10)
+                    Cursor.SetCursor(handClosedTexture, cursorHotspot, CursorMode.Auto);
                 }
             }
             else
             {
                 if (handOpenTexture != null)
                 {
-                    Cursor.SetCursor(handOpenTexture, Vector2.zero, CursorMode.Auto);
+                    // Đã sửa Vector2.zero -> cursorHotspot (32, 10)
+                    Cursor.SetCursor(handOpenTexture, cursorHotspot, CursorMode.Auto);
                 }
             }
         }
@@ -173,7 +177,6 @@ public class Chapter1Manager : MonoBehaviour
         return true;
     }
 
-    // Giữ nguyên hàm ClosePuzzleGame gốc phòng trường hợp bấm nút "Thoát ngang" minigame khi chưa giải xong
     public void ClosePuzzleGame(bool isWin = false)
     {
         MiniGameFlowManager.Close(
@@ -198,9 +201,6 @@ public class Chapter1Manager : MonoBehaviour
 
     }
 
-    // =========================================================================
-    // HÀM TIẾP NHẬN XỬ LÝ SỰ KIỆN THẮNG TỪ PUZZLE MANAGER
-    // =========================================================================
     public void StartGlitchFadeTransition(GameObject puzzleUI, GameObject photoOnWall, MapSealCutscenePlayer seal1Cutscene)
     {
         isPuzzleFinished = true;
@@ -209,7 +209,6 @@ public class Chapter1Manager : MonoBehaviour
 
     private IEnumerator UltimateWinRoutine(GameObject puzzleUI, GameObject photoOnWall, MapSealCutscenePlayer seal1Cutscene)
     {
-        // 1. Giai đoạn: Màn hình tối dần về đen hoàn toàn
         if (fadeImage != null)
         {
             fadeImage.gameObject.SetActive(true);
@@ -229,14 +228,8 @@ public class Chapter1Manager : MonoBehaviour
             yield return new WaitForSeconds(1.0f);
         }
 
-        // ========================================================
-        // [ ĐÃ ĐEN THUI - NGƯỜI CHƠI KHÔNG NHÌN THẤY GÌ ]
-        // ========================================================
-
-        // ĐOẠN NGHỈ: giữ màn hình đen một lúc cho có nhịp
         yield return new WaitForSeconds(holdBlackTime);
 
-        // 2. Tắt các UI giao diện xếp hình đi để dọn dẹp màn hình
         MiniGameFlowManager.Close(
             this,
             puzzleMiniGameUI,
@@ -246,25 +239,20 @@ public class Chapter1Manager : MonoBehaviour
         if (puzzleMiniGameUI != null) puzzleMiniGameUI.SetActive(false);
         if (puzzleUI != null) puzzleUI.SetActive(false);
 
-        // 3. Kích hoạt hiện ảnh hoàn chỉnh trên tường
         if (photoOnWall != null) photoOnWall.SetActive(true);
 
-        // 4. Xóa các mảnh giấy nhiệm vụ khỏi túi đồ
         PlayerInventory.RemoveAll("ManhGiay1");
         PlayerInventory.RemoveAll("ManhGiay2");
         PlayerInventory.RemoveAll("ManhGiay3");
         PlayerInventory.RemoveAll("ManhGiay4");
 
-        // Khóa con trỏ chuột chuẩn bị xem cutscene
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
 
-        // 5. Kích hoạt và chạy các Cutscene cốt truyện chạy chữ và Timeline
         if (victoryCutsceneObject != null) victoryCutsceneObject.SetActive(true);
         if (victoryCutsceneTimeline != null) victoryCutsceneTimeline.Play();
         if (seal1Cutscene != null) seal1Cutscene.PlayCutscene();
 
-        // 6. Giai đoạn: Màn hình từ từ sáng lên trở lại để xem phim
         if (fadeImage != null)
         {
             float alpha = 1f;
@@ -277,7 +265,7 @@ public class Chapter1Manager : MonoBehaviour
                 fadeImage.color = c;
                 yield return null;
             }
-            fadeImage.gameObject.SetActive(false); // Sáng hẳn rồi thì ẩn ảnh đi
+            fadeImage.gameObject.SetActive(false);
         }
     }
 
@@ -301,7 +289,8 @@ public class Chapter1Manager : MonoBehaviour
     {
         if (handOpenTexture != null)
         {
-            Cursor.SetCursor(handOpenTexture, Vector2.zero, CursorMode.Auto);
+            // Đã sửa Vector2.zero -> cursorHotspot (32, 10)
+            Cursor.SetCursor(handOpenTexture, cursorHotspot, CursorMode.Auto);
         }
     }
 }
