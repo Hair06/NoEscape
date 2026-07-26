@@ -2,11 +2,10 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using TMPro;
 using System.Collections.Generic;
-using ElmanGameDevTools.PlayerSystem; // để tự tìm PlayerController Elman
+using ElmanGameDevTools.PlayerSystem;
 
-// Quản lý tổng khóa số 3D (nhập bằng phím số).
-// Nhấn E -> ổ khóa bay lên cận cảnh -> gõ phím số 0-9 để nhập mật mã.
-// Mỗi số gõ vào: vòng tương ứng xoay mượt tới số đó. Đủ 4 số tự kiểm tra.
+// Khoa so 3D. Nhan E -> CAMERA BAY XUONG diem moc truoc o khoa.
+// Giai xong -> camera BAY LEN tra ve vi tri cu.
 public class CombinationLock : MonoBehaviour, IInteractable
 {
     private const int ChapterIndex = 2;
@@ -16,30 +15,50 @@ public class CombinationLock : MonoBehaviour, IInteractable
     [SerializeField] private string interactMessage = "Nhấn [E] để chỉnh khóa số";
 
     [Header("Hiển thị số đang nhập (tùy chọn)")]
-    [Tooltip("Text hiện dãy số đang gõ, ví dụ '0 4 _ _'")]
     [SerializeField] private TextMeshProUGUI inputDisplay;
 
     [Header("4 vòng số")]
-    [Tooltip("Kéo 4 Object vòng số (có script LockDial) theo thứ tự trái->phải")]
     [SerializeField] private LockDial[] dials;
 
     [Header("Tổ hợp đúng (theo thứ tự vòng)")]
-    [SerializeField] private List<int> correctCombination = new List<int>() { 0, 4, 5, 1 };
+    [SerializeField] private List<int> correctCombination = new List<int>() { 1, 2, 3, 4 };
 
     [Header("Camera")]
     [SerializeField] private Camera gameCamera;
 
     [Header("Khóa di chuyển khi chỉnh")]
-    [Tooltip("Có thể để trống - script sẽ tự tìm PlayerController trong scene")]
     [SerializeField] private MonoBehaviour playerInput;
-    private PlayerController autoFoundPlayer; // tự tìm nếu playerInput trống
+    private PlayerController autoFoundPlayer;
 
-    [Header("Ổ khóa bay lên cận cảnh")]
+    // ============================================================
+    [Header("═══ ĐIỂM MỐC CAMERA (CÁCH CHÍNH) ═══")]
+    [Tooltip("Kéo object CamAnchor_Lock vào đây. Camera bay CHÍNH XÁC tới vị trí + góc của nó.\n" +
+             "Mẹo: chọn object mốc rồi dùng GameObject > Align View to Selected để xem trước.")]
+    [SerializeField] private Transform cameraAnchor;
+
+    [Header("═══ ĐIỂM NGẮM (chỉ dùng khi KHÔNG có mốc) ═══")]
+    [Tooltip("Kéo object ổ khóa vào đây")]
     [SerializeField] private Transform lockBody;
-    [SerializeField] private float closeUpDistance = 0.3f;
-    [SerializeField] private float closeUpYOffset = 0f;
-    [SerializeField] private Vector3 closeUpEuler = new Vector3(0, 180, 0);
-    [SerializeField] private float moveSpeed = 8f;
+    [Tooltip("Lệch điểm ngắm theo X/Y/Z (mét)")]
+    [SerializeField] private Vector3 lookPointOffset = Vector3.zero;
+
+    [Header("═══ VỊ TRÍ TỰ ĐỘNG (chỉ dùng khi KHÔNG có mốc) ═══")]
+    [SerializeField] private float viewDistance = 1.2f;
+    [SerializeField] private float viewHeight = 0.6f;
+    [SerializeField] private float viewSideOffset = 0f;
+    [SerializeField] private bool useLockForwardDirection = false;
+    [SerializeField] private float extraPitch = 0f;
+    [SerializeField] private float extraYaw = 0f;
+    [SerializeField] private float extraRoll = 0f;
+
+    [Header("═══ TỐC ĐỘ BAY ═══")]
+    [SerializeField] private float flyDownSpeed = 4f;
+    [SerializeField] private float flyUpSpeed = 4f;
+
+    [Header("═══ XEM TRƯỚC TRONG SCENE ═══")]
+    [Tooltip("Cầu VÀNG = điểm ngắm. Cầu XANH = vị trí camera sẽ dừng")]
+    [SerializeField] private bool showAimGizmo = true;
+    // ============================================================
 
     [Header("Âm thanh (có thể để trống)")]
     [SerializeField] private AudioSource unlockAudio;
@@ -49,36 +68,33 @@ public class CombinationLock : MonoBehaviour, IInteractable
     [SerializeField] private GameObject windKeyReward;
 
     [Header("Nắp hòm xoay lên (sau khi mở khóa)")]
-    [Tooltip("Kéo Object LidHinge (bản lề chứa nắp) vào đây")]
     [SerializeField] private Transform lidHinge;
-    [Tooltip("Góc mở nắp (độ). Thử -100 hoặc 100 tùy hướng")]
     [SerializeField] private float lidOpenAngle = -100f;
-    [Tooltip("Trục xoay nắp")]
     [SerializeField] private Vector3 lidRotateAxis = new Vector3(1, 0, 0);
     [SerializeField] private float lidSpeed = 3f;
-    [Tooltip("Chữ gợi ý mở nắp")]
     [SerializeField] private string openLidMessage = "Nhấn [E] để mở nắp hòm";
     [SerializeField] private AudioSource lidOpenAudio;
 
     private bool isAdjusting = false;
     private bool isUnlocked = false;
-    private bool isMoving = false;
-    private bool isUnlockedWaitingLid = false; // đã mở khóa, chờ nhấn E mở nắp
+    private bool isUnlockedWaitingLid = false;
     private bool isLidOpen = false;
     private Quaternion lidClosedRot;
     private Quaternion lidTargetRot;
 
-    private int currentDigitIndex = 0;       // đang nhập vòng thứ mấy
-    private int[] enteredDigits;              // các số đã nhập
+    private int currentDigitIndex = 0;
+    private int[] enteredDigits;
 
-    private Vector3 homePosition;
-    private Quaternion homeRotation;
-    private Transform homeParent;
-    private Vector3 targetPosition;
-    private Quaternion targetRotation;
-    private bool returningHome = false;
+    // ===== CAMERA STATE =====
+    private bool isFlyingDown = false;
+    private bool isFlyingUp = false;
+    private Vector3 camHomePosition;
+    private Quaternion camHomeRotation;
+    private Transform camHomeParent;
 
-    // ===== IInteractable: Player mới gọi qua raycast + GameInputBridge =====
+    private Vector3 flyTargetPosition;
+    private Quaternion flyTargetRotation;
+
     public string GetInteractPrompt()
     {
         if (!MiniGameFlowManager.IsChapterActive(ChapterIndex))
@@ -86,25 +102,20 @@ public class CombinationLock : MonoBehaviour, IInteractable
 
         if (isUnlocked && !isUnlockedWaitingLid && !isLidOpen) return "";
         if (isUnlockedWaitingLid && !isLidOpen) return openLidMessage;
-        if (isAdjusting) return ""; // đang chỉnh thì không hiện prompt
+        if (isAdjusting) return "";
         return interactMessage;
     }
 
     public void Interact()
     {
-        if (!MiniGameFlowManager.IsChapterActive(ChapterIndex))
-        {
-            return;
-        }
+        if (!MiniGameFlowManager.IsChapterActive(ChapterIndex)) return;
 
-        // Chưa mở khóa -> vào chế độ chỉnh (nếu chưa đang chỉnh)
         if (!isUnlocked && !isAdjusting)
         {
             EnterAdjustMode();
             return;
         }
 
-        // Đã mở khóa, đang chờ mở nắp -> mở nắp
         if (isUnlockedWaitingLid && !isLidOpen)
         {
             OpenLid();
@@ -123,39 +134,99 @@ public class CombinationLock : MonoBehaviour, IInteractable
 
         enteredDigits = new int[dials.Length];
 
-        homePosition = lockBody.position;
-        homeRotation = lockBody.rotation;
-        homeParent = lockBody.parent;
-
         if (lidHinge != null)
         {
             lidClosedRot = lidHinge.localRotation;
             lidTargetRot = lidClosedRot;
         }
+
+        if (cameraAnchor == null)
+            Debug.LogWarning("[CombinationLock] Chưa gán 'Camera Anchor'. Đang dùng cách tính tự động (có thể lệch). " +
+                             "Nên tạo object mốc và kéo vào ô Camera Anchor.");
+    }
+
+    private Vector3 GetLookPoint()
+    {
+        if (lockBody == null) return transform.position;
+        return lockBody.position + lookPointOffset;
+    }
+
+    private Vector3 GetCameraTargetPosition()
+    {
+        // Uu tien diem moc dat tay
+        if (cameraAnchor != null) return cameraAnchor.position;
+
+        Vector3 lookPoint = GetLookPoint();
+
+        Vector3 backDir;
+        if (useLockForwardDirection && lockBody != null)
+        {
+            backDir = lockBody.forward;
+        }
+        else
+        {
+            Camera cam = gameCamera != null ? gameCamera : Camera.main;
+            if (cam == null) return lookPoint;
+
+            Vector3 d = cam.transform.position - lookPoint;
+            d.y = 0f;
+            backDir = d.sqrMagnitude > 0.0001f ? d.normalized : Vector3.back;
+        }
+
+        Vector3 sideDir = Vector3.Cross(Vector3.up, backDir).normalized;
+
+        return lookPoint
+             + backDir * viewDistance
+             + Vector3.up * viewHeight
+             + sideDir * viewSideOffset;
+    }
+
+    private Quaternion GetCameraTargetRotation(Vector3 fromPosition)
+    {
+        // Uu tien goc cua diem moc
+        if (cameraAnchor != null) return cameraAnchor.rotation;
+
+        Vector3 dir = GetLookPoint() - fromPosition;
+        if (dir.sqrMagnitude < 0.0001f) return Quaternion.identity;
+
+        Quaternion baseRot = Quaternion.LookRotation(dir, Vector3.up);
+        return baseRot * Quaternion.Euler(extraPitch, extraYaw, extraRoll);
     }
 
     private void Update()
     {
-        // Xoay nắp hòm mượt về góc đích
         if (lidHinge != null)
             lidHinge.localRotation = Quaternion.Slerp(lidHinge.localRotation, lidTargetRot, Time.deltaTime * lidSpeed);
 
-        // Di chuyển ổ khóa mượt
-        if (isMoving)
+        // ===== CAMERA BAY XUONG =====
+        if (isFlyingDown && gameCamera != null)
         {
-            lockBody.position = Vector3.Lerp(lockBody.position, targetPosition, Time.deltaTime * moveSpeed);
-            lockBody.rotation = Quaternion.Slerp(lockBody.rotation, targetRotation, Time.deltaTime * moveSpeed);
+            Transform ct = gameCamera.transform;
 
-            if (Vector3.Distance(lockBody.position, targetPosition) < 0.01f)
+            ct.position = Vector3.Lerp(ct.position, flyTargetPosition, Time.deltaTime * flyDownSpeed);
+            ct.rotation = Quaternion.Slerp(ct.rotation, flyTargetRotation, Time.deltaTime * flyDownSpeed);
+        }
+        // ===== CAMERA BAY LEN TRA VE =====
+        else if (isFlyingUp && gameCamera != null)
+        {
+            Transform ct = gameCamera.transform;
+
+            ct.position = Vector3.Lerp(ct.position, camHomePosition, Time.deltaTime * flyUpSpeed);
+            ct.rotation = Quaternion.Slerp(ct.rotation, camHomeRotation, Time.deltaTime * flyUpSpeed);
+
+            bool posDone = Vector3.Distance(ct.position, camHomePosition) < 0.02f;
+            bool rotDone = Quaternion.Angle(ct.rotation, camHomeRotation) < 0.5f;
+
+            if (posDone && rotDone)
             {
-                lockBody.position = targetPosition;
-                lockBody.rotation = targetRotation;
-                isMoving = false;
-                if (returningHome)
-                {
-                    lockBody.SetParent(homeParent);
-                    returningHome = false;
-                }
+                ct.position = camHomePosition;
+                ct.rotation = camHomeRotation;
+
+                if (camHomeParent != null)
+                    ct.SetParent(camHomeParent, true);
+
+                isFlyingUp = false;
+                RestorePlayerControl();
             }
         }
 
@@ -163,11 +234,9 @@ public class CombinationLock : MonoBehaviour, IInteractable
         {
             HandleNumberInput();
 
-            // Backspace: xóa số vừa nhập
             if (Keyboard.current != null && Keyboard.current.backspaceKey.wasPressedThisFrame)
                 DeleteLastDigit();
 
-            // Esc: thoát
             if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
                 ExitAdjustMode();
         }
@@ -175,23 +244,13 @@ public class CombinationLock : MonoBehaviour, IInteractable
 
     private void EnterAdjustMode()
     {
-        GameObject modalRoot =
-            inputDisplay != null
-                ? inputDisplay.gameObject
-                : null;
+        GameObject modalRoot = inputDisplay != null ? inputDisplay.gameObject : null;
 
-        if (!MiniGameFlowManager.TryOpen(
-                this,
-                modalRoot,
-                ChapterIndex))
-        {
-            return;
-        }
+        if (!MiniGameFlowManager.TryOpen(this, modalRoot, ChapterIndex)) return;
 
         isAdjusting = true;
         currentDigitIndex = 0;
 
-        // Tắt chữ hướng dẫn cho gọn, bật ô hiển thị số nhập
         if (promptText != null) promptText.gameObject.SetActive(false);
         if (inputDisplay != null) inputDisplay.gameObject.SetActive(true);
         UpdateInputDisplay();
@@ -199,28 +258,48 @@ public class CombinationLock : MonoBehaviour, IInteractable
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
 
-        // Ưu tiên dùng playerInput đã gán; nếu trống thì tự tìm PlayerController Elman
         if (playerInput != null)
         {
             playerInput.enabled = false;
-            Debug.Log($"[CombinationLock] Đã tắt playerInput: {playerInput.GetType().Name}");
         }
         else
         {
             autoFoundPlayer = FindFirstObjectByType<PlayerController>();
-            if (autoFoundPlayer != null)
+            if (autoFoundPlayer != null) autoFoundPlayer.enabled = false;
+            else Debug.LogWarning("[CombinationLock] Không tìm thấy PlayerController để khóa camera!");
+        }
+
+        if (gameCamera != null)
+        {
+            Transform ct = gameCamera.transform;
+
+            camHomeParent = ct.parent;
+            camHomePosition = ct.position;
+            camHomeRotation = ct.rotation;
+
+            ct.SetParent(null, true);
+
+            // TINH DIEM DICH 1 LAN DUY NHAT
+            if (cameraAnchor != null)
             {
-                autoFoundPlayer.enabled = false;
-                Debug.Log("[CombinationLock] Tự tìm và tắt PlayerController Elman.");
+                // Uu tien dung diem moc dat tay trong Scene
+                flyTargetPosition = cameraAnchor.position;
+                flyTargetRotation = cameraAnchor.rotation;
             }
             else
             {
-                Debug.LogWarning("[CombinationLock] Không tìm thấy PlayerController nào để khóa camera!");
+                flyTargetPosition = GetCameraTargetPosition();
+                flyTargetRotation = GetCameraTargetRotation(flyTargetPosition);
             }
         }
 
-        MoveToCloseUp();
-        Debug.Log("Vào chế độ chỉnh khóa số. Gõ phím số để nhập mật mã.");
+        foreach (LockDial d in dials)
+            if (d != null) d.CaptureBase();
+
+        isFlyingDown = true;
+        isFlyingUp = false;
+
+        Debug.Log("Camera đang bay xuống ổ khóa. Gõ phím số để nhập mật mã.");
     }
 
     private void HandleNumberInput()
@@ -229,13 +308,11 @@ public class CombinationLock : MonoBehaviour, IInteractable
         if (currentDigitIndex >= dials.Length) return;
 
         int pressed = GetPressedDigit();
-        if (pressed < 0) return; // không có phím số nào vừa bấm
+        if (pressed < 0) return;
 
-        // Chỉ chấp nhận nếu gõ ĐÚNG số của vòng hiện tại
         if (currentDigitIndex < correctCombination.Count
             && pressed == correctCombination[currentDigitIndex])
         {
-            // Đúng -> vòng xoay tới số, chuyển sang vòng kế tiếp
             enteredDigits[currentDigitIndex] = pressed;
             if (dials[currentDigitIndex] != null)
                 dials[currentDigitIndex].SetNumber(pressed);
@@ -243,19 +320,16 @@ public class CombinationLock : MonoBehaviour, IInteractable
             currentDigitIndex++;
             UpdateInputDisplay();
 
-            // Gõ đúng hết các vòng -> mở khóa
             if (currentDigitIndex >= dials.Length)
                 Unlock();
         }
         else
         {
-            // Sai -> kêu tiếng, đứng yên (không qua vòng)
             if (wrongAudio != null) wrongAudio.Play();
             Debug.Log($"Sai số ở vòng {currentDigitIndex + 1}. Thử lại.");
         }
     }
 
-    // Trả về số 0-9 vừa bấm (cả phím hàng trên lẫn numpad), hoặc -1
     private int GetPressedDigit()
     {
         var k = Keyboard.current;
@@ -313,7 +387,6 @@ public class CombinationLock : MonoBehaviour, IInteractable
         Debug.Log("Sai mật mã! Thử lại.");
         if (wrongAudio != null) wrongAudio.Play();
 
-        // Reset cho nhập lại
         currentDigitIndex = 0;
         for (int i = 0; i < dials.Length; i++)
         {
@@ -323,64 +396,39 @@ public class CombinationLock : MonoBehaviour, IInteractable
         UpdateInputDisplay();
     }
 
-    private void MoveToCloseUp()
-    {
-        if (gameCamera == null) return;
-        lockBody.SetParent(null);
-
-        // Sau khi đổi parent, ghi lại góc gốc các vòng cho chuẩn
-        foreach (LockDial d in dials)
-        {
-            if (d != null) d.CaptureBase();
-        }
-
-        Transform cam = gameCamera.transform;
-        targetPosition = cam.position + cam.forward * closeUpDistance + cam.up * closeUpYOffset;
-        targetRotation = Quaternion.LookRotation(cam.forward, cam.up) * Quaternion.Euler(closeUpEuler);
-
-        isMoving = true;
-        returningHome = false;
-    }
-
     private void ExitAdjustMode()
     {
-        MiniGameFlowManager.Close(
-            this,
-            inputDisplay != null
-                ? inputDisplay.gameObject
-                : null
-        );
+        MiniGameFlowManager.Close(this, inputDisplay != null ? inputDisplay.gameObject : null);
 
         isAdjusting = false;
-
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
-        if (playerInput != null) playerInput.enabled = true;
-        else if (autoFoundPlayer != null) autoFoundPlayer.enabled = true;
 
         if (inputDisplay != null) inputDisplay.gameObject.SetActive(false);
         if (promptText != null) promptText.text = interactMessage;
 
-        ReturnHome();
+        StartCameraReturn();
         Debug.Log("Thoát chế độ chỉnh khóa.");
     }
 
-    private void ReturnHome()
+    private void StartCameraReturn()
     {
-        targetPosition = homePosition;
-        targetRotation = homeRotation;
-        isMoving = true;
-        returningHome = true;
+        isFlyingDown = false;
+        isFlyingUp = true;
+    }
+
+    private void RestorePlayerControl()
+    {
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+
+        if (playerInput != null) playerInput.enabled = true;
+        else if (autoFoundPlayer != null) autoFoundPlayer.enabled = true;
+
+        Debug.Log("[CombinationLock] Camera đã bay về vị trí cũ. Trả lại điều khiển cho Player.");
     }
 
     private void Unlock()
     {
-        MiniGameFlowManager.Close(
-            this,
-            inputDisplay != null
-                ? inputDisplay.gameObject
-                : null
-        );
+        MiniGameFlowManager.Close(this, inputDisplay != null ? inputDisplay.gameObject : null);
 
         isUnlocked = true;
         Debug.Log("Đúng tổ hợp! Khóa số đã mở.");
@@ -388,16 +436,11 @@ public class CombinationLock : MonoBehaviour, IInteractable
         if (unlockAudio != null) unlockAudio.Play();
 
         isAdjusting = false;
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
-        if (playerInput != null) playerInput.enabled = true;
-        else if (autoFoundPlayer != null) autoFoundPlayer.enabled = true;
 
         if (inputDisplay != null) inputDisplay.gameObject.SetActive(false);
 
-        ReturnHome();
+        StartCameraReturn();
 
-        // Chưa hiện chìa. Chuyển sang trạng thái chờ người chơi nhấn E mở nắp.
         isUnlockedWaitingLid = true;
         if (promptText != null)
         {
@@ -418,9 +461,32 @@ public class CombinationLock : MonoBehaviour, IInteractable
 
         if (promptText != null) promptText.gameObject.SetActive(false);
 
-        // Giờ mới hiện chìa vặn để nhặt (WindKeyCollect lo việc nhặt)
         if (windKeyReward != null) windKeyReward.SetActive(true);
     }
 
+    private void OnDrawGizmos()
+    {
+        if (!showAimGizmo) return;
 
+        // Vi tri camera se dung
+        Vector3 camPos = GetCameraTargetPosition();
+
+        Gizmos.color = Color.cyan;
+        Gizmos.DrawWireSphere(camPos, 0.08f);
+
+        if (cameraAnchor != null)
+        {
+            // Ve huong nhin cua diem moc
+            Gizmos.color = new Color(0.3f, 1f, 1f, 0.8f);
+            Gizmos.DrawRay(cameraAnchor.position, cameraAnchor.forward * 1.5f);
+        }
+        else if (lockBody != null)
+        {
+            Vector3 lookPoint = GetLookPoint();
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawWireSphere(lookPoint, 0.06f);
+            Gizmos.color = new Color(0.3f, 1f, 1f, 0.7f);
+            Gizmos.DrawLine(camPos, lookPoint);
+        }
+    }
 }
