@@ -102936,6 +102936,12 @@ MonoBehaviour:
   triggerRadius: 0.9
   rewards:
   - {fileID: 1022101187}
+  useGlowLight: 1
+  glowColor: {r: 0.2, g: 1, b: 0.3, a: 1}
+  glowIntensity: 2
+  glowRange: 1.5
+  glowHeightOffset: 0.3
+  glowVFXPrefab: {fileID: 0}
   stepSounds:
   - {fileID: 8300000, guid: f653b4256e65058419e13274c1e0371e, type: 3}
   - {fileID: 8300000, guid: 23838f455d314c54490adb5b10a2556a, type: 3}
@@ -110993,6 +110999,12 @@ MonoBehaviour:
   triggerRadius: 0.9
   rewards:
   - {fileID: 1585203650}
+  useGlowLight: 1
+  glowColor: {r: 0.2, g: 1, b: 0.3, a: 1}
+  glowIntensity: 2
+  glowRange: 1.5
+  glowHeightOffset: 0.3
+  glowVFXPrefab: {fileID: 0}
   stepSounds:
   - {fileID: 8300000, guid: f653b4256e65058419e13274c1e0371e, type: 3}
   - {fileID: 8300000, guid: 23838f455d314c54490adb5b10a2556a, type: 3}
@@ -150409,13 +150421,41 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2760461924795514672, guid: 9673acb30656f2d459d56cb56c04d535, type: 3}
+      propertyPath: m_Size.x
+      value: 5.9102945
+      objectReference: {fileID: 0}
+    - target: {fileID: 2760461924795514672, guid: 9673acb30656f2d459d56cb56c04d535, type: 3}
+      propertyPath: m_Size.y
+      value: 2.561286
+      objectReference: {fileID: 0}
+    - target: {fileID: 2760461924795514672, guid: 9673acb30656f2d459d56cb56c04d535, type: 3}
+      propertyPath: m_Center.x
+      value: 1.207394
+      objectReference: {fileID: 0}
+    - target: {fileID: 2760461924795514672, guid: 9673acb30656f2d459d56cb56c04d535, type: 3}
+      propertyPath: m_Center.y
+      value: 0.5512929
+      objectReference: {fileID: 0}
+    - target: {fileID: 2760461924795514672, guid: 9673acb30656f2d459d56cb56c04d535, type: 3}
+      propertyPath: m_Center.z
+      value: -1.9538152
+      objectReference: {fileID: 0}
     - target: {fileID: 4011393667525999979, guid: 9673acb30656f2d459d56cb56c04d535, type: 3}
       propertyPath: m_Name
       value: dianhac_1
       objectReference: {fileID: 0}
+    - target: {fileID: 4011393667525999979, guid: 9673acb30656f2d459d56cb56c04d535, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4386653256014833617, guid: 9673acb30656f2d459d56cb56c04d535, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.16688304
+      objectReference: {fileID: 0}
     - target: {fileID: 4386653256014833617, guid: 9673acb30656f2d459d56cb56c04d535, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -9.132
+      value: -8.798
       objectReference: {fileID: 0}
     - target: {fileID: 4386653256014833617, guid: 9673acb30656f2d459d56cb56c04d535, type: 3}
       propertyPath: m_LocalPosition.y
@@ -309972,8 +310012,8 @@ SceneRoots:
   - {fileID: 1327656913}
   - {fileID: 989167969}
   - {fileID: 697054859}
-  - {fileID: 59757650}
   - {fileID: 1550016895}
+  - {fileID: 59757650}
   - {fileID: 1047497310}
   - {fileID: 1518532590}
   - {fileID: 282860915}
