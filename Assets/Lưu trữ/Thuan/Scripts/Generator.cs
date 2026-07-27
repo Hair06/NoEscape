@@ -3,6 +3,7 @@ using UnityEngine.Events;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using ElmanGameDevTools.PlayerSystem;
+using System.Collections;
 
 public class Generator : MonoBehaviour, IInteractable
 {
@@ -30,6 +31,13 @@ public class Generator : MonoBehaviour, IInteractable
     [Header("Hiệu ứng")]
     [SerializeField] private AudioSource generatorAudio;
     [SerializeField] private ParticleSystem exhaustSmoke;
+    [Header("Startup Effect")]
+[SerializeField] private float shakeDuration = 2f;
+[SerializeField] private float shakeStrength = 0.03f;
+[SerializeField] private float shakeSpeed = 35f;
+
+private Vector3 originalLocalPosition;
+private bool isStarting;
 
     [Header("Sự kiện khi máy phát hoạt động")]
     [SerializeField] private UnityEvent onPowerOn;
@@ -69,6 +77,7 @@ public class Generator : MonoBehaviour, IInteractable
                 ParticleSystemStopBehavior.StopEmittingAndClear
             );
         }
+        originalLocalPosition = transform.localPosition;
     }
 
     private void Update()
@@ -98,10 +107,10 @@ public class Generator : MonoBehaviour, IInteractable
             fuelBar.value = fillAmount;
         }
 
-        if (fillAmount >= 1f)
-        {
-            PowerOn();
-        }
+       if (fillAmount >= 1f && !isStarting)
+{
+    StartCoroutine(StartGeneratorSequence());
+}
     }
 
     public string GetInteractPrompt()
@@ -193,70 +202,97 @@ public class Generator : MonoBehaviour, IInteractable
         );
     }
 
-    private void PowerOn()
+   private IEnumerator StartGeneratorSequence()
+{
+    isStarting = true;
+
+    isPowered = true;
+    isFilling = false;
+
+    if (fuelBar != null)
     {
-        if (isPowered)
-        {
-            return;
-        }
-
-        isPowered = true;
-        isFilling = false;
-        fillAmount = 1f;
-
-        if (fuelBar != null)
-        {
-            fuelBar.value = 1f;
-            fuelBar.gameObject.SetActive(false);
-        }
-
-        MiniGameFlowManager.Close(
-            this,
-            fuelBar != null ? fuelBar.gameObject : null
-        );
-
-        if (playerController != null)
-        {
-            playerController.enabled = true;
-        }
-
-        // Xóa các can xăng khỏi kho sau khi sử dụng.
-        PlayerInventory.RemoveAll(fuelItemName);
-
-        if (generatorAudio != null)
-        {
-            generatorAudio.loop = true;
-
-            if (!generatorAudio.isPlaying)
-            {
-                generatorAudio.Play();
-            }
-        }
-
-        if (exhaustSmoke != null)
-        {
-            exhaustSmoke.Play();
-        }
-
-        // Gọi RoomLight.TurnOn() được gán trong Inspector.
-        onPowerOn?.Invoke();
-
-        // Hoàn thành nhiệm vụ:
-        // "Đổ xăng và khởi động máy phát điện".
-        if (QuestManager.Instance != null)
-        {
-            QuestManager.Instance.CompleteSubQuestForChapter(
-                chapterIndex,
-                generatorSubQuestIndex
-            );
-        }
-        else
-        {
-            Debug.LogWarning(
-                "Không tìm thấy QuestManager trong Scene."
-            );
-        }
-
-        Debug.Log("Máy phát đã hoạt động và hệ thống đèn đã được bật.");
+        fuelBar.value = 1f;
+        fuelBar.gameObject.SetActive(false);
     }
+
+    MiniGameFlowManager.Close(
+        this,
+        fuelBar != null ? fuelBar.gameObject : null);
+
+    if (playerController != null)
+        playerController.enabled = true;
+
+    PlayerInventory.RemoveAll(fuelItemName);
+
+    //------------------------------------------------
+    // RUNG MÁY
+    //------------------------------------------------
+
+    float timer = 0;
+
+    while (timer < shakeDuration)
+    {
+        timer += Time.deltaTime;
+
+        Vector3 offset = new Vector3(
+            Random.Range(-shakeStrength, shakeStrength),
+            Random.Range(-shakeStrength * 0.5f, shakeStrength * 0.5f),
+            Random.Range(-shakeStrength, shakeStrength));
+
+        transform.localPosition = originalLocalPosition + offset;
+
+        transform.localRotation =
+            Quaternion.Euler(
+                Random.Range(-2f,2f),
+                -90 + Random.Range(-2f,2f),
+                Random.Range(-2f,2f));
+
+        yield return null;
+    }
+
+    transform.localPosition = originalLocalPosition;
+    transform.localRotation = Quaternion.Euler(0,-90,0);
+
+    //------------------------------------------------
+    // KHÓI
+    //------------------------------------------------
+
+    if(exhaustSmoke!=null)
+    {
+        exhaustSmoke.Play();
+    }
+
+    //------------------------------------------------
+    // ÂM THANH
+    //------------------------------------------------
+
+    if(generatorAudio!=null)
+    {
+        generatorAudio.loop=true;
+
+        if(!generatorAudio.isPlaying)
+            generatorAudio.Play();
+    }
+
+    //------------------------------------------------
+    // BẬT ĐIỆN
+    //------------------------------------------------
+
+    onPowerOn?.Invoke();
+
+    //------------------------------------------------
+    // QUEST
+    //------------------------------------------------
+
+    if(QuestManager.Instance!=null)
+    {
+        QuestManager.Instance.CompleteSubQuestForChapter(
+            chapterIndex,
+            generatorSubQuestIndex);
+    }
+
+    Debug.Log("Generator Started!");
+
+    isStarting = false;
+}
 }
