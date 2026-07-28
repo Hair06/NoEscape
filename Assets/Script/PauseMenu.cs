@@ -48,17 +48,7 @@ public class PauseMenu : MonoBehaviour
             CursorLockMode.Locked;
     }
 
-    public void ResumeGame()
-    {
-        isPaused = false;
 
-        pausePanel.SetActive(false);
-
-        Time.timeScale = 1;
-
-        Cursor.visible = false;
-        Cursor.lockState = CursorLockMode.Locked;
-    }
 
     public void ExitToMenu()
     {
@@ -71,4 +61,5 @@ public class PauseMenu : MonoBehaviour
     {
         Application.Quit();
     }
+  
 }
