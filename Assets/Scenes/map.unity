@@ -33818,8 +33818,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "CH\u01AF\u01A0NG 1 - PHONG \u1EA4N C\u1EE6A H\u1EA0NH PH\xDAC"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: bea777d5222853a4b8c50bac1c7be5f9, type: 2}
-  m_sharedMaterial: {fileID: -2172438220289588219, guid: bea777d5222853a4b8c50bac1c7be5f9, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: b5061a9bc38b7284d9cc6568f5a5b7dd, type: 2}
+  m_sharedMaterial: {fileID: 9108110975851271829, guid: b5061a9bc38b7284d9cc6568f5a5b7dd, type: 2}
   m_fontSharedMaterials:
   - {fileID: 9108110975851271829, guid: b5061a9bc38b7284d9cc6568f5a5b7dd, type: 2}
   m_fontMaterial: {fileID: 0}
