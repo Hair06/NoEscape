@@ -6,8 +6,9 @@ public class PauseMenu : MonoBehaviour
 {
     [SerializeField] private GameObject pausePanel;
 
+    public static bool IsPaused { get; private set; }
+
     private InputSystem_Actions input;
-    private bool isPaused;
 
     private void Awake()
     {
@@ -31,19 +32,46 @@ public class PauseMenu : MonoBehaviour
 
     void Start()
     {
+        IsPaused = false;
+        Time.timeScale = 1;
         pausePanel.SetActive(false);
     }
 
     void TogglePause()
     {
-        isPaused = !isPaused;
+        IsPaused = !IsPaused;
 
-        pausePanel.SetActive(isPaused);
+        pausePanel.SetActive(IsPaused);
 
-        Time.timeScale = isPaused ? 0 : 1;
+        Time.timeScale = IsPaused ? 0 : 1;
 
-        Cursor.visible = isPaused;
-        Cursor.lockState = isPaused ?
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.SetGamePaused(IsPaused);
+        }
+
+        ApplyCursorState();
+    }
+
+    private void OnDestroy()
+    {
+        IsPaused = false;
+        Time.timeScale = 1;
+
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.SetGamePaused(false);
+        }
+    }
+
+    private void ApplyCursorState()
+    {
+        bool needsCursor =
+            IsPaused ||
+            MiniGameFlowManager.HasActiveMiniGame;
+
+        Cursor.visible = needsCursor;
+        Cursor.lockState = needsCursor ?
             CursorLockMode.None :
             CursorLockMode.Locked;
     }
@@ -52,7 +80,13 @@ public class PauseMenu : MonoBehaviour
 
     public void ExitToMenu()
     {
+        IsPaused = false;
         Time.timeScale = 1;
+
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.SetGamePaused(false);
+        }
 
         SceneManager.LoadScene("SceneMenu");
     }

@@ -303,7 +303,7 @@ public class QuestManager : MonoBehaviour
         {
             if (data.characterThoughtDelay > 0f)
             {
-                yield return new WaitForSecondsRealtime(
+                yield return WaitForSecondsRealtimePausable(
                     data.characterThoughtDelay
                 );
             }
@@ -393,7 +393,7 @@ public class QuestManager : MonoBehaviour
             thoughtTypeSpeed
         );
 
-        yield return new WaitForSecondsRealtime(
+        yield return WaitForSecondsRealtimePausable(
             Mathf.Max(0f, holdDuration)
         );
 
@@ -423,7 +423,7 @@ public class QuestManager : MonoBehaviour
             typeSpeed
         );
 
-        yield return new WaitForSecondsRealtime(
+        yield return WaitForSecondsRealtimePausable(
             autoHideTime
         );
 
@@ -643,7 +643,7 @@ public class QuestManager : MonoBehaviour
             hintTypeSpeed
         );
 
-        yield return new WaitForSecondsRealtime(
+        yield return WaitForSecondsRealtimePausable(
             Mathf.Max(0f, holdDuration)
         );
 
@@ -693,7 +693,7 @@ public class QuestManager : MonoBehaviour
     {
         if (delay > 0f)
         {
-            yield return new WaitForSecondsRealtime(delay);
+            yield return WaitForSecondsRealtimePausable(delay);
         }
 
         while (isQuestVisible ||
@@ -734,7 +734,7 @@ public class QuestManager : MonoBehaviour
         int expectedSubQuestIndex,
         float delay)
     {
-        yield return new WaitForSecondsRealtime(delay);
+        yield return WaitForSecondsRealtimePausable(delay);
 
         if (currentSubQuestIndex !=
             expectedSubQuestIndex)
@@ -1062,7 +1062,7 @@ public class QuestManager : MonoBehaviour
             hintFadeDuration
         );
 
-        yield return new WaitForSecondsRealtime(1.5f);
+        yield return WaitForSecondsRealtimePausable(1.5f);
 
         yield return FadeCanvasGroup(
             subQuestHintPanelGroup,
@@ -1225,7 +1225,7 @@ public class QuestManager : MonoBehaviour
                     : completeMessage;
         }
 
-        yield return new WaitForSecondsRealtime(1.5f);
+        yield return WaitForSecondsRealtimePausable(1.5f);
 
         yield return FadeCanvasGroup(
             questPanelGroup,
@@ -1310,7 +1310,7 @@ public class QuestManager : MonoBehaviour
     {
         if (delay > 0f)
         {
-            yield return new WaitForSecondsRealtime(delay);
+            yield return WaitForSecondsRealtimePausable(delay);
         }
 
         int chapterToStart = pendingNextChapterIndex;
@@ -1403,7 +1403,7 @@ public class QuestManager : MonoBehaviour
 
         isQuestVisible = true;
 
-        yield return new WaitForSecondsRealtime(
+        yield return WaitForSecondsRealtimePausable(
             autoHideTime
         );
 
@@ -1534,6 +1534,12 @@ public class QuestManager : MonoBehaviour
         {
             while (timer < duration)
             {
+                if (PauseMenu.IsPaused)
+                {
+                    yield return null;
+                    continue;
+                }
+
                 timer += Time.unscaledDeltaTime;
 
                 float progress = Mathf.Clamp01(
@@ -1577,6 +1583,11 @@ public class QuestManager : MonoBehaviour
 
         foreach (char character in content)
         {
+            while (PauseMenu.IsPaused)
+            {
+                yield return null;
+            }
+
             textTarget.text += character;
 
             if (character == '.' ||
@@ -1584,7 +1595,7 @@ public class QuestManager : MonoBehaviour
                 character == '?' ||
                 character == '…')
             {
-                yield return new WaitForSecondsRealtime(
+                yield return WaitForSecondsRealtimePausable(
                     speed * 6f
                 );
             }
@@ -1592,16 +1603,35 @@ public class QuestManager : MonoBehaviour
                      character == ';' ||
                      character == ':')
             {
-                yield return new WaitForSecondsRealtime(
+                yield return WaitForSecondsRealtimePausable(
                     speed * 3f
                 );
             }
             else
             {
-                yield return new WaitForSecondsRealtime(
+                yield return WaitForSecondsRealtimePausable(
                     speed
                 );
             }
+        }
+    }
+
+    private IEnumerator WaitForSecondsRealtimePausable(
+        float duration)
+    {
+        float timer = 0f;
+        duration = Mathf.Max(0f, duration);
+
+        while (timer < duration)
+        {
+            if (PauseMenu.IsPaused)
+            {
+                yield return null;
+                continue;
+            }
+
+            timer += Time.unscaledDeltaTime;
+            yield return null;
         }
     }
 

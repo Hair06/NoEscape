@@ -11,6 +11,8 @@ public class AudioManager : MonoBehaviour
     [Header("UI Sounds")]
     public AudioClip buttonClick;
 
+    private bool musicPausedByGamePause;
+
     private void Awake()
     {
         if (Instance == null)
@@ -55,8 +57,35 @@ public class AudioManager : MonoBehaviour
         }
     }
 
+    public void SetGamePaused(bool paused)
+    {
+        if (musicSource == null)
+        {
+            return;
+        }
+
+        if (paused)
+        {
+            if (musicSource.isPlaying)
+            {
+                musicSource.Pause();
+                musicPausedByGamePause = true;
+            }
+
+            return;
+        }
+
+        if (musicPausedByGamePause)
+        {
+            musicSource.UnPause();
+            musicPausedByGamePause = false;
+        }
+    }
+
     public void StopMusic()
     {
+        musicPausedByGamePause = false;
+
         if (musicSource != null)
             musicSource.Stop();
     }

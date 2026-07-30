@@ -58,6 +58,7 @@ public class TapePiece : MonoBehaviour,
 
     public void OnPointerDown(PointerEventData eventData)
     {
+        if (PauseMenu.IsPaused) return;
         if (isPeeled) return;
 
         isDragging = true;
@@ -67,6 +68,7 @@ public class TapePiece : MonoBehaviour,
 
     public void OnDrag(PointerEventData eventData)
     {
+        if (PauseMenu.IsPaused) return;
         if (isPeeled || !isDragging) return;
 
         Vector2 dragDelta = eventData.position - startMousePos;
@@ -87,6 +89,12 @@ public class TapePiece : MonoBehaviour,
 
     public void OnPointerUp(PointerEventData eventData)
     {
+        if (PauseMenu.IsPaused)
+        {
+            isDragging = false;
+            return;
+        }
+
         if (isPeeled) return;
 
         isDragging = false;

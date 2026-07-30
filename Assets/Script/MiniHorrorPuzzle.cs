@@ -44,7 +44,7 @@ public class MiniHorrorPuzzle : MonoBehaviour
 
     void Update()
     {
-        if (gameEnded) return;
+        if (gameEnded || PauseMenu.IsPaused) return;
 
         timer -= Time.deltaTime;
         timerText.text = "Time: " + Mathf.Ceil(timer).ToString();
@@ -57,7 +57,7 @@ public class MiniHorrorPuzzle : MonoBehaviour
 
     void PressSymbol(int number)
     {
-        if (gameEnded) return;
+        if (gameEnded || PauseMenu.IsPaused) return;
 
         if (audioSource != null && clickSound != null)
             audioSource.PlayOneShot(clickSound);
