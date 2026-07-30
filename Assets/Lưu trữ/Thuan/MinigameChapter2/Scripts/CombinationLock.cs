@@ -230,6 +230,11 @@ public class CombinationLock : MonoBehaviour, IInteractable
             }
         }
 
+        if (!MiniGameFlowManager.CanContinue(this, ChapterIndex))
+        {
+            return;
+        }
+
         if (isAdjusting)
         {
             HandleNumberInput();

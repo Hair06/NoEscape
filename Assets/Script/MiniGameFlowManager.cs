@@ -11,6 +11,8 @@ public static class MiniGameFlowManager
 
     public static bool HasActiveMiniGame => activeOwner != null;
 
+    public static bool IsPaused => PauseMenu.IsPaused;
+
     public static bool IsOpenBy(Object owner)
     {
         return owner != null && activeOwner == owner;
@@ -22,6 +24,11 @@ public static class MiniGameFlowManager
     /// </summary>
     public static bool IsChapterActive(int chapterIndex)
     {
+        if (IsPaused)
+        {
+            return false;
+        }
+
         QuestManager questManager = QuestManager.Instance;
 
         if (questManager == null)
@@ -36,6 +43,11 @@ public static class MiniGameFlowManager
         Object owner,
         int chapterIndex)
     {
+        if (IsPaused)
+        {
+            return false;
+        }
+
         if (!IsOpenBy(owner))
         {
             return IsChapterActive(chapterIndex);
@@ -54,6 +66,11 @@ public static class MiniGameFlowManager
         GameObject panel,
         int chapterIndex)
     {
+        if (IsPaused)
+        {
+            return false;
+        }
+
         if (owner == null)
         {
             Debug.LogWarning(
