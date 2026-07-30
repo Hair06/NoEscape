@@ -170,7 +170,10 @@ public class SymbolLockBox : MonoBehaviour
 
     private void PressSymbol(int number)
     {
-        if (state != State.Locked || !isPanelOpen) return;
+        if (state != State.Locked ||
+            !isPanelOpen ||
+            !MiniGameFlowManager.CanContinue(this, ChapterIndex))
+            return;
 
         if (audioSource != null && clickSound != null)
             audioSource.PlayOneShot(clickSound);
