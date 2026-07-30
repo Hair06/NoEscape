@@ -160,6 +160,9 @@ public static class GameInputBridge
 
     public static float GetAxis(string axisName)
     {
+        if (PauseMenu.IsPaused)
+            return 0f;
+
 #if ENABLE_INPUT_SYSTEM
         if (string.Equals(axisName, "Horizontal", System.StringComparison.OrdinalIgnoreCase))
             return ReadHorizontalAxis();
@@ -181,6 +184,9 @@ public static class GameInputBridge
 
     public static bool GetKeyDown(KeyCode keyCode)
     {
+        if (PauseMenu.IsPaused)
+            return false;
+
 #if ENABLE_INPUT_SYSTEM
         KeyControl key = GetKeyboardKey(keyCode);
         return key != null && key.wasPressedThisFrame;
@@ -191,6 +197,9 @@ public static class GameInputBridge
 
     public static bool GetKeyUp(KeyCode keyCode)
     {
+        if (PauseMenu.IsPaused)
+            return false;
+
 #if ENABLE_INPUT_SYSTEM
         KeyControl key = GetKeyboardKey(keyCode);
         return key != null && key.wasReleasedThisFrame;
@@ -201,6 +210,9 @@ public static class GameInputBridge
 
     public static bool GetMouseButtonDown(int button)
     {
+        if (PauseMenu.IsPaused)
+            return false;
+
 #if ENABLE_INPUT_SYSTEM
         if (Mouse.current == null)
             return false;

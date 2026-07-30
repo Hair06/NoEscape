@@ -29,6 +29,7 @@ public class PuzzlePiece : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndD
 
     public void OnBeginDrag(PointerEventData eventData)
     {
+        if (PauseMenu.IsPaused) return;
         if (isSnapped) return; // Nếu đã ghép đúng vị trí thì không cho kéo nữa
         canvasGroup.blocksRaycasts = false;
         canvasGroup.alpha = 0.6f; // Làm mờ mảnh khi đang kéo
@@ -36,6 +37,7 @@ public class PuzzlePiece : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndD
 
     public void OnDrag(PointerEventData eventData)
     {
+        if (PauseMenu.IsPaused) return;
         if (isSnapped) return;
         // Di chuyển mảnh ghép theo tọa độ chuột
         rectTransform.anchoredPosition += eventData.delta / transform.root.GetComponent<Canvas>().scaleFactor;
@@ -43,6 +45,13 @@ public class PuzzlePiece : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndD
 
     public void OnEndDrag(PointerEventData eventData)
     {
+        if (PauseMenu.IsPaused)
+        {
+            canvasGroup.blocksRaycasts = true;
+            canvasGroup.alpha = 1f;
+            return;
+        }
+
         if (isSnapped) return;
         canvasGroup.blocksRaycasts = true;
         canvasGroup.alpha = 1f;
@@ -70,6 +79,7 @@ public class PuzzlePiece : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndD
     // Click Chuột phải để xoay mảnh ghép 90 độ
     public void OnPointerClick(PointerEventData eventData)
     {
+        if (PauseMenu.IsPaused) return;
         if (isSnapped) return;
 
         if (eventData.button == PointerEventData.InputButton.Right)

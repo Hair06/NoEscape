@@ -68,6 +68,7 @@ public class DiscPiece : MonoBehaviour,
 
     public void OnBeginDrag(PointerEventData eventData)
     {
+        if (PauseMenu.IsPaused) return;
         if (isSnapped) return;
         canvasGroup.blocksRaycasts = false;
         canvasGroup.alpha = 0.6f;
@@ -75,12 +76,20 @@ public class DiscPiece : MonoBehaviour,
 
     public void OnDrag(PointerEventData eventData)
     {
+        if (PauseMenu.IsPaused) return;
         if (isSnapped) return;
         rectTransform.anchoredPosition += eventData.delta / transform.root.GetComponent<Canvas>().scaleFactor;
     }
 
     public void OnEndDrag(PointerEventData eventData)
     {
+        if (PauseMenu.IsPaused)
+        {
+            canvasGroup.blocksRaycasts = true;
+            canvasGroup.alpha = 1f;
+            return;
+        }
+
         if (isSnapped) return;
         canvasGroup.blocksRaycasts = true;
         canvasGroup.alpha = 1f;
@@ -108,6 +117,7 @@ public class DiscPiece : MonoBehaviour,
 
     public void OnPointerClick(PointerEventData eventData)
     {
+        if (PauseMenu.IsPaused) return;
         if (isSnapped || !requireRotation) return;
         if (eventData.button == PointerEventData.InputButton.Right)
             rectTransform.Rotate(0, 0, 90f);
