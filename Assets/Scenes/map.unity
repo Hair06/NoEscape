@@ -9803,6 +9803,7 @@ Transform:
   m_Children:
   - {fileID: 2071855238}
   - {fileID: 809666590}
+  - {fileID: 560960068}
   m_Father: {fileID: 88678157}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &65341033 stripped
@@ -56323,6 +56324,79 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4275353874267448, guid: 9f4f95afe3490ab4f9d5448b9ea1242e, type: 3}
   m_PrefabInstance: {fileID: 383583891}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &383938589
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 65203201}
+    m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: efef341aa034fb144ba161335d0e1525, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1.2350067
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: efef341aa034fb144ba161335d0e1525, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 2.3377097
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: efef341aa034fb144ba161335d0e1525, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1.2350067
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: efef341aa034fb144ba161335d0e1525, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.36809847
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: efef341aa034fb144ba161335d0e1525, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.106894545
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: efef341aa034fb144ba161335d0e1525, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.010146062
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: efef341aa034fb144ba161335d0e1525, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: -0.064083606
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: efef341aa034fb144ba161335d0e1525, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0.55152774
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: efef341aa034fb144ba161335d0e1525, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.7353727
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: efef341aa034fb144ba161335d0e1525, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0.38850674
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: efef341aa034fb144ba161335d0e1525, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 219.94699
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: efef341aa034fb144ba161335d0e1525, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 334.148
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: efef341aa034fb144ba161335d0e1525, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 263.276
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: efef341aa034fb144ba161335d0e1525, type: 3}
+      propertyPath: m_Name
+      value: Crowbar_InHand
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: efef341aa034fb144ba161335d0e1525, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: efef341aa034fb144ba161335d0e1525, type: 3}
 --- !u!1001 &385427497
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -79792,6 +79866,16 @@ PrefabInstance:
 Transform:
   m_CorrespondingSourceObject: {fileID: 4138761749470562, guid: 8c94aaaeef5f68148b8c0dd3a0b5c015, type: 3}
   m_PrefabInstance: {fileID: 560769191}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &560960067 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: efef341aa034fb144ba161335d0e1525, type: 3}
+  m_PrefabInstance: {fileID: 383938589}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &560960068 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: efef341aa034fb144ba161335d0e1525, type: 3}
+  m_PrefabInstance: {fileID: 383938589}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &561499204
 PrefabInstance:
@@ -173490,6 +173574,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemName: Crowbar
+  crowbarInHand: {fileID: 560960067}
   questChapterIndex: 3
   questSubQuestIndex: 0
   requiredProgress: 2
@@ -288965,6 +289050,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   requiredItem: Crowbar
+  crowbarInHand: {fileID: 560960067}
   questChapterIndex: 3
   questSubQuestIndex: 0
   requiredProgress: 2

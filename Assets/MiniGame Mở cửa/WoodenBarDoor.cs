@@ -7,6 +7,10 @@ public class WoodenBarDoor : MonoBehaviour, IInteractable
     [Header("Yêu cầu item")]
     public string requiredItem = "Crowbar";
 
+    [Header("Xà beng trên tay Player (ẩn sau khi dùng xong)")]
+    [Tooltip("Kéo CÙNG object xà beng trên tay mà CrowbarCollectible đang dùng")]
+    [SerializeField] private GameObject crowbarInHand;
+
     [Header("Liên kết bảng nhiệm vụ")]
     [SerializeField, Min(0)] private int questChapterIndex = 3;
     [SerializeField, Min(0)] private int questSubQuestIndex = 0;
@@ -83,7 +87,15 @@ public class WoodenBarDoor : MonoBehaviour, IInteractable
     private IEnumerator OpenDoor()
     {
         isOpened = true;
+
+        // ===== DUNG XONG XA BENG: xoa khoi hotbar + an khoi tay =====
         PlayerInventory.RemoveAll(requiredItem);
+
+        if (crowbarInHand != null)
+        {
+            crowbarInHand.SetActive(false);
+            Debug.Log("Đã cất xà beng khỏi tay.");
+        }
 
         if (audioSource != null && breakSound != null)
         {
