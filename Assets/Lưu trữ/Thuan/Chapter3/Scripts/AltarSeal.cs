@@ -1,4 +1,6 @@
+using System.Collections;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.InputSystem;
 using TMPro;
 
@@ -49,6 +51,14 @@ public class AltarSeal : MonoBehaviour
     [Header("Cutscene kết thúc Chapter 3")]
     [SerializeField] private MapSealCutscenePlayer endCutscene;
 
+    [Header("Hiệu ứng tối dần trước cutscene")]
+    [Tooltip("Kéo tấm Image đen phủ màn hình (FadeScreen) vào đây")]
+    [SerializeField] private Image fadeImage;
+    [Tooltip("Tốc độ tối/sáng dần. Số nhỏ = chậm hơn")]
+    [SerializeField] private float fadeSpeed = 1f;
+    [Tooltip("Thời gian giữ màn hình đen (giây) trước khi vào cutscene")]
+    [SerializeField] private float holdBlackTime = 1.5f;
+
     private bool isPlayerInside = false;
     private bool isComplete = false;
 
@@ -66,6 +76,15 @@ public class AltarSeal : MonoBehaviour
         if (kiTuVisual != null) kiTuVisual.SetActive(false);
         if (traiTimVisual != null) traiTimVisual.SetActive(false);
         if (giotMauVisual != null) giotMauVisual.SetActive(false);
+
+        // Đảm bảo tấm đen trong suốt và tắt lúc đầu
+        if (fadeImage != null)
+        {
+            Color c = fadeImage.color;
+            c.a = 0f;
+            fadeImage.color = c;
+            fadeImage.gameObject.SetActive(false);
+        }
     }
 
     private void Update()
@@ -197,7 +216,56 @@ public class AltarSeal : MonoBehaviour
         }
 
         if (doorChain != null) doorChain.SetActive(false);
+
+        // Chạy chuỗi: tối dần -> giữ đen -> cutscene -> sáng dần
+        StartCoroutine(FadeThenPlayCutscene());
+    }
+
+    private IEnumerator FadeThenPlayCutscene()
+    {
+        // 1. Màn hình tối dần
+        if (fadeImage != null)
+        {
+            fadeImage.gameObject.SetActive(true);
+
+            float alpha = 0f;
+            Color c = fadeImage.color;
+
+            while (alpha < 1f)
+            {
+                alpha += Time.unscaledDeltaTime * fadeSpeed;
+                c.a = Mathf.Clamp01(alpha);
+                fadeImage.color = c;
+                yield return null;
+            }
+        }
+
+        // 2. Giữ màn hình đen một lúc cho có nhịp
+        yield return new WaitForSecondsRealtime(holdBlackTime);
+
+        // 3. Khóa chuột chuẩn bị xem phim
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+
+        // 4. Bắt đầu cutscene
         if (endCutscene != null) endCutscene.PlayCutscene();
+
+        // 5. Màn hình sáng dần lại để xem cutscene
+        if (fadeImage != null)
+        {
+            float alpha = 1f;
+            Color c = fadeImage.color;
+
+            while (alpha > 0f)
+            {
+                alpha -= Time.unscaledDeltaTime * fadeSpeed;
+                c.a = Mathf.Clamp01(alpha);
+                fadeImage.color = c;
+                yield return null;
+            }
+
+            fadeImage.gameObject.SetActive(false);
+        }
     }
 
     private string GetCurrentPrompt()

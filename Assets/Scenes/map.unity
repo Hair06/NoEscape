@@ -73910,7 +73910,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 4555089721710695388, guid: 50bf99fbccee09348b24bb6895bcd1bd, type: 3}
       propertyPath: m_Name
-      value: Ban
+      value: Chapter3Manager
       objectReference: {fileID: 0}
     - target: {fileID: 6767263399854166369, guid: 50bf99fbccee09348b24bb6895bcd1bd, type: 3}
       propertyPath: m_Name
@@ -74037,6 +74037,9 @@ MonoBehaviour:
   sealVFX: {fileID: 0}
   doorChain: {fileID: 0}
   endCutscene: {fileID: 1112358168}
+  fadeImage: {fileID: 397784299}
+  fadeSpeed: 1
+  holdBlackTime: 1.5
 --- !u!1001 &513354498
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -116843,7 +116846,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0, b: 0, a: 0.21960784}
+  m_Color: {r: 0.36078432, g: 0.9098039, b: 0.5176471, a: 0.09411765}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -145376,7 +145379,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1001079173}
   m_Layer: 0
-  m_Name: GameObject
+  m_Name: DenManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -174925,19 +174928,14 @@ MonoBehaviour:
   bobAmountY: 0.05
   walkBobFrequency: 12
   runBobFrequency: 16
-  crouchBobFrequency: 8
   bobSmoothness: 10
   cameraWeight: 12
   enableCameraTilt: 1
   tiltAmount: 2
   tiltSmoothness: 8
   runTiltMultiplier: 1.2
-  crouchTiltMultiplier: 0.5
   turnTiltAmount: 1.5
   maxTotalTilt: 5
-  crouchHeight: 2
-  crouchSmoothTime: 0.1
-  crouchCameraHeightBoost: 0.15
   enableRunFov: 1
   normalFov: 60
   runFov: 70
@@ -189450,7 +189448,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4055842502837856, guid: 6cf3988ed095953439adb77c7ab314aa, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 18.288
+      value: 18.336
       objectReference: {fileID: 0}
     - target: {fileID: 4055842502837856, guid: 6cf3988ed095953439adb77c7ab314aa, type: 3}
       propertyPath: m_LocalRotation.w
@@ -192202,6 +192200,10 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2223632770451406756, guid: 9a8f210322ee9df46ae960d1a9363dbd, type: 3}
+      propertyPath: fadeImage
+      value: 
+      objectReference: {fileID: 397784299}
+    - target: {fileID: 2223632770451406756, guid: 9a8f210322ee9df46ae960d1a9363dbd, type: 3}
       propertyPath: promptText
       value: 
       objectReference: {fileID: 0}
@@ -192223,7 +192225,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5160378225533204091, guid: 9a8f210322ee9df46ae960d1a9363dbd, type: 3}
       propertyPath: m_Name
-      value: MusicBox Variant
+      value: MusicBoxManager
       objectReference: {fileID: 0}
     - target: {fileID: 6091465073116817093, guid: 9a8f210322ee9df46ae960d1a9363dbd, type: 3}
       propertyPath: m_LocalPosition.x
