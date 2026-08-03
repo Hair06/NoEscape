@@ -77,8 +77,7 @@ namespace ElmanGameDevTools.PlayerAudio
             }
 
             float targetPitch = walkPitch;
-            if (playerController.IsCrouching) targetPitch = crouchPitch;
-            else if (playerController.CurrentState == PlayerController.MovementState.Running) targetPitch = runPitch;
+            if (playerController.CurrentState == PlayerController.MovementState.Running) targetPitch = runPitch;
 
             audioSource.pitch = Mathf.Lerp(audioSource.pitch, targetPitch, Time.deltaTime * 10f);
             audioSource.volume = volume;

@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.Rendering; // Đã thêm thư viện này để dùng Volume
 
 public class CultEyeAutoDetector : MonoBehaviour
 {
@@ -16,8 +15,8 @@ public class CultEyeAutoDetector : MonoBehaviour
     [SerializeField] private Light roomLight;
     [SerializeField] private Color horrorColor = new Color(0.4f, 0f, 0f);
 
-    [Header("CẤU HÌNH HIỆU ỨNG NHIỄU (GLITCH)")]
-    [SerializeField] private Volume glitchVolume; // Mới thêm: Kéo CameraGlitchVolume vào đây
+    [Header("CẤU HÌNH HIỆU ỨNG NHIỄU (UI)")]
+    [SerializeField] private GameObject glitchOverlayUI; // Object GlitchOverlay (RawImage)
 
     private Color originalRoomColor;
     private bool isHoldingEye = false;
@@ -48,10 +47,10 @@ public class CultEyeAutoDetector : MonoBehaviour
             scopeMaskUI.SetActive(false);
         }
 
-        // Tắt nhiễu khi bắt đầu game
-        if (glitchVolume != null)
+        // Tắt lớp UI nhiễu khi vừa vào game
+        if (glitchOverlayUI != null)
         {
-            glitchVolume.weight = 0f;
+            glitchOverlayUI.SetActive(false);
         }
     }
 
@@ -115,25 +114,14 @@ public class CultEyeAutoDetector : MonoBehaviour
 
     private void ApplyCultVision(bool state)
     {
-        if (scopeMaskUI != null)
-        {
-            scopeMaskUI.SetActive(state);
-        }
+        if (scopeMaskUI != null) scopeMaskUI.SetActive(state);
+        if (hiddenSignObject != null) hiddenSignObject.SetActive(state);
+        if (roomLight != null) roomLight.color = state ? horrorColor : originalRoomColor;
 
-        if (hiddenSignObject != null)
+        // Bật/tắt lớp nhiễu UI theo trạng thái giữ chuột
+        if (glitchOverlayUI != null)
         {
-            hiddenSignObject.SetActive(state);
-        }
-
-        if (roomLight != null)
-        {
-            roomLight.color = state ? horrorColor : originalRoomColor;
-        }
-
-        // BẬT HIỆU ỨNG NHIỄU KHI BẤM GIỮ CHUỘT PHẢI - TẮT KHI NHẢ CHUỘT
-        if (glitchVolume != null)
-        {
-            glitchVolume.weight = state ? 1f : 0f;
+            glitchOverlayUI.SetActive(state);
         }
     }
 }

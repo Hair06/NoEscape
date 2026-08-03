@@ -26,10 +26,27 @@ namespace QLDATN.ProjectTracker
         private const string DeviceIdPreference = "QLDATN_PROJECT_TRACKER_DEVICE_ID";
         private const double HeartbeatSeconds = 30.0;
         private const double GitRefreshSeconds = 60.0;
-        private const string ClientVersion = "qldatn-unity-3.0.1";
+        private const double RecentSourceActivitySeconds = 90.0;
+        private const string ClientVersion = "qldatn-unity-3.3.1";
+        private const string PendingUpdatePreference = "QLDATN_PROJECT_TRACKER_PENDING_UPDATE";
+        private const int MaximumOfflinePayloads = 50;
+        private static readonly double[] RetryDelaysSeconds = { 2.0, 5.0, 15.0 };
 
-        private static readonly string SessionId = Guid.NewGuid().ToString("N");
+        private static readonly string SessionIdPath = Path.Combine(
+            "Library",
+            "QLDATNTracker",
+            "session-id.txt"
+        );
+        private static readonly string SessionId = LoadOrCreateSessionId();
         private static readonly Queue<StatusPayload> PendingPayloads = new Queue<StatusPayload>();
+        private static StatusPayload _latestHeartbeat;
+        private static int _retryAttempt;
+        private static double _nextRetryAt;
+        private static readonly string OfflineQueuePath = Path.Combine(
+            "Library",
+            "QLDATNTracker",
+            "offline-queue.json"
+        );
         private static string _scene = "";
         private static string _branch = "";
         private static string _revision = "";
@@ -42,10 +59,13 @@ namespace QLDATN.ProjectTracker
         private static double _assetFlushAt;
         private static double _lastHeartbeat;
         private static double _lastGitRefresh = -GitRefreshSeconds;
+        private static double _lastSourceActivity = -RecentSourceActivitySeconds;
         private static long _lastSequence;
+        private static bool _updateCompilationFailed;
 
         static SceneTracker()
         {
+            RestorePendingPayloads();
             EditorApplication.update += OnEditorUpdate;
             EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
             EditorSceneManager.sceneOpened += OnSceneChanged;
@@ -53,6 +73,7 @@ namespace QLDATN.ProjectTracker
             EditorSceneManager.sceneSaved += OnSceneSaved;
             CompilationPipeline.compilationStarted += OnCompilationStarted;
             CompilationPipeline.compilationFinished += OnCompilationFinished;
+            CompilationPipeline.assemblyCompilationFinished += OnAssemblyCompilationFinished;
             EditorApplication.quitting += OnEditorQuitting;
 
             EditorApplication.delayCall += () =>
@@ -77,10 +98,10 @@ namespace QLDATN.ProjectTracker
             var now = EditorApplication.timeSinceStartup;
             if (_pendingAssetChanges > 0 && now >= _assetFlushAt)
             {
-                var changedAssets = _pendingAssetChanges;
                 _pendingAssetChanges = 0;
                 RefreshState(false);
-                QueueSend(CurrentStatus(), "ASSETS_CHANGED", changedAssets);
+                // Server chỉ ghi một lượt sự kiện cho mỗi request; không tin số lượng do client khai.
+                QueueSend(CurrentStatus(), "ASSETS_CHANGED", 1);
             }
             var active = EditorSceneManager.GetActiveScene();
             var dirtyNow = active.IsValid() && active.isDirty;
@@ -130,8 +151,10 @@ namespace QLDATN.ProjectTracker
             {
                 QueueSend("PLAYING", "PLAY_MODE_ENTERED");
             }
-            else if (state == PlayModeStateChange.ExitingPlayMode)
+            else if (state == PlayModeStateChange.EnteredEditMode)
             {
+                // Đợi Unity trở lại Edit Mode hoàn toàn để heartbeat thoát Play
+                // không tiếp tục mang trạng thái PLAYING thêm một chu kỳ.
                 QueueSend(CurrentStatus(), "PLAY_MODE_EXITED");
             }
         }
@@ -143,8 +166,25 @@ namespace QLDATN.ProjectTracker
 
         private static void OnCompilationFinished(object _context)
         {
+            FinalizePendingUpdate();
             RefreshState(true);
             QueueSend(CurrentStatus(), "COMPILATION_FINISHED");
+        }
+
+        private static void OnAssemblyCompilationFinished(
+            string _assemblyPath,
+            CompilerMessage[] messages
+        )
+        {
+            if (string.IsNullOrEmpty(EditorPrefs.GetString(PendingUpdatePreference))) return;
+            foreach (var message in messages)
+            {
+                if (message.type == CompilerMessageType.Error)
+                {
+                    _updateCompilationFailed = true;
+                    break;
+                }
+            }
         }
 
         private static void RefreshState(bool refreshGit)
@@ -217,9 +257,9 @@ namespace QLDATN.ProjectTracker
         {
             if (_isBuilding) return "BUILDING";
             if (EditorApplication.isCompiling) return "COMPILING";
-            if (!IsEditorFocused()) return "BACKGROUND";
             if (EditorApplication.isPlayingOrWillChangePlaymode) return "PLAYING";
-            if (_isDirty) return "EDITING";
+            if (_isDirty || HasRecentSourceActivity()) return "EDITING";
+            if (!IsEditorFocused()) return "BACKGROUND";
             if (_uncommittedFiles > 0) return "UNCOMMITTED";
             return string.IsNullOrEmpty(_scene) ? "SAFE" : "VIEWING";
         }
@@ -228,9 +268,10 @@ namespace QLDATN.ProjectTracker
         {
             if (_isBuilding) return "Đang build";
             if (EditorApplication.isCompiling) return "Đang biên dịch";
-            if (!IsEditorFocused()) return "Unity Editor chạy nền";
             if (EditorApplication.isPlayingOrWillChangePlaymode) return "Đang chạy Play Mode";
             if (_isDirty) return "Đang chỉnh sửa scene";
+            if (HasRecentSourceActivity()) return "Source/asset vừa được thay đổi";
+            if (!IsEditorFocused()) return "Unity Editor chạy nền";
             return string.IsNullOrEmpty(_scene) ? "Unity Editor" : "Đang xem scene";
         }
 
@@ -238,10 +279,17 @@ namespace QLDATN.ProjectTracker
         {
             if (_isBuilding) return "BUILD";
             if (EditorApplication.isCompiling) return "COMPILE";
-            if (!IsEditorFocused()) return "BACKGROUND";
             if (EditorApplication.isPlayingOrWillChangePlaymode) return "PLAY";
             if (EditorApplication.isPaused) return "PAUSED";
+            if (_isDirty || HasRecentSourceActivity()) return "EDIT";
+            if (!IsEditorFocused()) return "BACKGROUND";
             return "EDIT";
+        }
+
+        private static bool HasRecentSourceActivity()
+        {
+            return EditorApplication.timeSinceStartup - _lastSourceActivity
+                <= RecentSourceActivitySeconds;
         }
 
         private static bool IsEditorFocused()
@@ -317,26 +365,107 @@ namespace QLDATN.ProjectTracker
             );
             lock (PendingPayloads)
             {
-                while (PendingPayloads.Count >= 100) PendingPayloads.Dequeue();
-                PendingPayloads.Enqueue(payload);
+                if (string.IsNullOrEmpty(eventType))
+                {
+                    // Keep only the newest periodic state so stale heartbeats
+                    // cannot delay the next live heartbeat after reconnect.
+                    _latestHeartbeat = payload;
+                }
+                else
+                {
+                    while (PendingPayloads.Count >= MaximumOfflinePayloads) PendingPayloads.Dequeue();
+                    PendingPayloads.Enqueue(payload);
+                }
             }
+            PersistPendingPayloads();
             _ = FlushQueueAsync();
+        }
+
+        private static void RestorePendingPayloads()
+        {
+            try
+            {
+                if (!File.Exists(OfflineQueuePath)) return;
+                var stored = JsonUtility.FromJson<OfflineQueue>(
+                    File.ReadAllText(OfflineQueuePath, Encoding.UTF8)
+                );
+                if (stored?.items == null) return;
+                foreach (var payload in stored.items)
+                {
+                    if (payload == null) continue;
+                    while (PendingPayloads.Count >= MaximumOfflinePayloads)
+                    {
+                        PendingPayloads.Dequeue();
+                    }
+                    PendingPayloads.Enqueue(payload);
+                }
+            }
+            catch
+            {
+                // File hỏng không được làm gián đoạn Unity Editor.
+            }
+        }
+
+        private static void PersistPendingPayloads()
+        {
+            try
+            {
+                List<StatusPayload> snapshot;
+                lock (PendingPayloads)
+                {
+                    snapshot = new List<StatusPayload>(PendingPayloads);
+                }
+                var directory = Path.GetDirectoryName(OfflineQueuePath);
+                if (!string.IsNullOrEmpty(directory)) Directory.CreateDirectory(directory);
+                File.WriteAllText(
+                    OfflineQueuePath,
+                    JsonUtility.ToJson(new OfflineQueue { items = snapshot }),
+                    new UTF8Encoding(false)
+                );
+            }
+            catch
+            {
+                // Hàng đợi trên RAM vẫn tiếp tục hoạt động nếu không ghi được Library.
+            }
+        }
+
+        private static void RemoveSentPayload(StatusPayload expected, bool heartbeat)
+        {
+            lock (PendingPayloads)
+            {
+                if (heartbeat)
+                {
+                    if (ReferenceEquals(_latestHeartbeat, expected)) _latestHeartbeat = null;
+                }
+                else if (PendingPayloads.Count > 0 && ReferenceEquals(PendingPayloads.Peek(), expected))
+                {
+                    PendingPayloads.Dequeue();
+                }
+            }
+            PersistPendingPayloads();
         }
 
         private static async Task FlushQueueAsync()
         {
             if (_isSending) return;
+            var now = EditorApplication.timeSinceStartup;
+            if (now < _nextRetryAt) return;
             _isSending = true;
             try
             {
-                while (true)
+                var sentThisPass = 0;
+                while (sentThisPass < 5)
                 {
                     StatusPayload payload;
+                    bool heartbeat;
                     lock (PendingPayloads)
                     {
-                        if (PendingPayloads.Count == 0) break;
-                        payload = PendingPayloads.Dequeue();
+                        heartbeat = _latestHeartbeat != null;
+                        payload = heartbeat
+                            ? _latestHeartbeat
+                            : PendingPayloads.Count > 0 ? PendingPayloads.Peek() : null;
                     }
+                    if (payload == null) break;
                     var json = JsonUtility.ToJson(payload);
                     var body = Encoding.UTF8.GetBytes(json);
                     var timestamp = UnixTimeMilliseconds().ToString();
@@ -350,6 +479,9 @@ namespace QLDATN.ProjectTracker
                         EditorPrefs.GetString(TrackerUrlPreference),
                         "POST"
                     );
+                    // Prevent one stalled network request from blocking every
+                    // later heartbeat while Unity remains open.
+                    request.timeout = 15;
                     request.uploadHandler = new UploadHandlerRaw(body);
                     request.downloadHandler = new DownloadHandlerBuffer();
                     request.SetRequestHeader("Content-Type", "application/json");
@@ -378,6 +510,33 @@ namespace QLDATN.ProjectTracker
                             + "): "
                             + serverMessage
                         );
+                        // Server vẫn có thể trả gói cập nhật đã ký kèm HTTP 422.
+                        // Xử lý trước khi loại payload để client cũ có cơ hội tự sửa.
+                        await TryApplyUpdate(responseBody);
+                        var transientFailure = request.responseCode == 0
+                            || request.responseCode == 408
+                            || request.responseCode == 429
+                            || request.responseCode >= 500;
+                        if (transientFailure)
+                        {
+                            var delayIndex = Math.Min(_retryAttempt, RetryDelaysSeconds.Length - 1);
+                            _nextRetryAt = EditorApplication.timeSinceStartup + RetryDelaysSeconds[delayIndex];
+                            _retryAttempt += 1;
+                            PersistPendingPayloads();
+                            break;
+                        }
+                        RemoveSentPayload(payload, heartbeat);
+                        _retryAttempt = 0;
+                        _nextRetryAt = 0;
+                        sentThisPass += 1;
+                    }
+                    else
+                    {
+                        RemoveSentPayload(payload, heartbeat);
+                        _retryAttempt = 0;
+                        _nextRetryAt = 0;
+                        sentThisPass += 1;
+                        await TryApplyUpdate(request.downloadHandler?.text);
                     }
                 }
             }
@@ -391,9 +550,138 @@ namespace QLDATN.ProjectTracker
             }
         }
 
+        private static async Task TryApplyUpdate(string responseBody)
+        {
+            if (string.IsNullOrWhiteSpace(responseBody)) return;
+            HeartbeatResponse response;
+            try
+            {
+                response = JsonUtility.FromJson<HeartbeatResponse>(responseBody);
+            }
+            catch
+            {
+                return;
+            }
+            var update = response?.clientUpdate;
+            if (
+                update == null
+                || update.platform != "UNITY"
+                || update.version == ClientVersion
+                || string.IsNullOrEmpty(update.url)
+                || string.IsNullOrEmpty(update.sha256)
+                || string.IsNullOrEmpty(update.signature)
+            )
+            {
+                return;
+            }
+            var manifest = "artifact."
+                + update.platform + "."
+                + update.version + "."
+                + update.sha256 + "."
+                + update.url;
+            var expectedSignature = SignRequest(
+                EditorPrefs.GetString(DeviceSecretPreference),
+                manifest
+            );
+            if (!ConstantTimeEquals(expectedSignature, update.signature)) return;
+
+            string source;
+            using (var request = UnityWebRequest.Get(update.url))
+            {
+                var operation = request.SendWebRequest();
+                while (!operation.isDone) await Task.Delay(50);
+                if (request.result != UnityWebRequest.Result.Success) return;
+                source = request.downloadHandler?.text;
+            }
+            if (
+                string.IsNullOrWhiteSpace(source)
+                || !ConstantTimeEquals(Sha256Hex(source), update.sha256.ToLowerInvariant())
+            )
+            {
+                return;
+            }
+
+            var editorDirectory = Path.Combine(Application.dataPath, "Editor");
+            var targetPath = Path.Combine(editorDirectory, "QLDATNSceneTracker.cs");
+            var downloadPath = targetPath + ".download";
+            var backupPath = targetPath + ".backup";
+            File.WriteAllText(downloadPath, source, new UTF8Encoding(false));
+            try
+            {
+                File.Copy(targetPath, backupPath, true);
+                EditorPrefs.SetString(PendingUpdatePreference, update.version);
+                _updateCompilationFailed = false;
+                File.Copy(downloadPath, targetPath, true);
+                File.Delete(downloadPath);
+                AssetDatabase.ImportAsset(
+                    "Assets/Editor/QLDATNSceneTracker.cs",
+                    ImportAssetOptions.ForceUpdate
+                );
+                Debug.Log("[QLDATN Tracker] Đang tự cập nhật lên " + update.version + "...");
+            }
+            catch
+            {
+                EditorPrefs.DeleteKey(PendingUpdatePreference);
+                if (File.Exists(backupPath))
+                {
+                    File.Copy(backupPath, targetPath, true);
+                    File.Delete(backupPath);
+                }
+                if (File.Exists(downloadPath)) File.Delete(downloadPath);
+                throw;
+            }
+        }
+
+        private static void FinalizePendingUpdate()
+        {
+            var pendingVersion = EditorPrefs.GetString(PendingUpdatePreference);
+            if (string.IsNullOrEmpty(pendingVersion)) return;
+            var targetPath = Path.Combine(Application.dataPath, "Editor/QLDATNSceneTracker.cs");
+            var backupPath = targetPath + ".backup";
+            EditorPrefs.DeleteKey(PendingUpdatePreference);
+            if (_updateCompilationFailed && File.Exists(backupPath))
+            {
+                File.Copy(backupPath, targetPath, true);
+                AssetDatabase.ImportAsset(
+                    "Assets/Editor/QLDATNSceneTracker.cs",
+                    ImportAssetOptions.ForceUpdate
+                );
+                Debug.LogError(
+                    "[QLDATN Tracker] Bản cập nhật "
+                    + pendingVersion
+                    + " không biên dịch được; đã tự khôi phục bản trước."
+                );
+            }
+            else
+            {
+                Debug.Log("[QLDATN Tracker] Đã cập nhật thành công lên " + pendingVersion + ".");
+            }
+            if (File.Exists(backupPath)) File.Delete(backupPath);
+            _updateCompilationFailed = false;
+        }
+
+        private static string Sha256Hex(string value)
+        {
+            using var sha = SHA256.Create();
+            var hash = sha.ComputeHash(Encoding.UTF8.GetBytes(value));
+            return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
+        }
+
+        private static bool ConstantTimeEquals(string first, string second)
+        {
+            if (first == null || second == null || first.Length != second.Length) return false;
+            var difference = 0;
+            for (var index = 0; index < first.Length; index++)
+            {
+                difference |= first[index] ^ second[index];
+            }
+            return difference == 0;
+        }
+
         public static void ReportAssetChanges(int count)
         {
             if (count <= 0) return;
+            _lastSourceActivity = EditorApplication.timeSinceStartup;
             _pendingAssetChanges += count;
             _assetFlushAt = EditorApplication.timeSinceStartup + 2.0;
         }
@@ -448,6 +736,40 @@ namespace QLDATN.ProjectTracker
             {
                 // Server tự chuyển offline nếu Unity đóng trước khi gửi xong.
             }
+            DeleteSessionId();
+        }
+
+        private static string LoadOrCreateSessionId()
+        {
+            try
+            {
+                if (File.Exists(SessionIdPath))
+                {
+                    var stored = File.ReadAllText(SessionIdPath).Trim();
+                    if (stored.Length == 32) return stored;
+                }
+                var directory = Path.GetDirectoryName(SessionIdPath);
+                if (!string.IsNullOrEmpty(directory)) Directory.CreateDirectory(directory);
+                var created = Guid.NewGuid().ToString("N");
+                File.WriteAllText(SessionIdPath, created, new UTF8Encoding(false));
+                return created;
+            }
+            catch
+            {
+                return Guid.NewGuid().ToString("N");
+            }
+        }
+
+        private static void DeleteSessionId()
+        {
+            try
+            {
+                if (File.Exists(SessionIdPath)) File.Delete(SessionIdPath);
+            }
+            catch
+            {
+                // Session cũ vẫn an toàn vì server không cộng gap quá timeout.
+            }
         }
 
         private static long UnixTimeMilliseconds()
@@ -476,6 +798,12 @@ namespace QLDATN.ProjectTracker
             return Convert.ToBase64String(
                 hmac.ComputeHash(Encoding.UTF8.GetBytes(message))
             ).TrimEnd('=').Replace('+', '-').Replace('/', '_');
+        }
+
+        [Serializable]
+        private class OfflineQueue
+        {
+            public List<StatusPayload> items = new List<StatusPayload>();
         }
 
         [Serializable]
@@ -515,6 +843,22 @@ namespace QLDATN.ProjectTracker
             public long durationMs;
             public bool success;
             public string label;
+        }
+
+        [Serializable]
+        private class HeartbeatResponse
+        {
+            public ClientUpdatePayload clientUpdate;
+        }
+
+        [Serializable]
+        private class ClientUpdatePayload
+        {
+            public string platform;
+            public string version;
+            public string sha256;
+            public string url;
+            public string signature;
         }
     }
 

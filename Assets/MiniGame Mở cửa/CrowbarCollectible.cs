@@ -5,6 +5,10 @@ public class CrowbarCollectible : MonoBehaviour, IInteractable
     [Header("Tên item")]
     public string itemName = "Crowbar";
 
+    [Header("Xà beng hiện trên tay Player")]
+    [Tooltip("Kéo object xà beng gắn sẵn trên tay Player vào đây (để tắt sẵn trong Scene)")]
+    [SerializeField] private GameObject crowbarInHand;
+
     [Header("Liên kết bảng nhiệm vụ")]
     [SerializeField, Min(0)] private int questChapterIndex = 3;
     [SerializeField, Min(0)] private int questSubQuestIndex = 0;
@@ -22,6 +26,9 @@ public class CrowbarCollectible : MonoBehaviour, IInteractable
     private void Start()
     {
         playerCamera = Camera.main;
+
+        // Dam bao luc dau xa beng tren tay dang an
+        if (crowbarInHand != null) crowbarInHand.SetActive(false);
     }
 
     private void Update()
@@ -64,6 +71,14 @@ public class CrowbarCollectible : MonoBehaviour, IInteractable
             return;
 
         PlayerInventory.Add(itemName);
+
+        // Hien xa beng tren tay Player
+        if (crowbarInHand != null)
+        {
+            crowbarInHand.SetActive(true);
+            Debug.Log("Đã cầm xà beng lên tay!");
+        }
+
         ReportQuestProgress();
         Debug.Log("Đã nhặt Crowbar!");
 
