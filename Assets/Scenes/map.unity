@@ -27736,7 +27736,7 @@ GameObject:
   m_Component:
   - component: {fileID: 186538805}
   m_Layer: 0
-  m_Name: ===Chapter2===
+  m_Name: ===Chapter2===========
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -46085,7 +46085,7 @@ GameObject:
   m_Component:
   - component: {fileID: 317375465}
   m_Layer: 0
-  m_Name: ===Chapter3===
+  m_Name: ===Chapter3==========
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -299214,7 +299214,7 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   objectsToHide:
-  - {fileID: 1327656914}
+  - {fileID: 0}
   - {fileID: 989167970}
   - {fileID: 229146777}
   - {fileID: 1550016896}
@@ -314035,12 +314035,12 @@ SceneRoots:
   - {fileID: 1076183413}
   - {fileID: 21136472}
   - {fileID: 317375465}
+  - {fileID: 1001079173}
   - {fileID: 780306650}
   - {fileID: 787990405}
   - {fileID: 726268370}
   - {fileID: 630535334}
   - {fileID: 2062496567}
-  - {fileID: 1001079173}
   - {fileID: 595472718}
   - {fileID: 478217314}
   - {fileID: 1432473308}
