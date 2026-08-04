@@ -192475,7 +192475,7 @@ PrefabInstance:
     - target: {fileID: 2223632770451406756, guid: 9a8f210322ee9df46ae960d1a9363dbd, type: 3}
       propertyPath: fadeImage
       value: 
-      objectReference: {fileID: 397784299}
+      objectReference: {fileID: 0}
     - target: {fileID: 2223632770451406756, guid: 9a8f210322ee9df46ae960d1a9363dbd, type: 3}
       propertyPath: promptText
       value: 
