@@ -8,6 +8,7 @@ public static class MiniGameFlowManager
 {
     private static Object activeOwner;
     private static GameObject activePanel;
+    private static bool activePanelHiddenByPause;
 
     public static bool HasActiveMiniGame => activeOwner != null;
 
@@ -107,9 +108,37 @@ public static class MiniGameFlowManager
         if (activePanel != null)
         {
             activePanel.SetActive(true);
+            activePanelHiddenByPause = false;
         }
 
         return true;
+    }
+
+    public static void ApplyPauseState(bool paused)
+    {
+        if (activePanel == null)
+        {
+            activePanelHiddenByPause = false;
+            return;
+        }
+
+        if (paused)
+        {
+            if (activePanel.activeSelf)
+            {
+                activePanel.SetActive(false);
+                activePanelHiddenByPause = true;
+            }
+
+            return;
+        }
+
+        if (activePanelHiddenByPause && activeOwner != null)
+        {
+            activePanel.SetActive(true);
+        }
+
+        activePanelHiddenByPause = false;
     }
 
     /// <param name="resumeQuestUi">
@@ -140,6 +169,7 @@ public static class MiniGameFlowManager
 
         activeOwner = null;
         activePanel = null;
+        activePanelHiddenByPause = false;
 
         if (resumeQuestUi && QuestManager.Instance != null)
         {
