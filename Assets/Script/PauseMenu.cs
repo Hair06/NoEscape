@@ -51,6 +51,8 @@ public class PauseMenu : MonoBehaviour
     {
         IsPaused = paused;
 
+        MiniGameFlowManager.ApplyPauseState(IsPaused);
+
         pausePanel.SetActive(IsPaused);
 
         Time.timeScale = IsPaused ? 0 : 1;
