@@ -2,122 +2,224 @@ using UnityEngine;
 
 public class StoneDoorPuzzle : MonoBehaviour
 {
-    [Header("BỆ ĐÁ XANH")]
-    [SerializeField] private GameObject ghostCrystal; // Đá mờ làm mẫu (Xanh)
-    [SerializeField] private GameObject realCrystal;  // Đá thật hiện lên (Xanh)
+    private const int ChapterIndex = 4;
+    private const int PlaceStonesSubQuestIndex = 1;
+    private const int RequiredPlacedStones = 2;
 
-    [Header("BỆ ĐÁ ĐỎ")]
-    [SerializeField] private GameObject ghostRed;     // Đá mờ làm mẫu (Đỏ)
-    [SerializeField] private GameObject realRed;      // Đá thật hiện lên (Đỏ)
+    [Header("Bệ Đá Xanh")]
+    [SerializeField] private GameObject ghostCrystal;
+    [SerializeField] private GameObject realCrystal;
 
-    [Header("CỬA ĐÁ & CẤU HÌNH LÚN XUỐNG")]
-    [SerializeField] private Transform doorStoneTransform; // Kéo Transform của DoorStone vào đây
-    [SerializeField] private float sinkDistance = 5f;       // Khoảng cách cửa sẽ lún xuống (mét)
-    [SerializeField] private float sinkSpeed = 2f;          // Tốc độ lún xuống
+    [Header("Bệ Đá Đỏ")]
+    [SerializeField] private GameObject ghostRed;
+    [SerializeField] private GameObject realRed;
 
-    [Header("ÂM THANH")]
+    [Header("Cửa đá")]
+    [SerializeField] private Transform doorStoneTransform;
+    [SerializeField, Min(0.1f)] private float sinkDistance = 5f;
+    [SerializeField, Min(0.1f)] private float sinkSpeed = 2f;
+
+    [Header("Âm thanh")]
     [SerializeField] private AudioSource placeStoneSound;
     [SerializeField] private AudioSource openDoorSound;
 
-    private bool isBluePlaced = false;
-    private bool isRedPlaced = false;
-    private bool isDoorOpening = false;
+    public bool IsBluePlaced { get; private set; }
+    public bool IsRedPlaced { get; private set; }
 
-    private Vector3 initialDoorPosition;
+    private bool isDoorOpening;
+    private bool doorQuestCompleted;
+    private int reportedPlacementProgress;
     private Vector3 targetDoorPosition;
 
-    void Start()
+    private void Start()
     {
-        if (doorStoneTransform != null)
-        {
-            // Lưu vị trí ban đầu của cửa
-            initialDoorPosition = doorStoneTransform.position;
-            // Tính toán vị trí hạ xuống đất (Giảm Y đi một khoảng sinkDistance)
-            targetDoorPosition = initialDoorPosition - new Vector3(0, sinkDistance, 0);
-        }
-    }
+        SetStoneVisuals(
+            ghostCrystal,
+            realCrystal,
+            IsBluePlaced
+        );
 
-    void Update()
-    {
-        // Khi kích hoạt mở cửa, cho cửa di chuyển mượt mà xuống dưới đất
-        if (isDoorOpening && doorStoneTransform != null)
+        SetStoneVisuals(
+            ghostRed,
+            realRed,
+            IsRedPlaced
+        );
+
+        if (doorStoneTransform == null)
         {
-            doorStoneTransform.position = Vector3.MoveTowards(
-                doorStoneTransform.position,
-                targetDoorPosition,
-                sinkSpeed * Time.deltaTime
+            Debug.LogError(
+                "StoneDoorPuzzle: Chưa gán Door Stone Transform."
             );
+            return;
+        }
 
-            // Khi đã lún hoàn toàn xuống đất
-            if (Vector3.Distance(doorStoneTransform.position, targetDoorPosition) < 0.01f)
-            {
-                isDoorOpening = false; // Dừng chạy hàm Update
-                Debug.Log("Cửa đá đã lún xong -> Xoá vĩnh viễn!");
+        targetDoorPosition =
+            doorStoneTransform.position -
+            Vector3.up * sinkDistance;
+    }
 
-                // CÁCH 1: Tắt hẳn GameObject cửa đi (Khuyên dùng)
-                doorStoneTransform.gameObject.SetActive(false);
+    private void Update()
+    {
+        if (!isDoorOpening ||
+            doorStoneTransform == null ||
+            PauseMenu.IsPaused)
+        {
+            return;
+        }
 
-                // CÁCH 2: Nếu muốn xoá sạch hoàn toàn khỏi bộ nhớ RAM thì dùng lệnh bên dưới:
-                // Destroy(doorStoneTransform.gameObject);
-            }
+        doorStoneTransform.position = Vector3.MoveTowards(
+            doorStoneTransform.position,
+            targetDoorPosition,
+            sinkSpeed * Time.deltaTime
+        );
+
+        if (Vector3.Distance(
+                doorStoneTransform.position,
+                targetDoorPosition) > 0.01f)
+        {
+            return;
+        }
+
+        isDoorOpening = false;
+        doorStoneTransform.gameObject.SetActive(false);
+        CompleteDoorQuest();
+
+        Debug.Log(
+            "Cửa đá đã hạ hoàn toàn; lối đi đã mở."
+        );
+    }
+
+    public bool TryPlaceBlueStone()
+    {
+        if (IsBluePlaced ||
+            !MiniGameFlowManager.IsChapterActive(
+                ChapterIndex) ||
+            !StonePickup.HasBlueStone)
+        {
+            return false;
+        }
+
+        IsBluePlaced = true;
+        StonePickup.Consume(StoneType.Blue);
+        SetStoneVisuals(
+            ghostCrystal,
+            realCrystal,
+            true
+        );
+        PlayPlacementSound();
+        HandleStonePlaced();
+        return true;
+    }
+
+    public bool TryPlaceRedStone()
+    {
+        if (IsRedPlaced ||
+            !MiniGameFlowManager.IsChapterActive(
+                ChapterIndex) ||
+            !StonePickup.HasRedStone)
+        {
+            return false;
+        }
+
+        IsRedPlaced = true;
+        StonePickup.Consume(StoneType.Red);
+        SetStoneVisuals(
+            ghostRed,
+            realRed,
+            true
+        );
+        PlayPlacementSound();
+        HandleStonePlaced();
+        return true;
+    }
+
+    private void HandleStonePlaced()
+    {
+        if (!IsBluePlaced || !IsRedPlaced)
+        {
+            ReportPlacementProgress(1);
+            return;
+        }
+
+        if (openDoorSound != null)
+        {
+            openDoorSound.Play();
+        }
+
+        isDoorOpening = true;
+
+        Debug.Log(
+            "Đã đặt đủ hai viên đá; cửa bắt đầu hạ xuống."
+        );
+    }
+
+    private void CompleteDoorQuest()
+    {
+        if (doorQuestCompleted)
+        {
+            return;
+        }
+
+        doorQuestCompleted = true;
+        int remainingProgress = Mathf.Max(
+            0,
+            RequiredPlacedStones -
+            reportedPlacementProgress
+        );
+
+        if (remainingProgress > 0)
+        {
+            ReportPlacementProgress(
+                remainingProgress
+            );
         }
     }
 
-    // Gọi hàm này khi Player lại gần BỆ XANH bấm đặt đá
-    public void TryPlaceBlueStone()
+    private void ReportPlacementProgress(int amount)
     {
-        if (isBluePlaced) return;
-
-        if (StonePickup.HasBlueStone)
+        if (amount <= 0)
         {
-            isBluePlaced = true;
-
-            if (ghostCrystal != null) ghostCrystal.SetActive(false); // Tắt đá mờ
-            if (realCrystal != null) realCrystal.SetActive(true);   // Hiện đá thật
-            if (placeStoneSound != null) placeStoneSound.Play();
-
-            Debug.Log("Đã đặt Đá Xanh vào bệ!");
-            CheckDoorOpen();
+            return;
         }
-        else
+
+        reportedPlacementProgress = Mathf.Clamp(
+            reportedPlacementProgress + amount,
+            0,
+            RequiredPlacedStones
+        );
+
+        if (QuestManager.Instance != null)
         {
-            Debug.Log("Chưa nhặt Đá Xanh! Không thể đặt.");
+            QuestManager.Instance.ReportProgressForChapter(
+                ChapterIndex,
+                PlaceStonesSubQuestIndex,
+                amount,
+                RequiredPlacedStones
+            );
         }
     }
 
-    // Gọi hàm này khi Player lại gần BỆ ĐỎ bấm đặt đá
-    public void TryPlaceRedStone()
+    private void SetStoneVisuals(
+        GameObject ghost,
+        GameObject realStone,
+        bool placed)
     {
-        if (isRedPlaced) return;
-
-        if (StonePickup.HasRedStone)
+        if (ghost != null)
         {
-            isRedPlaced = true;
-
-            if (ghostRed != null) ghostRed.SetActive(false); // Tắt đá mờ
-            if (realRed != null) realRed.SetActive(true);   // Hiện đá thật
-            if (placeStoneSound != null) placeStoneSound.Play();
-
-            Debug.Log("Đã đặt Đá Đỏ vào bệ!");
-            CheckDoorOpen();
+            ghost.SetActive(!placed);
         }
-        else
+
+        if (realStone != null)
         {
-            Debug.Log("Chưa nhặt Đá Đỏ! Không thể đặt.");
+            realStone.SetActive(placed);
         }
     }
 
-    private void CheckDoorOpen()
+    private void PlayPlacementSound()
     {
-        // Khi CẢ 2 BỆ đều đã được đặt đá
-        if (isBluePlaced && isRedPlaced)
+        if (placeStoneSound != null)
         {
-            Debug.Log("Đã đặt đủ 2 đá! Bắt đầu lún cửa...");
-
-            if (openDoorSound != null) openDoorSound.Play();
-
-            // Kích hoạt biến để Update() tự động hạ cửa xuống
-            isDoorOpening = true;
+            placeStoneSound.Play();
         }
     }
 }

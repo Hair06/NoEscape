@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using ElmanGameDevTools.PlayerSystem;
 
 public class PostCutsceneDashScare : MonoBehaviour
 {
@@ -19,6 +20,10 @@ public class PostCutsceneDashScare : MonoBehaviour
     [SerializeField] private bool returnCameraAfterScare = true;
 
     [Header("Khóa điều khiển Player + Camera")]
+    [Tooltip("Để trống sẽ tự tìm PlayerController của Elman trong scene.")]
+    [SerializeField] private PlayerController playerController;
+
+    [Tooltip("Các script phụ cần tắt thêm trong lúc hù, ví dụ PlayerInteraction hoặc PlayerFlashlightController.")]
     [SerializeField] private MonoBehaviour[] scriptsToDisable;
 
     [Header("Menu hiện sau Jumpscare")]
@@ -49,18 +54,35 @@ public class PostCutsceneDashScare : MonoBehaviour
 
     private bool triggered;
     private bool forceLockCamera;
+    private bool gameplayControlLocked;
+    private bool playerControllerWasEnabled;
+    private bool[] scriptEnabledStates;
 
     private Vector3 originalCameraPos;
     private Quaternion originalCameraRot;
 
     private void Awake()
-{
-    if (ghoulHolder != null)
-        ghoulHolder.gameObject.SetActive(true);
+    {
+        ResolvePlayerReferences();
 
-    if (ghoulVisual != null)
-        ghoulVisual.SetActive(false);
-}
+        if (ghoulHolder != null)
+            ghoulHolder.gameObject.SetActive(true);
+
+        if (ghoulVisual != null)
+            ghoulVisual.SetActive(false);
+    }
+
+    private void OnDisable()
+    {
+        // Tránh trường hợp component bị tắt giữa coroutine khiến Player
+        // bị khóa vĩnh viễn.
+        forceLockCamera = false;
+
+        if (gameplayControlLocked)
+        {
+            SetGameplayControl(true);
+        }
+    }
 
     private void Update()
     {
@@ -82,6 +104,8 @@ public class PostCutsceneDashScare : MonoBehaviour
     public void TriggerScare()
     {
         if (triggered) return;
+
+        ResolvePlayerReferences();
 
         StartCoroutine(PlayScare());
     }
@@ -169,6 +193,8 @@ public class PostCutsceneDashScare : MonoBehaviour
 
     private bool ValidateReferences()
     {
+        ResolvePlayerReferences();
+
         bool valid = true;
 
         if (ghoulHolder == null)
@@ -387,14 +413,108 @@ public class PostCutsceneDashScare : MonoBehaviour
         Destroy(audioObj, scareSound.length + 0.2f);
     }
 
-    private void SetGameplayControl(bool enabled)
+    private void ResolvePlayerReferences()
     {
-        if (scriptsToDisable == null) return;
-
-        foreach (MonoBehaviour script in scriptsToDisable)
+        if (playerController == null)
         {
-            if (script != null)
-                script.enabled = enabled;
+            playerController =
+                FindFirstObjectByType<PlayerController>();
         }
+
+        if (playerCamera == null &&
+            playerController != null)
+        {
+            playerCamera = playerController.playerCamera;
+        }
+    }
+
+    private void SetGameplayControl(bool enableControl)
+    {
+        ResolvePlayerReferences();
+
+        if (!enableControl)
+        {
+            if (gameplayControlLocked)
+            {
+                return;
+            }
+
+            gameplayControlLocked = true;
+
+            if (playerController != null)
+            {
+                playerControllerWasEnabled =
+                    playerController.enabled;
+                playerController.enabled = false;
+            }
+
+            if (scriptsToDisable == null)
+            {
+                scriptEnabledStates = null;
+                return;
+            }
+
+            scriptEnabledStates =
+                new bool[scriptsToDisable.Length];
+
+            for (int i = 0;
+                 i < scriptsToDisable.Length;
+                 i++)
+            {
+                MonoBehaviour script =
+                    scriptsToDisable[i];
+
+                if (script == null ||
+                    script == this ||
+                    script == playerController)
+                {
+                    continue;
+                }
+
+                scriptEnabledStates[i] = script.enabled;
+                script.enabled = false;
+            }
+
+            return;
+        }
+
+        if (!gameplayControlLocked)
+        {
+            return;
+        }
+
+        if (playerController != null)
+        {
+            playerController.enabled =
+                playerControllerWasEnabled;
+        }
+
+        if (scriptsToDisable != null &&
+            scriptEnabledStates != null)
+        {
+            int count = Mathf.Min(
+                scriptsToDisable.Length,
+                scriptEnabledStates.Length
+            );
+
+            for (int i = 0; i < count; i++)
+            {
+                MonoBehaviour script =
+                    scriptsToDisable[i];
+
+                if (script == null ||
+                    script == this ||
+                    script == playerController)
+                {
+                    continue;
+                }
+
+                script.enabled =
+                    scriptEnabledStates[i];
+            }
+        }
+
+        scriptEnabledStates = null;
+        gameplayControlLocked = false;
     }
 }

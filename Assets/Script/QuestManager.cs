@@ -4,6 +4,13 @@ using UnityEngine;
 
 public class QuestManager : MonoBehaviour
 {
+    private enum AdaptiveHintLevel
+    {
+        Direction = 0,
+        Location = 1,
+        Action = 2,
+    }
+
     [System.Serializable]
     private class QuestProgressRequirement
     {
@@ -38,6 +45,9 @@ public class QuestManager : MonoBehaviour
     [Header("Quest Data")]
     [SerializeField] private QuestData[] chapters;
 
+    [Tooltip("Tự bổ sung dữ liệu Chương 4 cho câu đố hai viên đá nếu scene cũ mới chỉ có Chương 0-3.")]
+    [SerializeField] private bool enableBuiltInChapterFour = true;
+
     [Header("Quest Start")]
     [Tooltip("Tắt mục này nếu nhiệm vụ chỉ bắt đầu khi Player đi qua trigger cửa chính.")]
     [SerializeField] private bool startQuestAutomatically;
@@ -61,8 +71,12 @@ public class QuestManager : MonoBehaviour
     [SerializeField] private float hintTypeSpeed = 0.025f;
     [SerializeField] private float hintHoldTime = 5f;
 
-    [Tooltip("Tự động hiện gợi ý chi tiết khi người chơi bị kẹt quá lâu")]
+    [Tooltip("Tự động hiện tầng gợi ý mới khi người chơi bị kẹt đủ lâu")]
     [SerializeField] private bool autoShowDetailedHint = true;
+
+    [Tooltip("Khoảng cách tối thiểu giữa lúc mở gợi ý khu vực và gợi ý cách thực hiện.")]
+    [SerializeField, Min(5f)]
+    private float minimumHintEscalationInterval = 20f;
 
     [Tooltip("Tự hoàn thành chương khi toàn bộ nhiệm vụ nhỏ đã hoàn thành")]
     [SerializeField] private bool autoCompleteChapter = true;
@@ -76,7 +90,6 @@ public class QuestManager : MonoBehaviour
 
     private bool isQuestVisible;
     private bool isShowingThought;
-    private bool detailedHintUnlocked;
     private bool isCompletingChapter;
     private bool subQuestHintsSuppressed;
     private bool gameplayUiSuppressed;
@@ -85,8 +98,14 @@ public class QuestManager : MonoBehaviour
     private int pendingNextChapterIndex = -1;
     private bool nextChapterStartRequested;
 
+    private float activeHintExplorationTime;
+    private int highestUnlockedHintLevel;
+    private int lastShownHintLevel = -1;
+    private int pendingAutoHintLevel = -1;
+
     public bool IsQuestFlowStarted => questFlowStarted;
     public int CurrentChapterIndex => currentChapterIndex;
+    public int CurrentSubQuestIndex => currentSubQuestIndex;
     public bool IsChapterTransitioning =>
         isCompletingChapter || pendingNextChapterIndex >= 0;
 
@@ -94,7 +113,6 @@ public class QuestManager : MonoBehaviour
     private Coroutine questToggleRoutine;
     private Coroutine hintRoutine;
     private Coroutine scheduledHintRoutine;
-    private Coroutine detailedHintRoutine;
     private Coroutine progressDisplayRoutine;
     private Coroutine nextChapterStartRoutine;
 
@@ -107,10 +125,13 @@ public class QuestManager : MonoBehaviour
         }
 
         Instance = this;
+        EnsureBuiltInChapterFour();
     }
 
     private void Start()
     {
+        ResolveHintControlPanel();
+
         HideCanvasGroupInstant(questPanelGroup);
         HideCanvasGroupInstant(characterThoughtPanelGroup);
         HideCanvasGroupInstant(subQuestHintPanelGroup);
@@ -136,6 +157,9 @@ public class QuestManager : MonoBehaviour
         {
             return;
         }
+
+        UpdateAdaptiveHintClock();
+        TryShowPendingAdaptiveHint();
 
         if (GameInputBridge.GetKeyDown(KeyCode.Tab))
         {
@@ -183,7 +207,7 @@ public class QuestManager : MonoBehaviour
 
         currentChapterIndex = chapterIndex;
         currentSubQuestIndex = -1;
-        detailedHintUnlocked = false;
+        ResetAdaptiveHintState();
         isCompletingChapter = false;
         pendingNextChapterIndex = -1;
         nextChapterStartRequested = false;
@@ -478,7 +502,7 @@ public class QuestManager : MonoBehaviour
         }
 
         currentSubQuestIndex = subQuestIndex;
-        detailedHintUnlocked = false;
+        ResetAdaptiveHintState();
 
         RefreshSubQuestLine(
             currentSubQuestIndex
@@ -490,25 +514,8 @@ public class QuestManager : MonoBehaviour
             scheduledHintRoutine = null;
         }
 
-        if (detailedHintRoutine != null)
-        {
-            StopCoroutine(detailedHintRoutine);
-        }
-
         SubQuestData subQuest =
             chapter.subQuests[currentSubQuestIndex];
-
-        if (!string.IsNullOrWhiteSpace(
-                subQuest.detailedHint) &&
-            subQuest.detailedHintDelay > 0f)
-        {
-            detailedHintRoutine = StartCoroutine(
-                UnlockDetailedHintRoutine(
-                    currentSubQuestIndex,
-                    subQuest.detailedHintDelay
-                )
-            );
-        }
 
         if (showHint)
         {
@@ -519,6 +526,12 @@ public class QuestManager : MonoBehaviour
     }
 
     public void ShowCurrentSubQuestHint()
+    {
+        int nextLevel = GetNextHintLevelToShow();
+        ShowAdaptiveHint(nextLevel);
+    }
+
+    private void ShowAdaptiveHint(int hintLevel)
     {
         if (IsSubQuestHintPresentationBlocked() ||
             currentSubQuestIndex < 0)
@@ -538,30 +551,37 @@ public class QuestManager : MonoBehaviour
         SubQuestData subQuest =
             chapter.subQuests[currentSubQuestIndex];
 
+        hintLevel = Mathf.Clamp(
+            hintLevel,
+            (int)AdaptiveHintLevel.Direction,
+            highestUnlockedHintLevel
+        );
+
         if (scheduledHintRoutine != null)
         {
             StopCoroutine(scheduledHintRoutine);
             scheduledHintRoutine = null;
         }
 
-        string hintContent = subQuest.hint;
-
-        if (detailedHintUnlocked &&
-            !string.IsNullOrWhiteSpace(
-                subQuest.detailedHint))
-        {
-            hintContent = subQuest.detailedHint;
-        }
+        string hintContent = QuestHintCatalog.GetHint(
+            currentChapterIndex,
+            currentSubQuestIndex,
+            hintLevel,
+            subQuest
+        );
 
         if (hintRoutine != null)
         {
             StopCoroutine(hintRoutine);
         }
 
+        lastShownHintLevel = hintLevel;
+
         hintRoutine = StartCoroutine(
             ShowSubQuestHintWithCoordinationRoutine(
                 subQuest.title,
                 hintContent,
+                hintLevel,
                 subQuest.hintHoldTime < 0f
                     ? hintHoldTime
                     : subQuest.hintHoldTime
@@ -572,6 +592,7 @@ public class QuestManager : MonoBehaviour
     private IEnumerator ShowSubQuestHintWithCoordinationRoutine(
         string objective,
         string hint,
+        int hintLevel,
         float holdDuration)
     {
         if (progressDisplayRoutine != null)
@@ -601,6 +622,7 @@ public class QuestManager : MonoBehaviour
         yield return ShowSubQuestHintRoutine(
             objective,
             hint,
+            hintLevel,
             holdDuration
         );
 
@@ -610,6 +632,7 @@ public class QuestManager : MonoBehaviour
     private IEnumerator ShowSubQuestHintRoutine(
         string objective,
         string hint,
+        int hintLevel,
         float holdDuration)
     {
         if (subQuestHintPanelGroup == null)
@@ -620,7 +643,9 @@ public class QuestManager : MonoBehaviour
         if (activeSubQuestText != null)
         {
             activeSubQuestText.text =
-                "<size=70%><color=#C9B27A>MỤC TIÊU HIỆN TẠI</color></size>\n" +
+                "<size=70%><color=#C9B27A>" +
+                GetHintLevelTitle(hintLevel) +
+                "</color></size>\n" +
                 "<b>" + objective + "</b>";
         }
 
@@ -693,7 +718,10 @@ public class QuestManager : MonoBehaviour
     {
         if (delay > 0f)
         {
-            yield return WaitForSecondsRealtimePausable(delay);
+            yield return WaitForExplorationSeconds(
+                expectedSubQuestIndex,
+                delay
+            );
         }
 
         while (isQuestVisible ||
@@ -718,7 +746,7 @@ public class QuestManager : MonoBehaviour
             yield break;
         }
 
-        ShowCurrentSubQuestHint();
+        ShowAdaptiveHint((int)AdaptiveHintLevel.Direction);
     }
 
     private bool IsSubQuestStillAvailable(int subQuestIndex)
@@ -728,38 +756,6 @@ public class QuestManager : MonoBehaviour
                subQuestIndex >= 0 &&
                subQuestIndex < completedSubQuests.Length &&
                !completedSubQuests[subQuestIndex];
-    }
-
-    private IEnumerator UnlockDetailedHintRoutine(
-        int expectedSubQuestIndex,
-        float delay)
-    {
-        yield return WaitForSecondsRealtimePausable(delay);
-
-        if (currentSubQuestIndex !=
-            expectedSubQuestIndex)
-        {
-            yield break;
-        }
-
-        if (completedSubQuests[
-                expectedSubQuestIndex])
-        {
-            yield break;
-        }
-
-        detailedHintUnlocked = true;
-        detailedHintRoutine = null;
-        RefreshHintControlVisibility();
-
-        if (autoShowDetailedHint &&
-            !IsSubQuestHintPresentationBlocked() &&
-            !isQuestVisible &&
-            questToggleRoutine == null &&
-            chapterRoutine == null)
-        {
-            ShowCurrentSubQuestHint();
-        }
     }
 
     public void ReportProgressForChapter(
@@ -943,12 +939,6 @@ public class QuestManager : MonoBehaviour
             "Hoàn thành nhiệm vụ nhỏ: " +
             chapter.subQuests[index].title
         );
-
-        if (detailedHintRoutine != null)
-        {
-            StopCoroutine(detailedHintRoutine);
-            detailedHintRoutine = null;
-        }
 
         if (hintRoutine != null)
         {
@@ -1157,9 +1147,11 @@ public class QuestManager : MonoBehaviour
 
         if (hintControlText != null && hasReviewableHint)
         {
-            hintControlText.text = detailedHintUnlocked
-                ? "<b><color=#D9B66F>H</color></b> để xem lại gợi ý chi tiết"
-                : "<b><color=#D9B66F>H</color></b> để xem lại gợi ý";
+            int nextLevel = GetNextHintLevelToShow();
+
+            hintControlText.text =
+                "<b><color=#D9B66F>H</color></b> " +
+                GetHintControlLabel(nextLevel);
         }
     }
 
@@ -1171,7 +1163,298 @@ public class QuestManager : MonoBehaviour
             Cursor.visible &&
             Cursor.lockState != CursorLockMode.Locked;
 
-        return subQuestHintsSuppressed || modalUiIsOpen;
+        return gameplayUiSuppressed ||
+               subQuestHintsSuppressed ||
+               MiniGameFlowManager.HasActiveMiniGame ||
+               PauseMenu.IsPaused ||
+               modalUiIsOpen;
+    }
+
+    private void EnsureBuiltInChapterFour()
+    {
+        if (!enableBuiltInChapterFour ||
+            chapters == null ||
+            chapters.Length != 4)
+        {
+            return;
+        }
+
+        QuestData[] expandedChapters =
+            new QuestData[chapters.Length + 1];
+
+        for (int i = 0; i < chapters.Length; i++)
+        {
+            expandedChapters[i] = chapters[i];
+        }
+
+        expandedChapters[4] =
+            QuestHintCatalog.CreateChapterFour();
+        chapters = expandedChapters;
+
+        Debug.Log(
+            "QuestManager: Đã bổ sung dữ liệu runtime cho Chương 4 - Cánh Cửa Đá."
+        );
+    }
+
+    private void ResolveHintControlPanel()
+    {
+        if (hintControlText == null)
+        {
+            return;
+        }
+
+        // Scene hiện tại đặt HintControlText bên trong QuestPanel.
+        // Khi QuestPanel fade về 0, dòng nhắc H cũng bị ẩn theo dù có
+        // CanvasGroup riêng. Đưa nó lên cùng cấp ở runtime để luôn độc lập.
+        if (questPanelGroup != null &&
+            hintControlText.transform.IsChildOf(
+                questPanelGroup.transform) &&
+            questPanelGroup.transform.parent != null)
+        {
+            hintControlText.transform.SetParent(
+                questPanelGroup.transform.parent,
+                true
+            );
+        }
+
+        if (hintControlPanelGroup != null)
+        {
+            return;
+        }
+
+        hintControlPanelGroup =
+            hintControlText.GetComponent<CanvasGroup>();
+
+        if (hintControlPanelGroup == null)
+        {
+            hintControlPanelGroup =
+                hintControlText.gameObject
+                    .AddComponent<CanvasGroup>();
+        }
+
+        Debug.LogWarning(
+            "QuestManager: Hint Control Panel Group chưa được gán; " +
+            "đã tự dùng CanvasGroup trên Hint Control Text."
+        );
+    }
+
+    private void ResetAdaptiveHintState()
+    {
+        activeHintExplorationTime = 0f;
+        highestUnlockedHintLevel =
+            (int)AdaptiveHintLevel.Direction;
+        lastShownHintLevel = -1;
+        pendingAutoHintLevel = -1;
+    }
+
+    private void UpdateAdaptiveHintClock()
+    {
+        if (!ShouldAdvanceAdaptiveHintClock() ||
+            !TryGetCurrentSubQuest(out SubQuestData subQuest))
+        {
+            return;
+        }
+
+        activeHintExplorationTime +=
+            Time.unscaledDeltaTime;
+
+        float locationUnlockTime =
+            subQuest.locationHintDelay;
+
+        // Dữ liệu scene cũ chưa có locationHintDelay nên Unity có thể
+        // deserialize thành 0. Giữ một khoảng khám phá hợp lý thay vì
+        // tung ngay gợi ý vị trí ở khung hình đầu tiên.
+        if (locationUnlockTime <= 0f &&
+            string.IsNullOrWhiteSpace(
+                subQuest.locationHint))
+        {
+            locationUnlockTime = 25f;
+        }
+
+        locationUnlockTime = Mathf.Max(
+            0f,
+            locationUnlockTime
+        );
+
+        float actionUnlockTime = Mathf.Max(
+            subQuest.actionHintDelay,
+            locationUnlockTime +
+            minimumHintEscalationInterval
+        );
+
+        int unlockedLevel =
+            (int)AdaptiveHintLevel.Direction;
+
+        if (activeHintExplorationTime >=
+            locationUnlockTime)
+        {
+            unlockedLevel =
+                (int)AdaptiveHintLevel.Location;
+        }
+
+        if (activeHintExplorationTime >=
+            actionUnlockTime)
+        {
+            unlockedLevel =
+                (int)AdaptiveHintLevel.Action;
+        }
+
+        if (unlockedLevel <= highestUnlockedHintLevel)
+        {
+            return;
+        }
+
+        highestUnlockedHintLevel = unlockedLevel;
+
+        if (autoShowDetailedHint)
+        {
+            pendingAutoHintLevel = unlockedLevel;
+        }
+
+        RefreshHintControlVisibility();
+    }
+
+    private bool ShouldAdvanceAdaptiveHintClock()
+    {
+        if (!questFlowStarted ||
+            currentSubQuestIndex < 0 ||
+            completedSubQuests == null ||
+            currentSubQuestIndex >=
+                completedSubQuests.Length ||
+            completedSubQuests[currentSubQuestIndex] ||
+            isShowingThought ||
+            isCompletingChapter ||
+            chapterRoutine != null ||
+            hintRoutine != null ||
+            isQuestVisible ||
+            questToggleRoutine != null)
+        {
+            return false;
+        }
+
+        return !IsSubQuestHintPresentationBlocked();
+    }
+
+    private void TryShowPendingAdaptiveHint()
+    {
+        if (pendingAutoHintLevel < 0 ||
+            hintRoutine != null ||
+            scheduledHintRoutine != null ||
+            isQuestVisible ||
+            questToggleRoutine != null ||
+            chapterRoutine != null ||
+            IsSubQuestHintPresentationBlocked())
+        {
+            return;
+        }
+
+        int levelToShow = pendingAutoHintLevel;
+        pendingAutoHintLevel = -1;
+        ShowAdaptiveHint(levelToShow);
+    }
+
+    private int GetNextHintLevelToShow()
+    {
+        int maxLevel = Mathf.Clamp(
+            highestUnlockedHintLevel,
+            (int)AdaptiveHintLevel.Direction,
+            (int)AdaptiveHintLevel.Action
+        );
+
+        if (lastShownHintLevel < 0)
+        {
+            return (int)AdaptiveHintLevel.Direction;
+        }
+
+        if (lastShownHintLevel < maxLevel)
+        {
+            return lastShownHintLevel + 1;
+        }
+
+        return (int)AdaptiveHintLevel.Direction;
+    }
+
+    private string GetHintLevelTitle(int hintLevel)
+    {
+        switch ((AdaptiveHintLevel)Mathf.Clamp(
+                    hintLevel,
+                    0,
+                    2))
+        {
+            case AdaptiveHintLevel.Location:
+                return "GỢI Ý KHU VỰC";
+
+            case AdaptiveHintLevel.Action:
+                return "CÁCH THỰC HIỆN";
+
+            default:
+                return "MỤC TIÊU HIỆN TẠI";
+        }
+    }
+
+    private string GetHintControlLabel(int hintLevel)
+    {
+        switch ((AdaptiveHintLevel)Mathf.Clamp(
+                    hintLevel,
+                    0,
+                    2))
+        {
+            case AdaptiveHintLevel.Location:
+                return "để xem khu vực cần tìm";
+
+            case AdaptiveHintLevel.Action:
+                return "để xem cách thực hiện";
+
+            default:
+                return "để xem lại gợi ý";
+        }
+    }
+
+    private bool TryGetCurrentSubQuest(
+        out SubQuestData subQuest)
+    {
+        subQuest = null;
+
+        if (chapters == null ||
+            currentChapterIndex < 0 ||
+            currentChapterIndex >= chapters.Length ||
+            chapters[currentChapterIndex] == null ||
+            chapters[currentChapterIndex].subQuests == null ||
+            currentSubQuestIndex < 0 ||
+            currentSubQuestIndex >=
+                chapters[currentChapterIndex]
+                    .subQuests.Length)
+        {
+            return false;
+        }
+
+        subQuest = chapters[currentChapterIndex]
+            .subQuests[currentSubQuestIndex];
+        return subQuest != null;
+    }
+
+    private IEnumerator WaitForExplorationSeconds(
+        int expectedSubQuestIndex,
+        float duration)
+    {
+        float timer = 0f;
+        duration = Mathf.Max(0f, duration);
+
+        while (timer < duration)
+        {
+            if (!IsSubQuestStillAvailable(
+                    expectedSubQuestIndex))
+            {
+                yield break;
+            }
+
+            if (ShouldAdvanceAdaptiveHintClock())
+            {
+                timer += Time.unscaledDeltaTime;
+            }
+
+            yield return null;
+        }
     }
 
     public void CompleteCurrentChapter()
@@ -1245,8 +1528,15 @@ public class QuestManager : MonoBehaviour
         {
             pendingNextChapterIndex = nextChapter;
 
-            if (!chapters[completedChapterIndex]
-                    .waitForTransitionSignal)
+            // Chương 1 luôn phải chờ cutscene + jumpscare bàn giao.
+            // Scene cũ đang lưu cờ này là false nên cần bảo vệ ở runtime,
+            // nếu không Chương 2 sẽ bật khi màn hù vẫn còn chạy.
+            bool mustWaitForTransition =
+                chapters[completedChapterIndex]
+                    .waitForTransitionSignal ||
+                completedChapterIndex == 1;
+
+            if (!mustWaitForTransition)
             {
                 nextChapterStartRequested = true;
             }
@@ -1672,12 +1962,6 @@ public class QuestManager : MonoBehaviour
         {
             StopCoroutine(scheduledHintRoutine);
             scheduledHintRoutine = null;
-        }
-
-        if (detailedHintRoutine != null)
-        {
-            StopCoroutine(detailedHintRoutine);
-            detailedHintRoutine = null;
         }
 
         if (progressDisplayRoutine != null)

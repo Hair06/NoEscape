@@ -8720,6 +8720,7 @@ MonoBehaviour:
   holdCameraBeforeDash: 0.2
   holdCameraAfterDash: 1
   returnCameraAfterScare: 1
+  playerController: {fileID: 0}
   scriptsToDisable:
   - {fileID: 1205354181}
   - {fileID: 1205354181}
@@ -34544,8 +34545,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "CH\u01AF\u01A0NG 1 - PHONG \u1EA4N C\u1EE6A H\u1EA0NH PH\xDAC"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: b5061a9bc38b7284d9cc6568f5a5b7dd, type: 2}
-  m_sharedMaterial: {fileID: 9108110975851271829, guid: b5061a9bc38b7284d9cc6568f5a5b7dd, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: bea777d5222853a4b8c50bac1c7be5f9, type: 2}
+  m_sharedMaterial: {fileID: -2172438220289588219, guid: bea777d5222853a4b8c50bac1c7be5f9, type: 2}
   m_fontSharedMaterials:
   - {fileID: 9108110975851271829, guid: b5061a9bc38b7284d9cc6568f5a5b7dd, type: 2}
   m_fontMaterial: {fileID: 0}
@@ -143223,7 +143224,7 @@ MonoBehaviour:
   subQuestHintPanelGroup: {fileID: 92969917}
   activeSubQuestText: {fileID: 705629425}
   subQuestHintText: {fileID: 1655211608}
-  hintControlPanelGroup: {fileID: 0}
+  hintControlPanelGroup: {fileID: 1099663873}
   hintControlText: {fileID: 1518815455}
   chapters:
   - chapterTitle: "NHI\u1EC6M V\u1EE4 M\u1EDE \u0110\u1EA6U"
@@ -143241,21 +143242,24 @@ MonoBehaviour:
     subQuests:
     - title: "T\xECm 2 can x\u0103ng"
       hint: "T\xECm \u0111\u1EE7 2 can x\u0103ng trong ng\xF4i nh\xE0."
-      detailedHint: "H\xE3y t\xECm quanh khu v\u1EF1c nh\xE0 kho v\xE0 g\u1EA7n m\xE1y
+      locationHint: 
+      actionHint: "H\xE3y t\xECm quanh khu v\u1EF1c nh\xE0 kho v\xE0 g\u1EA7n m\xE1y
         ph\xE1t \u0111i\u1EC7n."
       hintShowDelay: 0
       hintHoldTime: -1
-      detailedHintDelay: 30
+      locationHintDelay: 25
+      actionHintDelay: 30
     - title: "\u0110\u1ED5 x\u0103ng v\xE0 kh\u1EDFi \u0111\u1ED9ng m\xE1y ph\xE1t
         \u0111i\u1EC7n "
       hint: "Mang \u0111\u1EE7 can x\u0103ng \u0111\u1EBFn m\xE1y ph\xE1t v\xE0 nh\u1EA5n
         E."
-      detailedHint: "Nh\u1EA5n E t\u1EA1i m\xE1y ph\xE1t, sau \u0111\xF3 b\u1EA5m
-        chu\u1ED9t tr\xE1i li\xEAn t\u1EE5c \u0111\u1EC3 l\xE0m \u0111\u1EA7y thanh
-        x\u0103ng."
+      locationHint: 
+      actionHint: "Nh\u1EA5n E t\u1EA1i m\xE1y ph\xE1t, sau \u0111\xF3 b\u1EA5m chu\u1ED9t
+        tr\xE1i li\xEAn t\u1EE5c \u0111\u1EC3 l\xE0m \u0111\u1EA7y thanh x\u0103ng."
       hintShowDelay: 0
       hintHoldTime: -1
-      detailedHintDelay: 20
+      locationHintDelay: 25
+      actionHintDelay: 20
   - chapterTitle: "CH\u01AF\u01A0NG 1 - PHONG \u1EA4N C\u1EE6A H\u1EA0NH PH\xDAC"
     characterThought: "N\u01A1i n\xE0y v\u1EABn khi\u1EBFn m\xECnh c\u1EA3m th\u1EA5y
       b\u1EA5t an, khung tranh trong ph\xF2ng kh\xE1ch r\u1EA5t quen thu\u1ED9c.
@@ -143274,41 +143278,49 @@ MonoBehaviour:
     - title: "T\xECm \u0111\u1EE7 4 m\u1EA3nh \u1EA3nh gia \u0111\xECnh"
       hint: "Nh\u1EEFng m\u1EA3nh \u1EA3nh b\u1ECB x\xE9 c\xF3 th\u1EC3 v\u1EABn
         c\xF2n n\u1EB1m r\u1EA3i r\xE1c trong c\u0103n ph\xF2ng th\u01B0 vi\u1EC7n."
-      detailedHint: "H\xE3y ki\u1EC3m tra k\u1EF9 c\xE1c g\xF3c t\u1ED1i, g\u1EA7n
+      locationHint: 
+      actionHint: "H\xE3y ki\u1EC3m tra k\u1EF9 c\xE1c g\xF3c t\u1ED1i, g\u1EA7n
         \u0111\u1ED3 n\u1ED9i th\u1EA5t, ph\xEDa sau nh\u1EEFng v\u1EADt c\u1EA3n
         v\xE0 nh\u1EEFng n\u01A1i \xEDt \u0111\u01B0\u1EE3c ch\xFA \xFD trong th\u01B0
         vi\u1EC7n."
       hintShowDelay: 0
       hintHoldTime: -1
-      detailedHintDelay: 35
+      locationHintDelay: 25
+      actionHintDelay: 35
     - title: "Mang c\xE1c m\u1EA3nh \u1EA3nh \u0111\u1EBFn khung tranh"
       hint: "Chi\u1EBFc khung tranh tr\u1ED1ng trong ph\xF2ng kh\xE1ch c\xF3 th\u1EC3
         l\xE0 n\u01A1i b\u1EE9c \u1EA3nh t\u1EEBng \u0111\u01B0\u1EE3c \u0111\u1EB7t."
-      detailedHint: "Sau khi t\xECm \u0111\u1EE7 4 m\u1EA3nh, h\xE3y \u0111\u1EBFn
+      locationHint: 
+      actionHint: "Sau khi t\xECm \u0111\u1EE7 4 m\u1EA3nh, h\xE3y \u0111\u1EBFn
         g\u1EA7n khung tranh tr\u1ED1ng v\xE0 nh\u1EA5n E \u0111\u1EC3 \u0111\u1EB7t
         c\xE1c m\u1EA3nh \u1EA3nh v\xE0o khung."
       hintShowDelay: 0
       hintHoldTime: -1
-      detailedHintDelay: 25
+      locationHintDelay: 25
+      actionHintDelay: 25
     - title: "Gh\xE9p ho\xE0n ch\u1EC9nh b\u1EE9c \u1EA3nh gia \u0111\xECnh"
       hint: "Quan s\xE1t h\xECnh d\xE1ng, \u0111\u01B0\u1EDDng vi\u1EC1n v\xE0 m\xE0u
         s\u1EAFc tr\xEAn t\u1EEBng m\u1EA3nh \u1EA3nh."
-      detailedHint: "K\xE9o t\u1EEBng m\u1EA3nh v\xE0o \u0111\xFAng v\u1ECB tr\xED.
+      locationHint: 
+      actionHint: "K\xE9o t\u1EEBng m\u1EA3nh v\xE0o \u0111\xFAng v\u1ECB tr\xED.
         H\xE3y \u0111\u1ED1i chi\u1EBFu khu\xF4n m\u1EB7t, qu\u1EA7n \xE1o, \u0111\u01B0\u1EDDng
         vi\u1EC1n v\xE0 ph\u1EA7n n\u1EC1n \u0111\u1EC3 x\xE1c \u0111\u1ECBnh v\u1ECB
         tr\xED ph\xF9 h\u1EE3p."
       hintShowDelay: 0
       hintHoldTime: -1
-      detailedHintDelay: 40
+      locationHintDelay: 25
+      actionHintDelay: 40
     - title: "Theo d\xF5i k\xFD \u1EE9c \u0111\u01B0\u1EE3c gi\u1EA3i ph\xF3ng"
       hint: "B\u1EE9c \u1EA3nh ho\xE0n ch\u1EC9nh d\u01B0\u1EDDng nh\u01B0 \u0111ang
         l\u01B0u gi\u1EEF m\u1ED9t k\xFD \u1EE9c b\u1ECB phong \u1EA5n."
-      detailedHint: "H\xE3y xem h\u1EBFt \u0111o\u1EA1n k\xFD \u1EE9c xu\u1EA5t hi\u1EC7n
+      locationHint: 
+      actionHint: "H\xE3y xem h\u1EBFt \u0111o\u1EA1n k\xFD \u1EE9c xu\u1EA5t hi\u1EC7n
         t\u1EEB b\u1EE9c \u1EA3nh. Sau khi k\xFD \u1EE9c k\u1EBFt th\xFAc, phong
         \u1EA5n \u0111\u1EA7u ti\xEAn s\u1EBD \u0111\u01B0\u1EE3c gi\u1EA3i m\xE3."
       hintShowDelay: 0
       hintHoldTime: -1
-      detailedHintDelay: 20
+      locationHintDelay: 25
+      actionHintDelay: 20
   - chapterTitle: "CH\u01AF\u01A0NG 2 - TI\u1EBENG NH\u1EA0C C\u1EE6A M\u1EB8"
     characterThought: "Giai \u0111i\u1EC7u v\u1EEBa r\u1ED3i... m\xECnh \u0111\xE3
       t\u1EEBng nghe n\xF3 khi c\xF2n nh\u1ECF. N\xF3 ph\xE1t ra t\u1EEB chi\u1EBFc
@@ -143328,54 +143340,64 @@ MonoBehaviour:
       hint: "B\u1ED9 ph\u1EADn t\u1EA1o n\xEAn nh\u1EEFng n\u1ED1t nh\u1EA1c c\xF3
         th\u1EC3 \u0111\u01B0\u1EE3c c\u1EA5t t\u1EA1i n\u01A1i giai \u0111i\u1EC7u
         t\u1EEBng th\u01B0\u1EDDng xuy\xEAn vang l\xEAn."
-      detailedHint: "H\xE3y t\xECm trong khu v\u1EF1c ph\xF2ng ng\u1EE7 ho\u1EB7c
-        g\u1EA7n nh\u1EEFng \u0111\u1ED3 v\u1EADt g\u1EAFn v\u1EDBi k\xFD \u1EE9c
-        c\u1EE7a m\u1EB9. \u0110\u1EBFn g\u1EA7n Con Thoi Nh\u1EA1c v\xE0 nh\u1EA5n
-        E \u0111\u1EC3 nh\u1EB7t."
+      locationHint: 
+      actionHint: "H\xE3y t\xECm trong khu v\u1EF1c ph\xF2ng ng\u1EE7 ho\u1EB7c g\u1EA7n
+        nh\u1EEFng \u0111\u1ED3 v\u1EADt g\u1EAFn v\u1EDBi k\xFD \u1EE9c c\u1EE7a
+        m\u1EB9. \u0110\u1EBFn g\u1EA7n Con Thoi Nh\u1EA1c v\xE0 nh\u1EA5n E \u0111\u1EC3
+        nh\u1EB7t."
       hintShowDelay: 0
       hintHoldTime: -1
-      detailedHintDelay: 40
+      locationHintDelay: 25
+      actionHintDelay: 40
     - title: "T\xECm L\xF2 Xo Nh\u1EA1c"
       hint: "L\xF2 xo l\xE0 b\u1ED9 ph\u1EADn truy\u1EC1n l\u1EF1c cho h\u1ED9p nh\u1EA1c.
         N\xF3 c\xF3 th\u1EC3 n\u1EB1m g\u1EA7n nh\u1EEFng v\u1EADt d\u1EE5ng c\u01A1
         kh\xED ho\u1EB7c \u0111\u1ED3 v\u1EADt \u0111\xE3 h\u1ECFng."
-      detailedHint: "H\xE3y ki\u1EC3m tra nh\u1EEFng chi\u1EBFc t\u1EE7, b\xE0n s\u1EEDa
+      locationHint: 
+      actionHint: "H\xE3y ki\u1EC3m tra nh\u1EEFng chi\u1EBFc t\u1EE7, b\xE0n s\u1EEDa
         ch\u1EEFa ho\u1EB7c khu v\u1EF1c c\xF3 c\xE1c m\xF3n \u0111\u1ED3 kim lo\u1EA1i.
         \u0110\u1EBFn g\u1EA7n L\xF2 Xo Nh\u1EA1c v\xE0 nh\u1EA5n E \u0111\u1EC3
         nh\u1EB7t."
       hintShowDelay: 0
       hintHoldTime: -1
-      detailedHintDelay: 40
+      locationHintDelay: 25
+      actionHintDelay: 40
     - title: "S\u1EEDa ch\u1EEFa v\xE0 thu th\u1EADp \u0110\u0129a Nh\u1EA1c"
       hint: "\u0110\u0129a nh\u1EA1c \u0111\xE3 b\u1ECB v\u1EE1 th\xE0nh nhi\u1EC1u
         m\u1EA3nh. M\xECnh c\u1EA7n gh\xE9p n\xF3 l\u1EA1i tr\u01B0\u1EDBc khi c\xF3
         th\u1EC3 s\u1EED d\u1EE5ng."
-      detailedHint: "T\xECm chi\u1EBFc \u0111\u0129a v\u1EE1 g\u1EA7n c\u1EEDa s\u1ED5,
+      locationHint: 
+      actionHint: "T\xECm chi\u1EBFc \u0111\u0129a v\u1EE1 g\u1EA7n c\u1EEDa s\u1ED5,
         nh\u1EA5n E \u0111\u1EC3 m\u1EDF b\u1EA3ng gh\xE9p h\xECnh r\u1ED3i k\xE9o
         t\u1EEBng m\u1EA3nh v\xE0o \u0111\xFAng v\u1ECB tr\xED. Sau khi ho\xE0n th\xE0nh,
         h\xE3y nh\u1EB7t chi\u1EBFc \u0111\u0129a \u0111\xE3 \u0111\u01B0\u1EE3c
         s\u1EEDa."
       hintShowDelay: 0
       hintHoldTime: -1
-      detailedHintDelay: 45
+      locationHintDelay: 25
+      actionHintDelay: 45
     - title: "T\xECm Ch\xECa V\u1EB7n c\u1EE7a h\u1ED9p nh\u1EA1c"
       hint: "Ch\xECa v\u1EB7n c\xF3 th\u1EC3 \u0111\xE3 \u0111\u01B0\u1EE3c c\u1EA5t
         trong m\u1ED9t chi\u1EBFc h\u1ED9p b\u1ECB kh\xF3a."
-      detailedHint: "T\xECm chi\u1EBFc h\u1ED9p c\xF3 kh\xF3a k\xFD hi\u1EC7u ho\u1EB7c
+      locationHint: 
+      actionHint: "T\xECm chi\u1EBFc h\u1ED9p c\xF3 kh\xF3a k\xFD hi\u1EC7u ho\u1EB7c
         kh\xF3a s\u1ED1. Gi\u1EA3i m\u1EADt m\xE3, m\u1EDF n\u1EAFp h\u1ED9p r\u1ED3i
         nh\u1EA5n E \u0111\u1EC3 nh\u1EB7t Ch\xECa V\u1EB7n b\xEAn trong."
       hintShowDelay: 0
       hintHoldTime: -1
-      detailedHintDelay: 45
+      locationHintDelay: 25
+      actionHintDelay: 45
     - title: "L\u1EAFp r\xE1p v\xE0 kh\xF4i ph\u1EE5c h\u1ED9p nh\u1EA1c"
       hint: "M\xECnh \u0111\xE3 t\xECm \u0111\u1EE7 c\xE1c b\u1ED9 ph\u1EADn. B\xE2y
         gi\u1EDD c\u1EA7n mang ch\xFAng tr\u1EDF l\u1EA1i chi\u1EBFc h\u1ED9p nh\u1EA1c."
-      detailedHint: "Quay l\u1EA1i v\u1ECB tr\xED chi\u1EBFc h\u1ED9p nh\u1EA1c,
-        nh\u1EA5n E \u0111\u1EC3 \u0111\u1EB7t Con Thoi, L\xF2 Xo, \u0110\u0129a
-        Nh\u1EA1c v\xE0 Ch\xECa V\u1EB7n v\xE0o \u0111\xFAng v\u1ECB tr\xED."
+      locationHint: 
+      actionHint: "Quay l\u1EA1i v\u1ECB tr\xED chi\u1EBFc h\u1ED9p nh\u1EA1c, nh\u1EA5n
+        E \u0111\u1EC3 \u0111\u1EB7t Con Thoi, L\xF2 Xo, \u0110\u0129a Nh\u1EA1c
+        v\xE0 Ch\xECa V\u1EB7n v\xE0o \u0111\xFAng v\u1ECB tr\xED."
       hintShowDelay: 0
       hintHoldTime: -1
-      detailedHintDelay: 30
+      locationHintDelay: 25
+      actionHintDelay: 30
   - chapterTitle: "CH\u01AF\u01A0NG 3 - NGHI L\u1EC4 B\u1ECA CH\xD4N V\xD9I"
     characterThought: "Kh\xFAc nh\u1EA1c cu\u1ED1i c\xF9ng t\u1EEB h\u1ED9p nh\u1EA1c
       \u0111\xE3 d\u1EABn m\xECnh \u0111\u1EBFn khu nh\xE0 k\xEDnh c\u0169. C\xE1nh
@@ -143397,49 +143419,60 @@ MonoBehaviour:
     - title: "M\u1EDF kh\xF3a c\u0103n ph\xF2ng b\u1ECB ch\u1EB7n."
       hint: "C\xE1nh c\u1EEDa c\u0103n ph\xF2ng c\u0169 \u0111\xE3 b\u1ECB \u0111\xF3ng
         k\xEDn b\u1EB1ng nh\u1EEFng t\u1EA5m g\u1ED7."
-      detailedHint: "T\xECm c\xE2y x\xE0 beng quanh nh\xE0 kho, sau \u0111\xF3 mang
+      locationHint: 
+      actionHint: "T\xECm c\xE2y x\xE0 beng quanh nh\xE0 kho, sau \u0111\xF3 mang
         n\xF3 \u0111\u1EBFn c\xE1nh c\u1EEDa b\u1ECB ch\u1EB7n v\xE0 nh\u1EA5n E
         \u0111\u1EC3 ph\xE1 c\xE1c t\u1EA5m g\u1ED7."
       hintShowDelay: 1
       hintHoldTime: 3
-      detailedHintDelay: 35
+      locationHintDelay: 25
+      actionHintDelay: 35
     - title: "T\xECm Con M\u1EAFt Gi\xE1o Ph\xE1i"
       hint: "C\u0103n ph\xF2ng v\u1EEBa m\u1EDF \u0111ang c\u1EA5t gi\u1EA5u m\u1ED9t
         c\u1ED5 v\u1EADt c\xF3 h\xECnh con m\u1EAFt."
-      detailedHint: "\u0110i v\xE0o c\u0103n ph\xF2ng v\u1EEBa ph\xE1 c\u1EEDa. Ki\u1EC3m
+      locationHint: 
+      actionHint: "\u0110i v\xE0o c\u0103n ph\xF2ng v\u1EEBa ph\xE1 c\u1EEDa. Ki\u1EC3m
         tra c\xE1c k\u1EC7 \u0111\u1ED3 v\xE0 v\u1EADt tr\u01B0ng b\xE0y, sau \u0111\xF3
         nh\u1EA5n E \u0111\u1EC3 nh\u1EB7t Con M\u1EAFt."
       hintShowDelay: 0.8
       hintHoldTime: -1
-      detailedHintDelay: 35
+      locationHintDelay: 25
+      actionHintDelay: 35
     - title: "D\xF9ng Con M\u1EAFt t\xECm K\xFD T\u1EF1 Gi\xE1o Ph\xE1i"
       hint: "Con M\u1EAFt c\xF3 th\u1EC3 nh\xECn th\u1EA5y nh\u1EEFng d\u1EA5u v\u1EBFt
         m\xE0 m\u1EAFt th\u01B0\u1EDDng kh\xF4ng th\u1EC3 nh\u1EADn ra."
-      detailedHint: "C\u1EA7m Con M\u1EAFt, gi\u1EEF chu\u1ED9t ph\u1EA3i \u0111\u1EC3
+      locationHint: 
+      actionHint: "C\u1EA7m Con M\u1EAFt, gi\u1EEF chu\u1ED9t ph\u1EA3i \u0111\u1EC3
         k\xEDch ho\u1EA1t t\u1EA7m nh\xECn gi\xE1o ph\xE1i. T\xECm k\xFD t\u1EF1
         ph\xE1t s\xE1ng b\xEAn trong c\u0103n nh\xE0 r\u1ED3i nh\u1EA5n E \u0111\u1EC3
         thu th\u1EADp."
       hintShowDelay: 0.8
       hintHoldTime: -1
-      detailedHintDelay: 35
+      locationHintDelay: 25
+      actionHintDelay: 35
     - title: "T\xECm Tr\xE1i Tim v\xE0 Gi\u1ECDt M\xE1u "
       hint: "Hai v\u1EADt hi\u1EBFn t\u1EBF c\xF2n l\u1EA1i \u0111\u01B0\u1EE3c c\u1EA5t
         gi\u1EA5u trong m\xEA cung \u1EDF s\xE2n tr\u01B0\u1EDBc."
-      detailedHint: "Kh\xE1m ph\xE1 nh\u1EEFng nh\xE1nh kh\xE1c nhau c\u1EE7a m\xEA
+      locationHint: 
+      actionHint: "Kh\xE1m ph\xE1 nh\u1EEFng nh\xE1nh kh\xE1c nhau c\u1EE7a m\xEA
         cung. T\xECm Tr\xE1i Tim v\xE0 Gi\u1ECDt M\xE1u r\u1ED3i nh\u1EA5n E \u0111\u1EC3
         thu th\u1EADp."
       hintShowDelay: 0.8
       hintHoldTime: -1
-      detailedHintDelay: 45
+      locationHintDelay: 25
+      actionHintDelay: 45
     - title: "\u0110\u1EB7t 4 v\u1EADt ph\u1EA9m l\xEAn b\xE0n th\u1EDD"
       hint: "B\xE0n th\u1EDD \u0111ang ch\u1EDD Con M\u1EAFt, K\xFD T\u1EF1, Tr\xE1i
         Tim v\xE0 Gi\u1ECDt M\xE1u."
-      detailedHint: "Mang c\xE1c v\u1EADt ph\u1EA9m tr\u1EDF l\u1EA1i b\xE0n th\u1EDD
+      locationHint: 
+      actionHint: "Mang c\xE1c v\u1EADt ph\u1EA9m tr\u1EDF l\u1EA1i b\xE0n th\u1EDD
         phong \u1EA5n v\xE0 nh\u1EA5n E. B\u1EA1n c\xF3 th\u1EC3 \u0111\u1EB7t t\u1EEBng
         m\xF3n ho\u1EB7c nhi\u1EC1u m\xF3n c\xF9ng l\xFAc."
       hintShowDelay: 0.8
       hintHoldTime: -1
-      detailedHintDelay: 35
+      locationHintDelay: 25
+      actionHintDelay: 35
+  enableBuiltInChapterFour: 1
   startQuestAutomatically: 0
   progressRequirements:
   - chapterIndex: 0
@@ -143459,8 +143492,9 @@ MonoBehaviour:
   thoughtHoldTime: 2.5
   hintFadeDuration: 0.35
   hintTypeSpeed: 0.025
-  hintHoldTime: 5
+  hintHoldTime: 3
   autoShowDetailedHint: 1
+  minimumHintEscalationInterval: 20
   autoCompleteChapter: 1
 --- !u!224 &982221154
 RectTransform:
@@ -153676,7 +153710,7 @@ RectTransform:
   - {fileID: 668234957}
   - {fileID: 251588626}
   - {fileID: 142220468}
-  - {fileID: 1518815454}
+  - {fileID: 1099663872}
   m_Father: {fileID: 654073371}
   m_LocalEulerAnglesHint: {x: 0, y: 1, z: 0}
   m_AnchorMin: {x: 0, y: 1}
@@ -162074,6 +162108,95 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4434815940873872, guid: c712ccf9ad2f7d746bbf5cd7179a77e0, type: 3}
   m_PrefabInstance: {fileID: 1099203672}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1099663871
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1099663872}
+  - component: {fileID: 1099663875}
+  - component: {fileID: 1099663874}
+  - component: {fileID: 1099663873}
+  m_Layer: 5
+  m_Name: HintControlPanelGroup
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1099663872
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1099663871}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1518815454}
+  m_Father: {fileID: 1048436856}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 356.00003, y: -267.99994}
+  m_SizeDelta: {x: -739.18066, y: -550}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!225 &1099663873
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1099663871}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
+--- !u!114 &1099663874
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1099663871}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
+  m_Type: 1
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &1099663875
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1099663871}
+  m_CullTransparentMesh: 1
 --- !u!224 &1100373996 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 5280628944940504981, guid: a24d4993edfdfde478f1be90da93f9f4, type: 3}
@@ -168764,6 +168887,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   stoneType: 1
   pickupSound: {fileID: 0}
+  bluePrompt: "Nh\u1EA5n [E] \u0111\u1EC3 nh\u1EB7t \u0110\xE1 Xanh"
+  redPrompt: "Nh\u1EA5n [E] \u0111\u1EC3 nh\u1EB7t \u0110\xE1 \u0110\u1ECF"
 --- !u!1001 &1149319232
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -179844,6 +179969,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   stoneType: 0
   pickupSound: {fileID: 0}
+  bluePrompt: "Nh\u1EA5n [E] \u0111\u1EC3 nh\u1EB7t \u0110\xE1 Xanh"
+  redPrompt: "Nh\u1EA5n [E] \u0111\u1EC3 nh\u1EB7t \u0110\xE1 \u0110\u1ECF"
 --- !u!1001 &1223172090
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -221952,16 +222079,16 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1518815453}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 22.4}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1048436856}
+  m_Father: {fileID: 1099663872}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 356, y: -268}
-  m_SizeDelta: {x: 260.8193, y: 50}
+  m_AnchoredPosition: {x: 2124.3, y: -1157}
+  m_SizeDelta: {x: 387.1804, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1518815455
 MonoBehaviour:
@@ -222010,8 +222137,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 22
-  m_fontSizeBase: 22
+  m_fontSize: 32
+  m_fontSizeBase: 32
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 10
