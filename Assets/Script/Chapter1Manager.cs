@@ -29,6 +29,10 @@ public class Chapter1Manager : MonoBehaviour
     [SerializeField] private PlayableDirector victoryCutsceneTimeline;
     [SerializeField] private GameObject victoryCutsceneObject;
 
+    [Header("Vật phẩm mở khóa sau khi xong Chương 1")]
+    [Tooltip("Kéo object LaThu_DuoiDat vào đây - sẽ ẩn cho tới khi hết Chương 1")]
+    [SerializeField] private GameObject letterObject;
+
     [Header("Cấu hình Con Trỏ Chuột Custom")]
     [Tooltip("Ảnh bàn tay xòe ra khi rê chuột bình thường")]
     [SerializeField] private Texture2D handOpenTexture;
@@ -56,6 +60,9 @@ public class Chapter1Manager : MonoBehaviour
         if (puzzleMiniGameUI != null) puzzleMiniGameUI.SetActive(false);
         if (victoryCutsceneObject != null) victoryCutsceneObject.SetActive(false);
 
+        // Ẩn lá thư cho tới khi hoàn thành Chương 1
+        if (letterObject != null) letterObject.SetActive(false);
+
         // Đảm bảo lúc đầu game ảnh đen tàng hình
         if (fadeImage != null)
         {
@@ -81,7 +88,6 @@ public class Chapter1Manager : MonoBehaviour
             {
                 if (handClosedTexture != null)
                 {
-                    // Đã sửa Vector2.zero -> cursorHotspot (32, 10)
                     Cursor.SetCursor(handClosedTexture, cursorHotspot, CursorMode.Auto);
                 }
             }
@@ -89,7 +95,6 @@ public class Chapter1Manager : MonoBehaviour
             {
                 if (handOpenTexture != null)
                 {
-                    // Đã sửa Vector2.zero -> cursorHotspot (32, 10)
                     Cursor.SetCursor(handOpenTexture, cursorHotspot, CursorMode.Auto);
                 }
             }
@@ -275,6 +280,13 @@ public class Chapter1Manager : MonoBehaviour
 
         if (victoryCutsceneObject != null) victoryCutsceneObject.SetActive(false);
 
+        // Hết Chương 1 -> lá thư gợi ý mật mã xuất hiện
+        if (letterObject != null)
+        {
+            letterObject.SetActive(true);
+            Debug.Log("Lá thư đã xuất hiện trong phòng.");
+        }
+
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
 
@@ -289,7 +301,6 @@ public class Chapter1Manager : MonoBehaviour
     {
         if (handOpenTexture != null)
         {
-            // Đã sửa Vector2.zero -> cursorHotspot (32, 10)
             Cursor.SetCursor(handOpenTexture, cursorHotspot, CursorMode.Auto);
         }
     }
