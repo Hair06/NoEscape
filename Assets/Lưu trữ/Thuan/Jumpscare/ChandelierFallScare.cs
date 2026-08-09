@@ -2,7 +2,8 @@ using UnityEngine;
 using System.Collections;
 
 // Jumpscare den chum roi sap.
-// Nguoi choi buoc vao vung -> den rung nhe -> CAT NHAC NEN (im lang) -> day dut, den roi.
+// Nguoi choi buoc vao vung -> den rung + tieng cot ket -> CAT NHAC NEN -> day dut, den roi.
+// Tieng va dap phat DUNG LUC den cham san that.
 public class ChandelierFallScare : MonoBehaviour
 {
     [Header("Đèn chùm sẽ rơi")]
@@ -10,8 +11,8 @@ public class ChandelierFallScare : MonoBehaviour
     [SerializeField] private Transform chandelier;
 
     [Header("Giai đoạn RUNG báo hiệu")]
-    [Tooltip("Rung bao lâu trước khi rơi (giây)")]
-    [SerializeField] private float shakeDuration = 1.5f;
+    [Tooltip("Rung bao lâu trước khi rơi (giây) - nên khớp độ dài tiếng cọt kẹt")]
+    [SerializeField] private float shakeDuration = 2.3f;
     [Tooltip("Biên độ rung (mét)")]
     [SerializeField] private float shakeAmount = 0.025f;
     [Tooltip("Tốc độ rung")]
@@ -32,13 +33,22 @@ public class ChandelierFallScare : MonoBehaviour
     [SerializeField] private float torqueForce = 2f;
     [SerializeField] private float chandelierMass = 80f;
 
-    [Header("Âm thanh")]
+    [Header("═══ ÂM THANH ═══")]
+    [Tooltip("BẮT BUỘC: kéo AudioSource riêng vào đây (Spatial Blend = 2D, bỏ Play On Awake)")]
+    [SerializeField] private AudioSource scareAudioSource;
     [Tooltip("Tiếng xích cọt kẹt lúc rung")]
     [SerializeField] private AudioClip creakSound;
     [Tooltip("Tiếng va đập lớn khi chạm sàn")]
     [SerializeField] private AudioClip crashSound;
-    [Range(0f, 1f)]
-    [SerializeField] private float soundVolume = 1f;
+    [Range(0f, 3f)]
+    [Tooltip("Âm lượng - có thể đẩy lên trên 1 để to hơn")]
+    [SerializeField] private float soundVolume = 1.5f;
+
+    [Header("═══ THỜI ĐIỂM PHÁT TIẾNG VA ĐẬP ═══")]
+    [Tooltip("BẬT: phát đúng lúc đèn chạm sàn thật (chính xác, khuyên dùng).\nTẮT: phát sau số giây cố định bên dưới")]
+    [SerializeField] private bool playCrashOnRealImpact = true;
+    [Tooltip("Chỉ dùng khi TẮT tùy chọn trên")]
+    [SerializeField] private float crashDelay = 0.35f;
 
     [Header("Hiệu ứng bụi khi chạm sàn (tùy chọn)")]
     [SerializeField] private ParticleSystem dustVFX;
@@ -48,6 +58,7 @@ public class ChandelierFallScare : MonoBehaviour
     [SerializeField] private float destroyAfter = 0f;
 
     private bool triggered = false;
+    private bool crashPlayed = false;
     private Rigidbody chandelierRb;
     private Vector3 originalPosition;
     private float musicOriginalVolume = 1f;
@@ -71,13 +82,22 @@ public class ChandelierFallScare : MonoBehaviour
         chandelierRb.useGravity = false;
 
         if (chandelier.GetComponent<Collider>() == null)
-            Debug.LogWarning("[ChandelierFallScare] Đèn chùm chưa có Collider - sẽ rơi xuyên sàn!");
+            Debug.LogWarning("[ChandelierFallScare] Đèn chùm chưa có Collider - sẽ rơi xuyên sàn và không phát tiếng va đập!");
+
+        // Gan script bao va cham vao den chum
+        ChandelierImpact impact = chandelier.GetComponent<ChandelierImpact>();
+        if (impact == null)
+            impact = chandelier.gameObject.AddComponent<ChandelierImpact>();
+        impact.owner = this;
 
         if (dustVFX != null) dustVFX.gameObject.SetActive(false);
 
-        // Tu tim nhac nen neu chua gan
         if (backgroundMusic == null && AudioManager.Instance != null)
             backgroundMusic = AudioManager.Instance.musicSource;
+
+        if (scareAudioSource == null)
+            Debug.LogWarning("[ChandelierFallScare] Chưa gán 'Scare Audio Source'. " +
+                             "Âm thanh sẽ phát 3D và nghe rất nhỏ. Nên thêm AudioSource 2D.");
     }
 
     private void OnTriggerEnter(Collider other)
@@ -93,9 +113,8 @@ public class ChandelierFallScare : MonoBehaviour
     {
         Debug.Log("[ChandelierFallScare] Đèn chùm bắt đầu rung...");
 
-        // ===== 1. RUNG BAO HIEU =====
-        if (creakSound != null)
-            AudioSource.PlayClipAtPoint(creakSound, chandelier.position, soundVolume);
+        // ===== 1. RUNG + TIENG COT KET =====
+        PlayScareSound(creakSound);
 
         float t = 0f;
         while (t < shakeDuration)
@@ -139,17 +158,28 @@ public class ChandelierFallScare : MonoBehaviour
         chandelierRb.AddForce(randomSide * sideForce, ForceMode.VelocityChange);
         chandelierRb.AddTorque(Random.insideUnitSphere * torqueForce, ForceMode.VelocityChange);
 
-        // ===== 4. TIENG VA DAP + BUI =====
-        yield return new WaitForSeconds(0.35f);
-
-        if (crashSound != null)
-            AudioSource.PlayClipAtPoint(crashSound, chandelier.position, soundVolume);
-
-        if (dustVFX != null)
+        // ===== 4. TIENG VA DAP =====
+        if (playCrashOnRealImpact)
         {
-            dustVFX.gameObject.SetActive(true);
-            dustVFX.transform.position = chandelier.position;
-            dustVFX.Play();
+            // Doi den cham san that (ChandelierImpact se goi ve)
+            float timeout = 0f;
+            while (!crashPlayed && timeout < 5f)
+            {
+                timeout += Time.deltaTime;
+                yield return null;
+            }
+
+            // Neu qua 5 giay ma khong cham gi (roi hut) thi phat luon
+            if (!crashPlayed)
+            {
+                Debug.LogWarning("[ChandelierFallScare] Đèn không chạm gì sau 5 giây - kiểm tra Collider của sàn!");
+                PlayCrashNow(chandelier.position);
+            }
+        }
+        else
+        {
+            yield return new WaitForSeconds(crashDelay);
+            PlayCrashNow(chandelier.position);
         }
 
         // ===== 5. PHAT LAI NHAC NEN =====
@@ -166,7 +196,46 @@ public class ChandelierFallScare : MonoBehaviour
         if (destroyAfter > 0f)
         {
             yield return new WaitForSeconds(destroyAfter);
-            Destroy(chandelier.gameObject);
+            if (chandelier != null) Destroy(chandelier.gameObject);
+        }
+    }
+
+    // ChandelierImpact goi ve khi den cham san that
+    public void OnChandelierHitGround(Vector3 hitPoint)
+    {
+        if (crashPlayed) return;
+        PlayCrashNow(hitPoint);
+    }
+
+    private void PlayCrashNow(Vector3 position)
+    {
+        if (crashPlayed) return;
+        crashPlayed = true;
+
+        PlayScareSound(crashSound);
+
+        if (dustVFX != null)
+        {
+            dustVFX.gameObject.SetActive(true);
+            dustVFX.transform.position = position;
+            dustVFX.Play();
+        }
+
+        Debug.Log("[ChandelierFallScare] Đèn chạm sàn! Phát tiếng va đập.");
+    }
+
+    // Phat am thanh qua AudioSource 2D (to ro), neu chua gan thi phat 3D
+    private void PlayScareSound(AudioClip clip)
+    {
+        if (clip == null) return;
+
+        if (scareAudioSource != null)
+        {
+            scareAudioSource.PlayOneShot(clip, soundVolume);
+        }
+        else
+        {
+            AudioSource.PlayClipAtPoint(clip, chandelier.position, Mathf.Clamp01(soundVolume));
         }
     }
 
