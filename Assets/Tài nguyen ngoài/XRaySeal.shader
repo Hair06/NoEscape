@@ -3,13 +3,14 @@ Shader "Custom/XRaySeal"
     Properties
     {
         _MainTex ("Seal Texture", 2D) = "white" {}
-        _Color ("Seal Color", Color) = (1, 0, 0, 1)
+        [HDR] _Color ("Seal Color", Color) = (1, 0, 0, 1) // Thêm [HDR] để kích hoạt thanh Intensity
     }
     SubShader
     {
         Tags { "Queue"="Overlay" "RenderType"="Transparent" }
         
-        ZTest Always 
+        Cull Off       // Vẽ cả 2 mặt (không bị mất hình khi hạ camera thấp)
+        ZTest Always   // Luôn nhìn xuyên tường/bệ đá
         ZWrite Off
         Blend SrcAlpha OneMinusSrcAlpha
 

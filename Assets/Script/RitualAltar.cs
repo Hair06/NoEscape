@@ -6,13 +6,13 @@ using UnityEngine.InputSystem;
 public class RitualAltar : MonoBehaviour
 {
     [Header("Các đối tượng liên quan")]
-    public GameObject phongAn;      // Phong ấn gợi ý vị trí
+    public GameObject phongAn;      // Kí tự phong ấn gợi ý (Material X-Ray đỏ ZTest Always)
     public GameObject jarOnAltar;   // Chiếc bình trên bệ
     public ParticleSystem soulVFX;  // Hiệu ứng linh hồn
 
     [Header("Cấu hình Hiệu ứng")]
     [Tooltip("Thời gian hiệu ứng linh hồn chạy (tính bằng giây)")]
-    public float soulVFXDuration = 5f; // Chỉnh 5s ở đây hoặc trên Inspector
+    public float soulVFXDuration = 5f;
 
     [Header("Giao diện UI")]
     public TextMeshProUGUI promptText;
@@ -30,11 +30,24 @@ public class RitualAltar : MonoBehaviour
         if (promptText) promptText.gameObject.SetActive(false);
     }
 
+    // Hàm gọi từ SoulJar khi người chơi nhặt bình thành công
     public void OnPickUpJar()
     {
         hasJar = true;
-        // Bật phong ấn gợi ý khi nhặt bình
-        if (phongAn) phongAn.SetActive(true); 
+
+        // Bật phong ấn đỏ nhìn xuyên tường
+        if (phongAn) 
+        {
+            phongAn.SetActive(true); 
+            Debug.Log("[RitualAltar] Đã nhặt bình -> Bật Phong Ấn gợi ý!");
+        }
+
+        // Nếu người chơi đang đứng sẵn trong vùng Trigger của Bệ Tế thì hiện UI ngay
+        if (isNearPlayer && !isPlaced && promptText != null)
+        {
+            promptText.text = promptMessage;
+            promptText.gameObject.SetActive(true);
+        }
     }
 
     private void Update()
@@ -54,7 +67,6 @@ public class RitualAltar : MonoBehaviour
         if (phongAn) phongAn.SetActive(false);      // Tắt phong ấn gợi ý
         if (jarOnAltar) jarOnAltar.SetActive(true); // Hiện chiếc bình trên bệ
 
-        // Kích hoạt hiệu ứng linh hồn và tự tắt sau soulVFXDuration giây
         if (soulVFX)
         {
             StartCoroutine(PlaySoulVFXRoutine());
@@ -65,9 +77,9 @@ public class RitualAltar : MonoBehaviour
 
     private IEnumerator PlaySoulVFXRoutine()
     {
-        soulVFX.Play(); // Chạy hiệu ứng
-        yield return new WaitForSeconds(soulVFXDuration); // Chờ 5 giây (hoặc số giây đã cài)
-        soulVFX.Stop(); // Tắt phát hạt mới
+        soulVFX.Play();
+        yield return new WaitForSeconds(soulVFXDuration);
+        soulVFX.Stop();
     }
 
     private void OnTriggerEnter(Collider other)
