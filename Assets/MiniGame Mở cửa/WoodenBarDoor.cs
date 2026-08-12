@@ -16,7 +16,7 @@ public class WoodenBarDoor : MonoBehaviour, IInteractable
     [SerializeField, Min(0)] private int questSubQuestIndex = 0;
     [SerializeField, Min(1)] private int requiredProgress = 2;
 
-    [Header("Thanh gỗ chặn cửa")]
+    [Header("Thanh gỗ chặn cửa (Kéo thứ tự từ ngoài vào trong)")]
     public GameObject[] woodenBars;
 
     [Header("Cửa")]
@@ -34,6 +34,8 @@ public class WoodenBarDoor : MonoBehaviour, IInteractable
 
     private bool isOpened = false;
     private bool isPlayerInside = false;
+    private bool isPrying = false;       // Khóa chống spam phím E quá nhanh
+    private int currentBarIndex = 0;    // Đếm số thanh gỗ đã cậy
 
     private void Start()
     {
@@ -43,37 +45,35 @@ public class WoodenBarDoor : MonoBehaviour, IInteractable
 
     private void Update()
     {
-        if (!MiniGameFlowManager.IsChapterActive(
-                questChapterIndex))
+        if (!MiniGameFlowManager.IsChapterActive(questChapterIndex))
         {
-            if (promptText != null)
-                promptText.gameObject.SetActive(false);
+            if (promptText != null) promptText.gameObject.SetActive(false);
             return;
         }
 
-        if (isPlayerInside && !isOpened && GameInputBridge.GetKeyDown(KeyCode.E))
+        if (isPlayerInside && !isOpened && !isPrying && GameInputBridge.GetKeyDown(KeyCode.E))
+        {
             Interact();
+        }
     }
 
     public string GetInteractPrompt()
     {
-        if (!MiniGameFlowManager.IsChapterActive(
-                questChapterIndex))
+        if (!MiniGameFlowManager.IsChapterActive(questChapterIndex))
             return "";
 
         if (isOpened) return "";
-        if (PlayerInventory.Count(requiredItem) > 0)
-            return "Nhấn [E] để dùng xà beng phá các tấm gỗ";
-        return "Cần tìm xà beng để phá cửa";
+
+        if (PlayerInventory.Count(requiredItem) <= 0)
+            return "Cần tìm xà beng để phá cửa";
+
+        return $"Nhấn [E] để cậy thanh gỗ ({currentBarIndex}/{woodenBars.Length})";
     }
 
     public void Interact()
     {
-        if (!MiniGameFlowManager.IsChapterActive(
-                questChapterIndex))
-            return;
-
-        if (isOpened) return;
+        if (!MiniGameFlowManager.IsChapterActive(questChapterIndex)) return;
+        if (isOpened || isPrying) return;
 
         if (PlayerInventory.Count(requiredItem) <= 0)
         {
@@ -81,14 +81,80 @@ public class WoodenBarDoor : MonoBehaviour, IInteractable
             return;
         }
 
-        StartCoroutine(OpenDoor());
+        StartCoroutine(PrySingleBarRoutine());
     }
 
-    private IEnumerator OpenDoor()
+    private IEnumerator PrySingleBarRoutine()
+    {
+        isPrying = true;
+
+        if (currentBarIndex < woodenBars.Length)
+        {
+            GameObject barGroup = woodenBars[currentBarIndex];
+
+            if (barGroup != null)
+            {
+                // Tách nhóm thanh ván ra khỏi khung cửa
+                barGroup.transform.SetParent(null);
+
+                // Lấy tất cả Transform con (bao gồm cả barGroup) để bật vật lý rơi từng mảnh
+                Transform[] allParts = barGroup.GetComponentsInChildren<Transform>();
+
+                foreach (Transform part in allParts)
+                {
+                    // Nếu là object con có Mesh thì bật Rigidbody
+                    if (part.GetComponent<MeshRenderer>() != null)
+                    {
+                        Rigidbody rb = part.gameObject.GetComponent<Rigidbody>();
+                        if (rb == null) rb = part.gameObject.AddComponent<Rigidbody>();
+
+                        rb.isKinematic = false;
+                        rb.useGravity = true;
+
+                        Collider col = part.gameObject.GetComponent<Collider>();
+                        if (col != null) col.enabled = true;
+
+                        // Tạo lực bật thanh gỗ văng ra hướng người chơi
+                        Vector3 flyDir = (transform.forward + Vector3.up * 0.3f + new Vector3(Random.Range(-0.3f, 0.3f), 0, Random.Range(-0.3f, 0.3f))).normalized;
+                        rb.AddForce(flyDir * 4f, ForceMode.Impulse);
+                        rb.AddTorque(Random.insideUnitSphere * 5f, ForceMode.Impulse);
+                    }
+                }
+
+                // Tiếng cậy ván gỗ
+                if (audioSource != null && breakSound != null)
+                {
+                    audioSource.PlayOneShot(breakSound);
+                }
+
+                // Tự hủy nhóm ván sau 3 giây
+                Destroy(barGroup, 3f);
+            }
+
+            currentBarIndex++;
+
+            if (promptText != null && isPlayerInside)
+            {
+                promptText.text = GetInteractPrompt();
+            }
+
+            yield return new WaitForSeconds(0.4f);
+        }
+
+        // Nếu đã cậy hết cả 4 nhóm ván -> Mở cửa
+        if (currentBarIndex >= woodenBars.Length && !isOpened)
+        {
+            yield return StartCoroutine(OpenDoorSequence());
+        }
+
+        isPrying = false;
+    }
+
+    private IEnumerator OpenDoorSequence()
     {
         isOpened = true;
 
-        // ===== DUNG XONG XA BENG: xoa khoi hotbar + an khoi tay =====
+        // Dùng xong toàn bộ thanh gỗ -> xóa xà beng khỏi túi & ẩn khỏi tay
         PlayerInventory.RemoveAll(requiredItem);
 
         if (crowbarInHand != null)
@@ -97,42 +163,14 @@ public class WoodenBarDoor : MonoBehaviour, IInteractable
             Debug.Log("Đã cất xà beng khỏi tay.");
         }
 
-        if (audioSource != null && breakSound != null)
-        {
-            audioSource.clip = breakSound;
-            audioSource.Play();
-        }
-
-        foreach (GameObject bar in woodenBars)
-        {
-            if (bar == null) continue;
-
-            Rigidbody rb = bar.GetComponent<Rigidbody>();
-            if (rb == null) rb = bar.AddComponent<Rigidbody>();
-
-            Vector3 flyDir = new Vector3(
-                Random.Range(-1f, 1f),
-                Random.Range(0.5f, 1f),
-                Random.Range(-1f, 1f)
-            ).normalized;
-
-            rb.AddForce(flyDir * 5f, ForceMode.Impulse);
-            rb.AddTorque(Random.insideUnitSphere * 3f, ForceMode.Impulse);
-        }
-
-        yield return new WaitForSeconds(0.5f);
-
-        foreach (GameObject bar in woodenBars)
-        {
-            if (bar != null) Destroy(bar, 2f);
-        }
-
+        // Phát tiếng mở cửa
         if (audioSource != null && doorSound != null)
         {
             audioSource.clip = doorSound;
             audioSource.Play();
         }
 
+        // Xoay mở cửa
         if (door != null)
         {
             float elapsed = 0f;
@@ -150,7 +188,7 @@ public class WoodenBarDoor : MonoBehaviour, IInteractable
         if (promptText != null) promptText.gameObject.SetActive(false);
 
         ReportQuestProgress();
-        Debug.Log("Đã phá các tấm gỗ và mở cửa phòng chứa Con Mắt!");
+        Debug.Log("Đã cậy hết các thanh gỗ và mở cửa!");
     }
 
     private void ReportQuestProgress()
@@ -171,9 +209,7 @@ public class WoodenBarDoor : MonoBehaviour, IInteractable
 
     private void OnTriggerEnter(Collider other)
     {
-        if (!other.CompareTag("Player") ||
-            !MiniGameFlowManager.IsChapterActive(
-                questChapterIndex))
+        if (!other.CompareTag("Player") || !MiniGameFlowManager.IsChapterActive(questChapterIndex))
             return;
         isPlayerInside = true;
 
