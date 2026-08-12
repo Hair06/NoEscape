@@ -1,5 +1,6 @@
 using UnityEngine;
-using UnityEngine.InputSystem; // Bắt buộc cho New Input System
+using TMPro; // Thêm thư viện TextMeshPro
+using UnityEngine.InputSystem;
 
 public enum StoneType { Blue, Red }
 
@@ -7,6 +8,9 @@ public class StonePickup : MonoBehaviour
 {
     [Header("LOẠI ĐÁ")]
     public StoneType stoneType;
+
+    [Header("GIAO DIỆN UI GỢI Ý")]
+    [SerializeField] private TextMeshProUGUI promptText; // Kéo Text UI vào đây
 
     [Header("ÂM THANH NHẶT")]
     [SerializeField] private AudioSource pickupSound;
@@ -16,13 +20,28 @@ public class StonePickup : MonoBehaviour
 
     private bool isPlayerNearby = false;
 
+    private void Start()
+    {
+        // Ẩn UI prompt khi bắt đầu game
+        if (promptText != null)
+        {
+            promptText.gameObject.SetActive(false);
+        }
+    }
+
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))
         {
             isPlayerNearby = true;
-            string stoneName = (stoneType == StoneType.Blue) ? "Đá Xanh" : "Đá Đỏ";
-            Debug.Log($"[GỢI Ý] Nhấn [E] để nhặt {stoneName}");
+            
+            // Hiển thị dòng chữ gợi ý trên UI
+            if (promptText != null)
+            {
+                string stoneName = (stoneType == StoneType.Blue) ? "Đá Xanh" : "Đá Đỏ";
+                promptText.text = $"Nhấn [E] để nhặt {stoneName}";
+                promptText.gameObject.SetActive(true);
+            }
         }
     }
 
@@ -31,6 +50,12 @@ public class StonePickup : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             isPlayerNearby = false;
+
+            // Ẩn UI prompt khi người chơi đi ra xa
+            if (promptText != null)
+            {
+                promptText.gameObject.SetActive(false);
+            }
         }
     }
 
@@ -49,6 +74,12 @@ public class StonePickup : MonoBehaviour
         else if (stoneType == StoneType.Red) HasRedStone = true;
 
         if (pickupSound != null) pickupSound.Play();
+
+        // Ẩn dòng chữ UI ngay khi nhặt xong
+        if (promptText != null)
+        {
+            promptText.gameObject.SetActive(false);
+        }
 
         gameObject.SetActive(false);
     }
