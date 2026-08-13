@@ -152,6 +152,7 @@ public class QuestManager : MonoBehaviour
             if (!isShowingThought &&
                 !isCompletingChapter &&
                 chapterRoutine == null &&
+                hintRoutine == null &&
                 !IsSubQuestHintPresentationBlocked())
             {
                 ShowCurrentSubQuestHint();
@@ -698,7 +699,10 @@ public class QuestManager : MonoBehaviour
 
         while (isQuestVisible ||
                questToggleRoutine != null ||
-               chapterRoutine != null)
+               chapterRoutine != null ||
+               hintRoutine != null ||
+               gameplayUiSuppressed ||
+               IsSubQuestHintPresentationBlocked())
         {
             if (!IsSubQuestStillAvailable(
                     expectedSubQuestIndex))
@@ -965,7 +969,7 @@ public class QuestManager : MonoBehaviour
         {
             // Mở mục tiêu kế tiếp ngay lập tức để các
             // tương tác liên tiếp không bị mất sự kiện.
-            ActivateNextIncompleteSubQuest(false);
+            ActivateNextIncompleteSubQuest(true);
         }
 
         if (IsSubQuestHintPresentationBlocked())
@@ -1007,12 +1011,6 @@ public class QuestManager : MonoBehaviour
             {
                 StopCoroutine(hintRoutine);
                 hintRoutine = null;
-            }
-
-            if (scheduledHintRoutine != null)
-            {
-                StopCoroutine(scheduledHintRoutine);
-                scheduledHintRoutine = null;
             }
 
             HideCanvasGroupInstant(subQuestHintPanelGroup);
@@ -1078,10 +1076,6 @@ public class QuestManager : MonoBehaviour
             {
                 CompleteCurrentChapter();
             }
-        }
-        else
-        {
-            ScheduleCurrentSubQuestHint();
         }
     }
 

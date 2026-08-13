@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class PostCutsceneDashScare : MonoBehaviour
@@ -19,6 +20,8 @@ public class PostCutsceneDashScare : MonoBehaviour
     [SerializeField] private bool returnCameraAfterScare = true;
 
     [Header("Khóa điều khiển Player + Camera")]
+    [Tooltip("Script điều khiển di chuyển chính của Player. Nếu để trống, hệ thống sẽ tự tìm PlayerController hoặc vThirdPersonInput.")]
+    [SerializeField] private MonoBehaviour playerMovementController;
     [SerializeField] private MonoBehaviour[] scriptsToDisable;
 
     [Header("Menu hiện sau Jumpscare")]
@@ -49,18 +52,31 @@ public class PostCutsceneDashScare : MonoBehaviour
 
     private bool triggered;
     private bool forceLockCamera;
+    private bool gameplayControlLocked;
+
+    private readonly Dictionary<MonoBehaviour, bool>
+        gameplayScriptStates = new Dictionary<MonoBehaviour, bool>();
 
     private Vector3 originalCameraPos;
     private Quaternion originalCameraRot;
 
     private void Awake()
-{
-    if (ghoulHolder != null)
-        ghoulHolder.gameObject.SetActive(true);
+    {
+        ResolvePlayerMovementController();
 
-    if (ghoulVisual != null)
-        ghoulVisual.SetActive(false);
-}
+        if (ghoulHolder != null)
+            ghoulHolder.gameObject.SetActive(true);
+
+        if (ghoulVisual != null)
+            ghoulVisual.SetActive(false);
+    }
+
+    private void OnDisable()
+    {
+        // Không để Player bị khóa vĩnh viễn nếu object scare bị tắt giữa coroutine.
+        RestoreGameplayControl();
+        forceLockCamera = false;
+    }
 
     private void Update()
     {
@@ -389,12 +405,127 @@ public class PostCutsceneDashScare : MonoBehaviour
 
     private void SetGameplayControl(bool enabled)
     {
-        if (scriptsToDisable == null) return;
-
-        foreach (MonoBehaviour script in scriptsToDisable)
+        if (enabled)
         {
-            if (script != null)
-                script.enabled = enabled;
+            RestoreGameplayControl();
+            return;
         }
+
+        if (gameplayControlLocked)
+        {
+            return;
+        }
+
+        ResolvePlayerMovementController();
+        gameplayScriptStates.Clear();
+
+        RememberAndDisable(playerMovementController);
+
+        if (scriptsToDisable != null)
+        {
+            foreach (MonoBehaviour script in scriptsToDisable)
+            {
+                RememberAndDisable(script);
+            }
+        }
+
+        gameplayControlLocked = true;
+    }
+
+    private void RememberAndDisable(MonoBehaviour script)
+    {
+        if (script == null ||
+            script == this ||
+            gameplayScriptStates.ContainsKey(script))
+        {
+            return;
+        }
+
+        gameplayScriptStates.Add(script, script.enabled);
+        script.enabled = false;
+    }
+
+    private void RestoreGameplayControl()
+    {
+        if (!gameplayControlLocked && gameplayScriptStates.Count == 0)
+        {
+            return;
+        }
+
+        foreach (KeyValuePair<MonoBehaviour, bool> state
+                 in gameplayScriptStates)
+        {
+            if (state.Key != null)
+            {
+                state.Key.enabled = state.Value;
+            }
+        }
+
+        gameplayScriptStates.Clear();
+        gameplayControlLocked = false;
+    }
+
+    private void ResolvePlayerMovementController()
+    {
+        if (playerMovementController != null)
+        {
+            return;
+        }
+
+        if (playerCamera != null)
+        {
+            playerMovementController = FindMovementController(
+                playerCamera.GetComponentsInParent<MonoBehaviour>(true)
+            );
+        }
+
+        if (playerMovementController == null)
+        {
+            GameObject player = GameObject.FindGameObjectWithTag("Player");
+
+            if (player != null)
+            {
+                playerMovementController = FindMovementController(
+                    player.GetComponentsInChildren<MonoBehaviour>(true)
+                );
+            }
+        }
+
+        if (playerMovementController == null)
+        {
+            Debug.LogWarning(
+                "[PostCutsceneDashScare] Không tìm thấy script di chuyển Player. " +
+                "Hãy gán Player Movement Controller trong Inspector."
+            );
+        }
+    }
+
+    private static MonoBehaviour FindMovementController(
+        MonoBehaviour[] candidates)
+    {
+        if (candidates == null)
+        {
+            return null;
+        }
+
+        foreach (MonoBehaviour candidate in candidates)
+        {
+            if (candidate == null)
+            {
+                continue;
+            }
+
+            string typeName = candidate.GetType().FullName;
+
+            if (typeName ==
+                    "ElmanGameDevTools.PlayerSystem.PlayerController" ||
+                typeName ==
+                    "Invector.vCharacterController.vThirdPersonInput")
+            {
+                return candidate;
+            }
+        }
+
+        return null;
     }
 }

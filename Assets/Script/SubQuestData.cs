@@ -15,9 +15,9 @@ public class SubQuestData
     public string detailedHint;
 
     [Header("Thời gian hiển thị Sub Quest Hint")]
-    [Tooltip("Thời gian chờ sau khi nhiệm vụ nhỏ được kích hoạt rồi mới tự động hiện gợi ý.")]
+    [Tooltip("Thời gian chờ tính từ lúc nhiệm vụ nhỏ được kích hoạt rồi mới tự động hiện gợi ý.")]
     [Min(0f)]
-    public float hintShowDelay = 0f;
+    public float hintShowDelay = 5f;
 
     [Tooltip("Thời gian giữ bảng gợi ý sau khi chạy xong hiệu ứng chữ. Đặt -1 để dùng thời gian mặc định trong QuestManager.")]
     [Min(-1f)]
