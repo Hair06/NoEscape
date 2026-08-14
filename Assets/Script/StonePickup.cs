@@ -1,86 +1,131 @@
 using UnityEngine;
-using TMPro; // Thêm thư viện TextMeshPro
-using UnityEngine.InputSystem;
 
-public enum StoneType { Blue, Red }
-
-public class StonePickup : MonoBehaviour
+public enum StoneType
 {
-    [Header("LOẠI ĐÁ")]
-    public StoneType stoneType;
+    Blue,
+    Red,
+}
 
-    [Header("GIAO DIỆN UI GỢI Ý")]
-    [SerializeField] private TextMeshProUGUI promptText; // Kéo Text UI vào đây
+public class StonePickup : MonoBehaviour, IInteractable
+{
+    private const int ChapterIndex = 4;
+    private const int FindStonesSubQuestIndex = 0;
+    private const int RequiredStones = 2;
 
-    [Header("ÂM THANH NHẶT")]
-    [SerializeField] private AudioSource pickupSound;
+    [Header("Loại đá")]
+    [SerializeField] private StoneType stoneType;
 
-    public static bool HasBlueStone { get; set; } = false;
-    public static bool HasRedStone { get; set; } = false;
+    [Header("Âm thanh nhặt")]
+    [SerializeField] private AudioClip pickupClip;
 
-    private bool isPlayerNearby = false;
+    [Header("Chữ tương tác")]
+    [SerializeField]
+    private string bluePrompt = "Nhấn [E] để nhặt Đá Xanh";
 
-    private void Start()
+    [SerializeField]
+    private string redPrompt = "Nhấn [E] để nhặt Đá Đỏ";
+
+    public static bool HasBlueStone { get; private set; }
+    public static bool HasRedStone { get; private set; }
+
+    private bool taken;
+
+    [RuntimeInitializeOnLoadMethod(
+        RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetStaticState()
     {
-        // Ẩn UI prompt khi bắt đầu game
-        if (promptText != null)
-        {
-            promptText.gameObject.SetActive(false);
-        }
+        HasBlueStone = false;
+        HasRedStone = false;
     }
 
-    private void OnTriggerEnter(Collider other)
+    public string GetInteractPrompt()
     {
-        if (other.CompareTag("Player"))
+        if (!CanPickup())
         {
-            isPlayerNearby = true;
-            
-            // Hiển thị dòng chữ gợi ý trên UI
-            if (promptText != null)
-            {
-                string stoneName = (stoneType == StoneType.Blue) ? "Đá Xanh" : "Đá Đỏ";
-                promptText.text = $"Nhấn [E] để nhặt {stoneName}";
-                promptText.gameObject.SetActive(true);
-            }
+            return "";
         }
+
+        return stoneType == StoneType.Blue
+            ? bluePrompt
+            : redPrompt;
     }
 
-    private void OnTriggerExit(Collider other)
+    public void Interact()
     {
-        if (other.CompareTag("Player"))
+        if (!CanPickup())
         {
-            isPlayerNearby = false;
-
-            // Ẩn UI prompt khi người chơi đi ra xa
-            if (promptText != null)
-            {
-                promptText.gameObject.SetActive(false);
-            }
-        }
-    }
-
-    private void Update()
-    {
-        // Bắt phím E bằng New Input System
-        if (isPlayerNearby && Keyboard.current != null && Keyboard.current.eKey.wasPressedThisFrame)
-        {
-            InteractPickup();
-        }
-    }
-
-    public void InteractPickup()
-    {
-        if (stoneType == StoneType.Blue) HasBlueStone = true;
-        else if (stoneType == StoneType.Red) HasRedStone = true;
-
-        if (pickupSound != null) pickupSound.Play();
-
-        // Ẩn dòng chữ UI ngay khi nhặt xong
-        if (promptText != null)
-        {
-            promptText.gameObject.SetActive(false);
+            return;
         }
 
+        taken = true;
+
+        string inventoryName;
+
+        if (stoneType == StoneType.Blue)
+        {
+            HasBlueStone = true;
+            inventoryName = "DaXanh";
+        }
+        else
+        {
+            HasRedStone = true;
+            inventoryName = "DaDo";
+        }
+
+        PlayerInventory.Add(inventoryName);
+
+        if (pickupClip != null)
+        {
+            AudioSource.PlayClipAtPoint(
+                pickupClip,
+                transform.position
+            );
+        }
+
+        if (QuestManager.Instance != null)
+        {
+            QuestManager.Instance.ReportProgressForChapter(
+                ChapterIndex,
+                FindStonesSubQuestIndex,
+                1,
+                RequiredStones
+            );
+        }
+
+        Debug.Log("Đã nhặt " + GetStoneDisplayName() + ".");
         gameObject.SetActive(false);
+    }
+
+    public static void Consume(StoneType type)
+    {
+        if (type == StoneType.Blue)
+        {
+            HasBlueStone = false;
+            PlayerInventory.RemoveAll("DaXanh");
+            return;
+        }
+
+        HasRedStone = false;
+        PlayerInventory.RemoveAll("DaDo");
+    }
+
+    private bool CanPickup()
+    {
+        QuestManager questManager = QuestManager.Instance;
+
+        return !taken &&
+               questManager != null &&
+               MiniGameFlowManager.IsChapterActive(ChapterIndex) &&
+               questManager.CurrentChapterIndex == ChapterIndex &&
+               questManager.CurrentSubQuestIndex ==
+                   FindStonesSubQuestIndex &&
+               !questManager.IsChapterTransitioning;
+    }
+
+    private string GetStoneDisplayName()
+    {
+        return stoneType == StoneType.Blue
+            ? "Đá Xanh"
+            : "Đá Đỏ";
     }
 }

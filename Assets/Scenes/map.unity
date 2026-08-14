@@ -34807,7 +34807,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 0, y: -100}
+  m_AnchoredPosition: {x: 0, y: -86}
   m_SizeDelta: {x: 1000, y: 80}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &225885701
@@ -90748,8 +90748,10 @@ MonoBehaviour:
   doorStoneTransform: {fileID: 112657917}
   sinkDistance: 5
   sinkSpeed: 1
+  completeDistance: 0.01
   placeStoneSound: {fileID: 62298501}
   openDoorSound: {fileID: 1678062211}
+  openDoorVfx: {fileID: 0}
 --- !u!1001 &621313690
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -97027,7 +97029,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: -4.0807, y: -191}
+  m_AnchoredPosition: {x: -4.0807, y: -169}
   m_SizeDelta: {x: 881.6275, y: 93.0015}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &668234958
@@ -144174,6 +144176,59 @@ MonoBehaviour:
       hintShowDelay: 0.8
       hintHoldTime: -1
       detailedHintDelay: 35
+  - chapterTitle: "CH\u01AF\u01A0NG 4 - GI\u1EA2I THO\xC1T LINH H\u1ED2N"
+    characterThought: "C\xE1nh c\u1EEDa \u0111\xE1 \u0111ang g\u1ECDi m\xECnh...
+      Hai h\u1ED1c b\u1EC7 mang m\xE0u xanh v\xE0 \u0111\u1ECF. Th\u1EE9 b\u1ECB
+      gi\u1EA5u sau \u0111\xF3 c\xF3 l\u1EBD l\xE0 m\u1EA3nh k\xFD \u1EE9c cu\u1ED1i
+      c\xF9ng c\u1EE7a m\u1EB9."
+    characterThoughtDelay: 0.8
+    characterThoughtHoldTime: 5
+    mainQuest: "M\u1EDF c\xE1nh c\u1EEDa b\u1EC7 \u0111\xE1, l\u1EA5y B\xECnh Linh
+      H\u1ED3n v\xE0 \u0111\u01B0a n\xF3 v\u1EC1 b\u1EC7 c\u1ED5 ngo\xE0i khu phong
+      \u1EA5n."
+    waitForTransitionSignal: 0
+    nextChapterStartDelay: 0.8
+    chapterCompleteMessage: "B\xECnh Linh H\u1ED3n \u0111\xE3 tr\u1EDF v\u1EC1 b\u1EC7
+      c\u1ED5. Nghi l\u1EC5 cu\u1ED1i c\xF9ng \u0111ang b\u1EAFt \u0111\u1EA7u..."
+    allowOutOfOrderCompletion: 0
+    subQuests:
+    - title: "T\xECm \u0110\xE1 Xanh v\xE0 \u0110\xE1 \u0110\u1ECF"
+      hint: "Hai h\u1ED1c tr\xEAn b\u1EC7 mang s\u1EAFc xanh v\xE0 \u0111\u1ECF.
+        Nh\u1EEFng vi\xEAn \u0111\xE1 t\u01B0\u01A1ng \u1EE9ng h\u1EB3n v\u1EABn
+        c\xF2n quanh khu t\xE0n t\xEDch."
+      detailedHint: "T\xECm \u1EDF hai nh\xE1nh kh\xE1c nhau tr\xEAn t\u1EA7ng g\xE1c
+        v\xE0 l\u1ED1i d\u1EABn \u0111\u1EBFn c\xE1nh c\u1EEDa b\u1EC7 \u0111\xE1."
+      hintShowDelay: 5
+      hintHoldTime: 3
+      detailedHintDelay: 35
+    - title: "\u0110\u1EB7t hai vi\xEAn \u0111\xE1 l\xEAn \u0111\xFAng b\u1EC7 v\xE0
+        m\u1EDF c\u1EEDa phong \u1EA5n"
+      hint: "M\xE0u s\u1EAFc tr\xEAn m\u1ED7i vi\xEAn \u0111\xE1 tr\xF9ng v\u1EDBi
+        \xE1nh s\xE1ng ph\xE1t ra t\u1EEB hai chi\u1EBFc b\u1EC7."
+      detailedHint: "Hai chi\u1EBFc b\u1EC7 n\u1EB1m ngay tr\u01B0\u1EDBc c\xE1nh
+        c\u1EEDa \u0111\xE1. M\u1ED9t b\u1EC7 ph\xE1t s\xE1ng xanh v\xE0 m\u1ED9t
+        b\u1EC7 ph\xE1t s\xE1ng \u0111\u1ECF."
+      hintShowDelay: 5
+      hintHoldTime: -1
+      detailedHintDelay: 35
+    - title: "Nh\u1EB7t B\xECnh Linh H\u1ED3n"
+      hint: "T\u1EEB ph\xEDa sau c\xE1nh c\u1EEDa v\u1EEBa m\u1EDF \u0111ang vang
+        l\xEAn nh\u1EEFng ti\u1EBFng th\xEC th\u1EA7m r\u1EA5t nh\u1ECF."
+      detailedHint: "\u0110i v\xE0o c\u0103n ph\xF2ng \u0111\xE1 ph\xEDa sau c\xE1nh
+        c\u1EEDa. B\xECnh Linh H\u1ED3n n\u1EB1m tr\xEAn b\u1EC7 \u1EDF s\xE2u b\xEAn
+        trong."
+      hintShowDelay: 5
+      hintHoldTime: -1
+      detailedHintDelay: 35
+    - title: "\u0110\u01B0a B\xECnh Linh H\u1ED3n \u0111\u1EBFn b\u1EC7 c\u1ED5 "
+      hint: "Chi\u1EBFc b\xECnh \u0111ang ph\u1EA3n \u1EE9ng v\u1EDBi n\u01A1i nghi
+        l\u1EC5 b\u1EAFt \u0111\u1EA7u. Linh h\u1ED3n b\xEAn trong mu\u1ED1n \u0111\u01B0\u1EE3c
+        \u0111\u01B0a tr\u1EDF l\u1EA1i \u0111\xF3."
+      detailedHint: "R\u1EDDi khu c\u1EEDa \u0111\xE1 v\xE0 quay l\u1EA1i b\u1EC7
+        c\u1ED5 n\u1EB1m ngo\xE0i khu hi\u1EBFn t\u1EBF"
+      hintShowDelay: 5
+      hintHoldTime: -1
+      detailedHintDelay: 35
   startQuestAutomatically: 0
   progressRequirements:
   - chapterIndex: 0
@@ -144188,9 +144243,12 @@ MonoBehaviour:
   - chapterIndex: 3
     subQuestIndex: 0
     requiredAmount: 5
-  fadeDuration: 0.5
+  - chapterIndex: 4
+    subQuestIndex: 0
+    requiredAmount: 4
+  fadeDuration: 0.4
   typeSpeed: 0.02
-  autoHideTime: 2
+  autoHideTime: 4
   thoughtFadeDuration: 0.4
   thoughtTypeSpeed: 0.035
   thoughtHoldTime: 2.5
@@ -164633,6 +164691,9 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
+  completeQuestOnEnd: 1
+  startNextChapterOnEnd: 1
+  notifyChapterOneManagerOnEnd: 1
   afterCutsceneScare: {fileID: 0}
   scareDelay: 2
 --- !u!114 &1112358169
@@ -169685,8 +169746,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   stoneType: 1
-  promptText: {fileID: 1896452819}
-  pickupSound: {fileID: 0}
+  pickupClip: {fileID: 0}
+  bluePrompt: "Nh\u1EA5n [E] \u0111\u1EC3 nh\u1EB7t \u0110\xE1 Xanh"
+  redPrompt: "Nh\u1EA5n [E] \u0111\u1EC3 nh\u1EB7t \u0110\xE1 \u0110\u1ECF"
 --- !u!1001 &1149319232
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -173923,6 +173985,9 @@ MonoBehaviour:
   - {fileID: 0}
   objectsToHide:
   - {fileID: 1517797187}
+  completeQuestOnEnd: 1
+  startNextChapterOnEnd: 1
+  notifyChapterOneManagerOnEnd: 1
   afterCutsceneScare: {fileID: 54831473}
   scareDelay: 3
 --- !u!82 &1180164972
@@ -180869,8 +180934,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   stoneType: 0
-  promptText: {fileID: 1896452819}
-  pickupSound: {fileID: 0}
+  pickupClip: {fileID: 0}
+  bluePrompt: "Nh\u1EA5n [E] \u0111\u1EC3 nh\u1EB7t \u0110\xE1 Xanh"
+  redPrompt: "Nh\u1EA5n [E] \u0111\u1EC3 nh\u1EB7t \u0110\xE1 \u0110\u1ECF"
 --- !u!1001 &1223172090
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -307473,6 +307539,9 @@ MonoBehaviour:
   - {fileID: 229146777}
   - {fileID: 1550016896}
   - {fileID: 59757651}
+  completeQuestOnEnd: 1
+  startNextChapterOnEnd: 1
+  notifyChapterOneManagerOnEnd: 1
   afterCutsceneScare: {fileID: 0}
   scareDelay: 2
 --- !u!114 &2055690570

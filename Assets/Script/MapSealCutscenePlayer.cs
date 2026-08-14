@@ -1,7 +1,7 @@
 using System.Collections;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
 
 public class MapSealCutscenePlayer : MonoBehaviour
 {
@@ -11,7 +11,7 @@ public class MapSealCutscenePlayer : MonoBehaviour
     public TextMeshProUGUI dialogueText;
     public AudioSource audioSource;
 
-    [Header("Nhạc nền (tắt khi cutscene chạy)")]
+    [Header("Nhạc nền tắt khi cutscene chạy")]
     public AudioSource bgMusic;
 
     [Header("Cutscene Root")]
@@ -28,8 +28,25 @@ public class MapSealCutscenePlayer : MonoBehaviour
     public MonoBehaviour[] scriptsToDisable;
     public GameObject[] objectsToHide;
 
+    [Header("Quest Transition")]
+    [Tooltip(
+        "Bật để hoàn thành nhiệm vụ hiện tại sau khi cutscene kết thúc.")]
+    [SerializeField]
+    private bool completeQuestOnEnd = true;
+
+    [Tooltip(
+        "Tắt ở cutscene cuối Chương 4 vì không còn Chương 5.")]
+    [SerializeField]
+    private bool startNextChapterOnEnd = true;
+
+    [Tooltip(
+        "Chỉ bật ở cutscene cần báo lại cho Chapter1Manager.")]
+    [SerializeField]
+    private bool notifyChapterOneManagerOnEnd = true;
+
     [Header("After Cutscene Scare")]
-    [SerializeField] private PostCutsceneDashScare afterCutsceneScare;
+    [SerializeField]
+    private PostCutsceneDashScare afterCutsceneScare;
 
     [Header("Scare Delay")]
     [SerializeField] private float scareDelay = 2f;
@@ -43,18 +60,25 @@ public class MapSealCutscenePlayer : MonoBehaviour
         SetImageAlpha(imageB, 0f);
 
         if (cutsceneRoot != null)
+        {
             cutsceneRoot.SetActive(false);
+        }
     }
 
     private void Start()
     {
         if (audioSource == null)
+        {
             audioSource = GetComponent<AudioSource>();
+        }
     }
 
     private void Update()
     {
-        if (!isPlaying) return;
+        if (!isPlaying)
+        {
+            return;
+        }
 
         if (GameInputBridge.GetKeyDown(KeyCode.Space) ||
             GameInputBridge.GetMouseButtonDown(0))
@@ -65,7 +89,10 @@ public class MapSealCutscenePlayer : MonoBehaviour
 
     public void PlayCutscene()
     {
-        if (isPlaying) return;
+        if (isPlaying)
+        {
+            return;
+        }
 
         if (QuestManager.Instance != null)
         {
@@ -73,7 +100,9 @@ public class MapSealCutscenePlayer : MonoBehaviour
         }
 
         if (cutsceneRoot != null)
+        {
             cutsceneRoot.SetActive(true);
+        }
 
         StartCoroutine(PlayRoutine());
     }
@@ -83,8 +112,10 @@ public class MapSealCutscenePlayer : MonoBehaviour
         isPlaying = true;
         DisableGameplay();
 
-        // Tắt nhạc nền
-        if (bgMusic != null) bgMusic.Pause();
+        if (bgMusic != null)
+        {
+            bgMusic.Pause();
+        }
 
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
@@ -95,7 +126,11 @@ public class MapSealCutscenePlayer : MonoBehaviour
             yield break;
         }
 
-        imageA.sprite = frames[0].image;
+        if (imageA != null)
+        {
+            imageA.sprite = frames[0].image;
+        }
+
         SetImageAlpha(imageA, 1f);
         SetImageAlpha(imageB, 0f);
 
@@ -113,24 +148,39 @@ public class MapSealCutscenePlayer : MonoBehaviour
     private IEnumerator ShowFrame(CutsceneFrame frame)
     {
         nextFrameRequested = false;
-        dialogueText.text = "";
+
+        if (dialogueText != null)
+        {
+            dialogueText.text = "";
+        }
 
         PlayVoice(frame.voiceClip);
 
-        foreach (char c in frame.dialogue)
+        string dialogue = frame.dialogue ?? "";
+
+        foreach (char character in dialogue)
         {
             if (nextFrameRequested)
             {
-                dialogueText.text = frame.dialogue;
+                if (dialogueText != null)
+                {
+                    dialogueText.text = dialogue;
+                }
+
                 nextFrameRequested = false;
                 break;
             }
 
-            dialogueText.text += c;
+            if (dialogueText != null)
+            {
+                dialogueText.text += character;
+            }
+
             yield return new WaitForSecondsRealtime(typeSpeed);
         }
 
         float timer = 0f;
+
         while (timer < frame.waitTime)
         {
             if (nextFrameRequested)
@@ -146,17 +196,31 @@ public class MapSealCutscenePlayer : MonoBehaviour
 
     private IEnumerator CrossFade(CutsceneFrame frame)
     {
+        if (imageA == null || imageB == null)
+        {
+            if (imageA != null)
+            {
+                imageA.sprite = frame.image;
+            }
+
+            yield break;
+        }
+
         imageB.sprite = frame.image;
         SetImageAlpha(imageB, 0f);
 
         float timer = 0f;
+
         while (timer < fadeDuration)
         {
             timer += Time.unscaledDeltaTime;
-            float t = Mathf.Clamp01(timer / fadeDuration);
 
-            SetImageAlpha(imageA, 1f - t);
-            SetImageAlpha(imageB, t);
+            float normalizedTime = fadeDuration <= 0f
+                ? 1f
+                : Mathf.Clamp01(timer / fadeDuration);
+
+            SetImageAlpha(imageA, 1f - normalizedTime);
+            SetImageAlpha(imageB, normalizedTime);
 
             yield return null;
         }
@@ -170,10 +234,15 @@ public class MapSealCutscenePlayer : MonoBehaviour
     {
         isPlaying = false;
 
-        if (audioSource != null) audioSource.Stop();
+        if (audioSource != null)
+        {
+            audioSource.Stop();
+        }
 
-        // Bật lại nhạc nền
-        if (bgMusic != null) bgMusic.UnPause();
+        if (bgMusic != null)
+        {
+            bgMusic.UnPause();
+        }
 
         EnableGameplay();
 
@@ -181,17 +250,20 @@ public class MapSealCutscenePlayer : MonoBehaviour
         Cursor.visible = false;
 
         if (cutsceneRoot != null)
+        {
             cutsceneRoot.SetActive(false);
+        }
 
-        if (Chapter1Manager.Instance != null)
+        if (notifyChapterOneManagerOnEnd &&
+            Chapter1Manager.Instance != null)
+        {
             Chapter1Manager.Instance.OnCutsceneFinished();
+        }
 
         QuestManager questManager = QuestManager.Instance;
 
-        if (questManager != null)
+        if (questManager != null && completeQuestOnEnd)
         {
-            // Khóa chương cũ sau khi cutscene kết thúc, nhưng chưa mở chương mới.
-            // Chương mới sẽ chờ jumpscare hoặc chuyển cảnh gửi tín hiệu bàn giao.
             questManager.CompleteCurrentSubQuest();
             questManager.CompleteCurrentChapter();
         }
@@ -199,35 +271,40 @@ public class MapSealCutscenePlayer : MonoBehaviour
         if (afterCutsceneScare != null)
         {
             StartCoroutine(StartScareAfterDelay());
+            return;
         }
-        else
+
+        if (questManager != null)
         {
-            // Không có jumpscare: cutscene chính là điểm kết thúc chuyển cảnh.
-            if (questManager != null)
+            questManager.SetGameplayUiSuppressed(
+                false,
+                false
+            );
+
+            if (startNextChapterOnEnd)
             {
-                questManager.SetGameplayUiSuppressed(
-                    false,
-                    false
-                );
                 questManager.RequestStartNextChapter();
             }
-
-            Debug.LogWarning(
-                "Chưa gán After Cutscene Scare; chương kế tiếp sẽ bắt đầu sau cutscene."
-            );
         }
     }
 
     private IEnumerator StartScareAfterDelay()
     {
         yield return new WaitForSecondsRealtime(scareDelay);
+
         if (afterCutsceneScare != null)
+        {
             afterCutsceneScare.TriggerScare();
+        }
     }
 
     private void PlayVoice(AudioClip clip)
     {
-        if (audioSource == null || clip == null) return;
+        if (audioSource == null || clip == null)
+        {
+            return;
+        }
+
         audioSource.Stop();
         audioSource.clip = clip;
         audioSource.Play();
@@ -235,27 +312,63 @@ public class MapSealCutscenePlayer : MonoBehaviour
 
     private void DisableGameplay()
     {
-        foreach (MonoBehaviour script in scriptsToDisable)
-            if (script != null) script.enabled = false;
+        if (scriptsToDisable != null)
+        {
+            foreach (MonoBehaviour script in scriptsToDisable)
+            {
+                if (script != null)
+                {
+                    script.enabled = false;
+                }
+            }
+        }
 
-        foreach (GameObject obj in objectsToHide)
-            if (obj != null) obj.SetActive(false);
+        if (objectsToHide != null)
+        {
+            foreach (GameObject targetObject in objectsToHide)
+            {
+                if (targetObject != null)
+                {
+                    targetObject.SetActive(false);
+                }
+            }
+        }
     }
 
     private void EnableGameplay()
     {
-        foreach (MonoBehaviour script in scriptsToDisable)
-            if (script != null) script.enabled = true;
+        if (scriptsToDisable != null)
+        {
+            foreach (MonoBehaviour script in scriptsToDisable)
+            {
+                if (script != null)
+                {
+                    script.enabled = true;
+                }
+            }
+        }
 
-        foreach (GameObject obj in objectsToHide)
-            if (obj != null) obj.SetActive(true);
+        if (objectsToHide != null)
+        {
+            foreach (GameObject targetObject in objectsToHide)
+            {
+                if (targetObject != null)
+                {
+                    targetObject.SetActive(true);
+                }
+            }
+        }
     }
 
-    private void SetImageAlpha(Image img, float alpha)
+    private static void SetImageAlpha(Image image, float alpha)
     {
-        if (img == null) return;
-        Color c = img.color;
-        c.a = alpha;
-        img.color = c;
+        if (image == null)
+        {
+            return;
+        }
+
+        Color color = image.color;
+        color.a = alpha;
+        image.color = color;
     }
 }

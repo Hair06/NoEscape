@@ -87,6 +87,7 @@ public class QuestManager : MonoBehaviour
 
     public bool IsQuestFlowStarted => questFlowStarted;
     public int CurrentChapterIndex => currentChapterIndex;
+    public int CurrentSubQuestIndex => currentSubQuestIndex;
     public bool IsChapterTransitioning =>
         isCompletingChapter || pendingNextChapterIndex >= 0;
 
