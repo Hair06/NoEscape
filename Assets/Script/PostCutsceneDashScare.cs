@@ -353,14 +353,47 @@ public class PostCutsceneDashScare : MonoBehaviour
             yield break;
         }
 
+        // AudioClip này đang tắt Preload Audio Data trong Import Settings.
+        // Nếu gọi Play ngay, Unity có thể chưa nạp xong và đoạn nhạc sẽ im lặng.
+        if (musicBoxClip.loadState != AudioDataLoadState.Loaded)
+        {
+            musicBoxClip.LoadAudioData();
+
+            float loadTimer = 0f;
+            const float loadTimeout = 5f;
+
+            while (musicBoxClip.loadState != AudioDataLoadState.Loaded &&
+                   musicBoxClip.loadState != AudioDataLoadState.Failed &&
+                   loadTimer < loadTimeout)
+            {
+                loadTimer += Time.unscaledDeltaTime;
+                yield return null;
+            }
+
+            if (musicBoxClip.loadState != AudioDataLoadState.Loaded)
+            {
+                Debug.LogWarning(
+                    "Không thể nạp Music Box Clip; bỏ qua đoạn nhạc chuyển sang Chương 2."
+                );
+                yield break;
+            }
+        }
+
         GameObject audioObj = new GameObject("MusicBoxTransitionCue");
         AudioSource source = audioObj.AddComponent<AudioSource>();
 
+        source.playOnAwake = false;
         source.clip = musicBoxClip;
         source.volume = musicBoxVolume;
         source.spatialBlend = 0f;
         source.loop = false;
+        source.ignoreListenerPause = true;
+        source.priority = 0;
         source.Play();
+
+        Debug.Log(
+            "Đang phát đoạn nhạc hộp nhạc dẫn vào Chương 2."
+        );
 
         float duration = Mathf.Min(musicBoxDuration, musicBoxClip.length);
         float fadeDuration = Mathf.Min(musicBoxFadeOutDuration, duration);

@@ -30,8 +30,8 @@ public class QuestManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI activeSubQuestText;
     [SerializeField] private TextMeshProUGUI subQuestHintText;
 
-    [Header("Hint Control luôn hiện trong Gameplay")]
-    [Tooltip("CanvasGroup riêng chứa dòng 'H để xem lại gợi ý'. Object này phải nằm NGOÀI SubQuestHintPanel.")]
+    [Header("Hint Control đi cùng bảng nhiệm vụ")]
+    [Tooltip("CanvasGroup riêng chứa dòng 'H để xem lại gợi ý'. Dòng này sẽ ẩn/hiện và fade theo QuestPanel.")]
     [SerializeField] private CanvasGroup hintControlPanelGroup;
     [SerializeField] private TextMeshProUGUI hintControlText;
 
@@ -1138,6 +1138,7 @@ public class QuestManager : MonoBehaviour
 
         bool hasReviewableHint =
             questFlowStarted &&
+            !gameplayUiSuppressed &&
             !subQuestHintsSuppressed &&
             !isCompletingChapter &&
             currentSubQuestIndex >= 0 &&
@@ -1145,8 +1146,16 @@ public class QuestManager : MonoBehaviour
             currentSubQuestIndex < completedSubQuests.Length &&
             !completedSubQuests[currentSubQuestIndex];
 
-        hintControlPanelGroup.alpha =
-            hasReviewableHint ? 1f : 0f;
+        // HintControlPanel là anh em với QuestPanel trong Canvas, vì vậy
+        // phải sao chép alpha của QuestPanel thay vì luôn hiện trong gameplay.
+        // Cách này cũng làm hai bảng fade đồng bộ khi nhấn TAB.
+        float questPanelAlpha = questPanelGroup != null
+            ? questPanelGroup.alpha
+            : 0f;
+
+        hintControlPanelGroup.alpha = hasReviewableHint
+            ? questPanelAlpha
+            : 0f;
         hintControlPanelGroup.interactable = false;
         hintControlPanelGroup.blocksRaycasts = false;
 

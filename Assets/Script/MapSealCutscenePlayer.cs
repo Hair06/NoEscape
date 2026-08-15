@@ -107,6 +107,18 @@ public class MapSealCutscenePlayer : MonoBehaviour
         StartCoroutine(PlayRoutine());
     }
 
+    public void PlayFinalChapterCutscene()
+    {
+        // Cutscene cuối luôn hoàn thành nhiệm vụ hiện tại, không mở Chương 5,
+        // không gọi logic riêng của Chương 1 và không nối sang jumpscare.
+        completeQuestOnEnd = true;
+        startNextChapterOnEnd = false;
+        notifyChapterOneManagerOnEnd = false;
+        afterCutsceneScare = null;
+
+        PlayCutscene();
+    }
+
     private IEnumerator PlayRoutine()
     {
         isPlaying = true;
