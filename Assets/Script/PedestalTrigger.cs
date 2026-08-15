@@ -1,58 +1,64 @@
 using UnityEngine;
-using UnityEngine.InputSystem; // Bắt buộc cho New Input System
 
-public class PedestalTrigger : MonoBehaviour
+public class PedestalTrigger : MonoBehaviour, IInteractable
 {
-    public enum PedestalType { BluePedestal, RedPedestal }
+    public enum PedestalType
+    {
+        BluePedestal,
+        RedPedestal,
+    }
 
-    [Header("LOẠI BỆ ĐÁ")]
-    public PedestalType pedestalType;
+    [Header("Loại bệ đá")]
+    [SerializeField] private PedestalType pedestalType;
 
-    [Header("THAM CHIẾU PUZZLE MANAGER")]
+    [Header("Tham chiếu câu đố")]
     [SerializeField] private StoneDoorPuzzle puzzleManager;
 
-    private bool isPlayerInside = false;
-
-    private void OnTriggerEnter(Collider other)
+    public string GetInteractPrompt()
     {
-        if (other.CompareTag("Player"))
+        if (puzzleManager == null ||
+            !puzzleManager.IsPlacementStepActive())
         {
-            isPlayerInside = true;
-
-            if (pedestalType == PedestalType.BluePedestal)
-            {
-                if (StonePickup.HasBlueStone) Debug.Log("[GỢI Ý] Nhấn [E] để đặt Đá Xanh");
-                else Debug.Log("[GỢI Ý] Cần tìm Đá Xanh...");
-            }
-            else if (pedestalType == PedestalType.RedPedestal)
-            {
-                if (StonePickup.HasRedStone) Debug.Log("[GỢI Ý] Nhấn [E] để đặt Đá Đỏ");
-                else Debug.Log("[GỢI Ý] Cần tìm Đá Đỏ...");
-            }
+            return "";
         }
+
+        if (pedestalType == PedestalType.BluePedestal)
+        {
+            if (puzzleManager.IsBluePlaced)
+            {
+                return "";
+            }
+
+            return StonePickup.HasBlueStone
+                ? "Nhấn [E] để đặt Đá Xanh"
+                : "Cần Đá Xanh cho bệ này";
+        }
+
+        if (puzzleManager.IsRedPlaced)
+        {
+            return "";
+        }
+
+        return StonePickup.HasRedStone
+            ? "Nhấn [E] để đặt Đá Đỏ"
+            : "Cần Đá Đỏ cho bệ này";
     }
 
-    private void OnTriggerExit(Collider other)
+    public void Interact()
     {
-        if (other.CompareTag("Player"))
+        if (puzzleManager == null ||
+            !puzzleManager.IsPlacementStepActive())
         {
-            isPlayerInside = false;
+            return;
         }
-    }
 
-    private void Update()
-    {
-        // Bắt phím E bằng New Input System
-        if (isPlayerInside && Keyboard.current != null && Keyboard.current.eKey.wasPressedThisFrame)
+        if (pedestalType == PedestalType.BluePedestal)
         {
-            if (pedestalType == PedestalType.BluePedestal)
-            {
-                puzzleManager.TryPlaceBlueStone();
-            }
-            else if (pedestalType == PedestalType.RedPedestal)
-            {
-                puzzleManager.TryPlaceRedStone();
-            }
+            puzzleManager.TryPlaceBlueStone();
+        }
+        else
+        {
+            puzzleManager.TryPlaceRedStone();
         }
     }
 }

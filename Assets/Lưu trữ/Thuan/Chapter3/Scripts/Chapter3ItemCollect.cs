@@ -1,43 +1,47 @@
-using UnityEngine;
-using UnityEngine.InputSystem;
 using TMPro;
+using UnityEngine;
 
 // Gắn vào Trái Tim / Giọt Máu (vật phẩm Chương 3).
 public class Chapter3ItemCollect : MonoBehaviour
 {
+    private const int ChapterIndex = 3;
+    private const int CollectionSubQuestIndex = 3;
+    private const int RequiredItems = 2;
+
     [Header("Cấu hình vật phẩm")]
     [Tooltip("Tên item trên hotbar: TraiTim hoặc GiotMau")]
     [SerializeField] private string itemName = "TraiTim";
 
-    [Header("Liên kết bảng nhiệm vụ")]
-    [SerializeField, Min(0)] private int questChapterIndex = 3;
-    [Tooltip("Trái Tim và Giọt Máu cùng thuộc nhiệm vụ khám phá mê cung.")]
-    [SerializeField, Min(0)] private int questSubQuestIndex = 3;
-    [SerializeField, Min(1)] private int requiredProgress = 2;
-
     [Header("UI hướng dẫn (TextMeshPro)")]
     [SerializeField] private TextMeshProUGUI promptText;
-    [SerializeField] private string interactMessage = "Nhấn [E] để nhặt Trái Tim Giáo Phái";
 
     [Header("Âm thanh khi nhặt (có thể để trống)")]
     [SerializeField] private AudioClip collectSound;
 
-    private bool isPlayerInside = false;
-    private bool taken = false;
+    private bool isPlayerInside;
+    private bool taken;
+
+    private void Start()
+    {
+        SetPromptVisible(false);
+    }
 
     private void Update()
     {
-        if (!MiniGameFlowManager.IsChapterActive(
-                questChapterIndex))
+        if (!MiniGameFlowManager.IsChapterActive(ChapterIndex))
         {
-            if (promptText != null)
-                promptText.gameObject.SetActive(false);
+            SetPromptVisible(false);
             return;
         }
 
-        if (isPlayerInside && !taken
-            && Keyboard.current != null
-            && Keyboard.current.eKey.wasPressedThisFrame)
+        if (!isPlayerInside || taken)
+        {
+            return;
+        }
+
+        SetPromptVisible(true);
+
+        if (GameInputBridge.GetKeyDown(KeyCode.E))
         {
             CollectItem();
         }
@@ -45,17 +49,27 @@ public class Chapter3ItemCollect : MonoBehaviour
 
     private void CollectItem()
     {
-        if (taken) return;
+        if (taken)
+        {
+            return;
+        }
+
         taken = true;
 
         if (collectSound != null)
-            AudioSource.PlayClipAtPoint(collectSound, transform.position);
+        {
+            AudioSource.PlayClipAtPoint(
+                collectSound,
+                transform.position
+            );
+        }
 
         PlayerInventory.Add(itemName);
         ReportQuestProgress();
-        Debug.Log("Đã nhặt: " + itemName);
 
-        if (promptText != null) promptText.gameObject.SetActive(false);
+        Debug.Log("Đã nhặt: " + GetDisplayName());
+
+        SetPromptVisible(false);
         Destroy(gameObject);
     }
 
@@ -63,40 +77,74 @@ public class Chapter3ItemCollect : MonoBehaviour
     {
         if (QuestManager.Instance == null)
         {
-            Debug.LogWarning("Chapter3ItemCollect: Không tìm thấy QuestManager để cập nhật Chương 3.");
+            Debug.LogWarning(
+                "Chapter3ItemCollect: Không tìm thấy QuestManager để cập nhật Chương 3."
+            );
             return;
         }
 
+        // Trái Tim và Giọt Máu luôn cùng báo về nhiệm vụ số 3.
+        // Dùng hằng số để dữ liệu cũ trong Scene không thể trỏ nhầm sang nhiệm vụ số 2.
         QuestManager.Instance.ReportProgressForChapter(
-            questChapterIndex,
-            questSubQuestIndex,
+            ChapterIndex,
+            CollectionSubQuestIndex,
             1,
-            requiredProgress
+            RequiredItems
         );
+    }
+
+    private string GetDisplayName()
+    {
+        return itemName == "GiotMau"
+            ? "Giọt Máu Giáo Phái"
+            : "Trái Tim Giáo Phái";
+    }
+
+    private void SetPromptVisible(bool visible)
+    {
+        if (promptText == null)
+        {
+            return;
+        }
+
+        if (visible)
+        {
+            promptText.text =
+                "Nhấn [E] để nhặt " + GetDisplayName();
+        }
+
+        promptText.gameObject.SetActive(visible);
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player") &&
-            !taken &&
-            MiniGameFlowManager.IsChapterActive(
-                questChapterIndex))
+        if (!other.CompareTag("Player"))
         {
-            isPlayerInside = true;
-            if (promptText != null)
-            {
-                promptText.text = interactMessage;
-                promptText.gameObject.SetActive(true);
-            }
+            return;
+        }
+
+        isPlayerInside = true;
+
+        if (!taken &&
+            MiniGameFlowManager.IsChapterActive(ChapterIndex))
+        {
+            SetPromptVisible(true);
         }
     }
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.CompareTag("Player"))
+        if (!other.CompareTag("Player"))
         {
-            isPlayerInside = false;
-            if (promptText != null) promptText.gameObject.SetActive(false);
+            return;
         }
+
+        isPlayerInside = false;
+        SetPromptVisible(false);
+    }
+
+    private void OnDisable()
+    {
+        SetPromptVisible(false);
     }
 }

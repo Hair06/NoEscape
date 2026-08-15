@@ -1,85 +1,200 @@
-using UnityEngine;
 using System.Collections;
 using TMPro;
-using UnityEngine.InputSystem;
+using UnityEngine;
 
 public class RitualAltar : MonoBehaviour
 {
-    [Header("Các đối tượng liên quan")]
-    public GameObject phongAn;      // Kí tự phong ấn gợi ý (Material X-Ray đỏ ZTest Always)
-    public GameObject jarOnAltar;   // Chiếc bình trên bệ
-    public ParticleSystem soulVFX;  // Hiệu ứng linh hồn
+    private const int ChapterIndex = 4;
+    private const int FinalSubQuestIndex = 3;
 
-    [Header("Cấu hình Hiệu ứng")]
+    [Header("Các đối tượng liên quan")]
+    public GameObject phongAn;
+    public GameObject jarOnAltar;
+    public ParticleSystem soulVFX;
+
+    [Header("Cấu hình hiệu ứng")]
     [Tooltip("Thời gian hiệu ứng linh hồn chạy (tính bằng giây)")]
     public float soulVFXDuration = 5f;
 
     [Header("Giao diện UI")]
     public TextMeshProUGUI promptText;
-    public string promptMessage = "Bấm [E] để đặt Bình lên Bệ Tế";
+    public string promptMessage =
+        "Nhấn [E] để đặt Bình Linh Hồn lên Bệ Cổ";
 
-    private bool hasJar = false;
-    private bool isPlaced = false;
-    private bool isNearPlayer = false;
+    [Header("Cutscene kết thúc Chương 4")]
+    [Tooltip("Kéo object chứa MapSealCutscenePlayer của cutscene kết thúc Chương 4 vào đây.")]
+    [SerializeField] private MapSealCutscenePlayer endCutscene;
+
+    private bool hasJar;
+    private bool isPlaced;
+    private bool isNearPlayer;
+
+    public bool IsConfiguredForSoulJar =>
+        phongAn != null ||
+        jarOnAltar != null ||
+        soulVFX != null;
 
     private void Start()
     {
-        if (phongAn) phongAn.SetActive(false);
-        if (jarOnAltar) jarOnAltar.SetActive(false);
-        if (soulVFX) soulVFX.Stop();
-        if (promptText) promptText.gameObject.SetActive(false);
+        if (phongAn != null)
+        {
+            phongAn.SetActive(false);
+        }
+
+        if (jarOnAltar != null)
+        {
+            jarOnAltar.SetActive(false);
+        }
+
+        if (soulVFX != null)
+        {
+            soulVFX.Stop();
+        }
+
+        SetPromptVisible(false);
     }
 
-    // Hàm gọi từ SoulJar khi người chơi nhặt bình thành công
+    // Được SoulJar gọi đúng một lần khi người chơi nhặt bình.
     public void OnPickUpJar()
     {
+        if (hasJar || isPlaced)
+        {
+            return;
+        }
+
         hasJar = true;
 
-        // Bật phong ấn đỏ nhìn xuyên tường
-        if (phongAn) 
+        if (phongAn != null)
         {
-            phongAn.SetActive(true); 
-            Debug.Log("[RitualAltar] Đã nhặt bình -> Bật Phong Ấn gợi ý!");
+            phongAn.SetActive(true);
         }
 
-        // Nếu người chơi đang đứng sẵn trong vùng Trigger của Bệ Tế thì hiện UI ngay
-        if (isNearPlayer && !isPlaced && promptText != null)
-        {
-            promptText.text = promptMessage;
-            promptText.gameObject.SetActive(true);
-        }
+        RefreshPrompt();
+
+        Debug.Log(
+            "[RitualAltar] Đã nhận Bình Linh Hồn; bật chỉ dẫn về Bệ Cổ."
+        );
     }
 
     private void Update()
     {
-        bool eKeyPressed = Keyboard.current != null && Keyboard.current.eKey.wasPressedThisFrame;
+        // Scene hiện có nhiều RitualAltar dùng chung PromptText.
+        // Chỉ altar mà Player đang đứng gần mới được điều khiển prompt.
+        if (!isNearPlayer)
+        {
+            return;
+        }
 
-        if (hasJar && !isPlaced && isNearPlayer && eKeyPressed)
+        RefreshPrompt();
+
+        if (CanPlaceJar() &&
+            GameInputBridge.GetKeyDown(KeyCode.E))
         {
             PlaceJar();
         }
     }
 
+    private bool CanPlaceJar()
+    {
+        QuestManager questManager = QuestManager.Instance;
+
+        return hasJar &&
+               !isPlaced &&
+               isNearPlayer &&
+               questManager != null &&
+               MiniGameFlowManager.IsChapterActive(ChapterIndex) &&
+               questManager.CurrentChapterIndex == ChapterIndex &&
+               questManager.CurrentSubQuestIndex == FinalSubQuestIndex &&
+               !questManager.IsChapterTransitioning;
+    }
+
     private void PlaceJar()
     {
+        if (!CanPlaceJar())
+        {
+            return;
+        }
+
         isPlaced = true;
 
-        if (phongAn) phongAn.SetActive(false);      // Tắt phong ấn gợi ý
-        if (jarOnAltar) jarOnAltar.SetActive(true); // Hiện chiếc bình trên bệ
+        if (phongAn != null)
+        {
+            phongAn.SetActive(false);
+        }
 
-        if (soulVFX)
+        if (jarOnAltar != null)
+        {
+            jarOnAltar.SetActive(true);
+        }
+
+        if (soulVFX != null)
         {
             StartCoroutine(PlaySoulVFXRoutine());
         }
 
-        if (promptText) promptText.gameObject.SetActive(false);
+        SetPromptVisible(false);
+
+        if (endCutscene != null)
+        {
+            endCutscene.PlayFinalChapterCutscene();
+        }
+        else
+        {
+            Debug.LogWarning(
+                "[RitualAltar] Chưa gán End Cutscene. Nhiệm vụ cuối sẽ được hoàn thành trực tiếp."
+            );
+            CompleteFinalQuestFallback();
+        }
+
+        Debug.Log(
+            "[RitualAltar] Đã đặt Bình Linh Hồn lên Bệ Cổ."
+        );
     }
 
     private IEnumerator PlaySoulVFXRoutine()
     {
         soulVFX.Play();
-        yield return new WaitForSeconds(soulVFXDuration);
-        soulVFX.Stop();
+        yield return new WaitForSecondsRealtime(
+            Mathf.Max(0f, soulVFXDuration)
+        );
+
+        if (soulVFX != null)
+        {
+            soulVFX.Stop();
+        }
+    }
+
+    private static void CompleteFinalQuestFallback()
+    {
+        if (QuestManager.Instance == null)
+        {
+            return;
+        }
+
+        QuestManager.Instance.CompleteSubQuestForChapter(
+            ChapterIndex,
+            FinalSubQuestIndex
+        );
+    }
+
+    private void RefreshPrompt()
+    {
+        SetPromptVisible(CanPlaceJar());
+    }
+
+    private void SetPromptVisible(bool visible)
+    {
+        if (promptText == null)
+        {
+            return;
+        }
+
+        if (visible)
+        {
+            promptText.text = promptMessage;
+        }
+
+        promptText.gameObject.SetActive(visible);
     }
 
     private void OnTriggerEnter(Collider other)
@@ -87,20 +202,23 @@ public class RitualAltar : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             isNearPlayer = true;
-            if (hasJar && !isPlaced && promptText != null)
-            {
-                promptText.text = promptMessage;
-                promptText.gameObject.SetActive(true);
-            }
+            RefreshPrompt();
         }
     }
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.CompareTag("Player"))
+        if (!other.CompareTag("Player"))
         {
-            isNearPlayer = false;
-            if (promptText != null) promptText.gameObject.SetActive(false);
+            return;
         }
+
+        isNearPlayer = false;
+        SetPromptVisible(false);
+    }
+
+    private void OnDisable()
+    {
+        SetPromptVisible(false);
     }
 }
