@@ -117,6 +117,9 @@ public class RitualAltar : MonoBehaviour
 
         isPlaced = true;
 
+        // Xoa Binh Linh Hon khoi hotbar (da dat len be)
+        PlayerInventory.RemoveAll("BinhLinhHon");
+
         if (phongAn != null)
         {
             phongAn.SetActive(false);
