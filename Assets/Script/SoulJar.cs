@@ -88,6 +88,9 @@ public class SoulJar : MonoBehaviour
         collected = true;
         targetAltar.OnPickUpJar();
 
+        // Them vao hotbar
+        PlayerInventory.Add("BinhLinhHon");
+
         if (QuestManager.Instance != null)
         {
             QuestManager.Instance.CompleteSubQuestForChapter(
