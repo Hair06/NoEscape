@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 1255117234637596455}
   - component: {fileID: 4271908649495091916}
   - component: {fileID: 3973291620665691185}
+  - component: {fileID: 350653154472027956}
   m_Layer: 6
   m_Name: Canister
   m_TagString: Untagged
@@ -137,6 +138,27 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!65 &350653154472027956
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1792390914810743704}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.1527091, y: 0.60266256, z: 0.44327587}
+  m_Center: {x: -0.0032467882, y: 0.30133116, z: 0.018888861}
 --- !u!1 &5408194767505750056
 GameObject:
   m_ObjectHideFlags: 0
