@@ -100,12 +100,12 @@ TextureImporter:
       name: end11_0
       rect:
         serializedVersion: 2
-        x: 68
+        x: 67
         y: 628
         width: 700
         height: 313
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -127,7 +127,7 @@ TextureImporter:
         width: 700
         height: 313
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -144,12 +144,12 @@ TextureImporter:
       name: end11_2
       rect:
         serializedVersion: 2
-        x: 69
-        y: 314
+        x: 70
+        y: 315
         width: 700
-        height: 313
+        height: 306
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -167,11 +167,11 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 909
-        y: 314
+        y: 317
         width: 700
-        height: 313
+        height: 304
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -191,9 +191,9 @@ TextureImporter:
         x: 767
         y: 0
         width: 700
-        height: 313
+        height: 308
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
