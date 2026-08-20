@@ -47723,41 +47723,59 @@ MonoBehaviour:
   bgMusic: {fileID: 1205354187}
   cutsceneRoot: {fileID: 1001946151}
   frames:
-  - image: {fileID: -582335509, guid: 6af53c91a4157014989a67b52f7c1dec, type: 3}
+  - image: {fileID: 228568479, guid: 9507581253dd78a4ba47aea8adaae955, type: 3}
     dialogue: 
     waitTime: 4
     voiceClip: {fileID: 0}
-  - image: {fileID: -551769867, guid: 118b401e06f4d444b85db53f8feffdb6, type: 3}
-    dialogue: "M\u01B0\u1EDDi n\u0103m tr\u01B0\u1EDBc, v\xEC kh\xF4ng th\u1EC3 v\u01B0\u1EE3t
-      qua c\xE1i ch\u1EBFt c\u1EE7a ch\u1ED3ng, Anna \u0111\xE3 t\xECm \u0111\u1EBFn
-      m\u1ED9t nghi l\u1EC5 g\u1ECDi h\u1ED3n."
+  - image: {fileID: 1951475580, guid: 9507581253dd78a4ba47aea8adaae955, type: 3}
+    dialogue: "Sau bao n\u0103m b\u1ECB phong \u1EA5n, chi\u1EBFc b\xECnh linh h\u1ED3n
+      cu\u1ED1i c\xF9ng c\u0169ng \u0111\u01B0\u1EE3c \u0111\u1EB7t tr\u1EDF l\u1EA1i
+      tr\xEAn b\u1EC7 \u0111\xE1 c\u1ED5."
     waitTime: 3
-    voiceClip: {fileID: 8300000, guid: 6a06979672fb8954fa062810b8e03e11, type: 3}
-  - image: {fileID: 1681655946, guid: 118b401e06f4d444b85db53f8feffdb6, type: 3}
-    dialogue: "Gi\xE1o ph\xE1i h\u1EE9a s\u1EBD gi\xFAp b\xE0 g\u1EB7p l\u1EA1i ng\u01B0\u1EDDi
-      \u0111\xE3 m\u1EA5t, nh\u01B0ng c\u1ED1 t\xECnh che gi\u1EA5u c\xE1i gi\xE1
-      c\u1EE7a nghi l\u1EC5."
+    voiceClip: {fileID: 0}
+  - image: {fileID: -1106465341, guid: 14093fd4addff0e4ebd41ad8f07fff3c, type: 3}
+    dialogue: "Tr\u01B0\u1EDBc \u0111\xE2y ch\u01B0a t\u1EEBng c\xF3 ai c\xF3 th\u1EC3
+      tho\xE1t kh\u1ECFi s\u1EF1 giam c\u1EA7m c\u1EE7a t\xE0 th\u1EA7n."
     waitTime: 3
-    voiceClip: {fileID: 8300000, guid: 4d13c2c6b3a88c94ca0341d5ec06ceec, type: 3}
-  - image: {fileID: 2099732464, guid: 118b401e06f4d444b85db53f8feffdb6, type: 3}
-    dialogue: "Khi nghi l\u1EC5 b\u1EAFt \u0111\u1EA7u, Anna m\u1EDBi bi\u1EBFt m\u1ED9t
-      sinh m\u1EA1ng c\u1EE7a ng\u01B0\u1EDDi th\xE2n ph\u1EA3i \u0111\u01B0\u1EE3c
-      hi\u1EBFn t\u1EBF \u0111\u1EC3 \u0111\u1ED5i l\u1EA5y \xEDt ph\xFAt g\u1EB7p
-      linh h\u1ED3n ng\u01B0\u1EDDi ch\u1EBFt."
+    voiceClip: {fileID: 0}
+  - image: {fileID: 1321275031, guid: ddf19d54b166b224ca9990df1280bc9b, type: 3}
+    dialogue: "Nh\u01B0ng b\u1EB1ng ni\u1EC1m tin, s\u1EF1 hy sinh v\xE0 t\xECnh
+      c\u1EA3m gia \u0111\xECnh. Alex \u0111\xE3 th\xE0nh c\xF4ng gi\u1EA3i tho\xE1t
+      linh h\u1ED3n c\u1EE7a ng\u01B0\u1EDDi m\u1EB9."
     waitTime: 4
-    voiceClip: {fileID: 8300000, guid: fefe6d96021ce6c41a82eb6f925836cb, type: 3}
-  - image: {fileID: 1528023596, guid: 118b401e06f4d444b85db53f8feffdb6, type: 3}
-    dialogue: "Linh h\u1ED3n ng\u01B0\u1EDDi ch\u1ED3ng d\u1EA7n xu\u1EA5t hi\u1EC7n,
-      nh\u01B0ng c\xF9ng v\u1EDBi \xF4ng l\xE0 m\u1ED9t t\xE0 th\u1EA7n \u0111ang
-      ch\u1EDD nh\u1EADn v\u1EADt hi\u1EBFn t\u1EBF."
+    voiceClip: {fileID: 0}
+  - image: {fileID: -390822641, guid: ddf19d54b166b224ca9990df1280bc9b, type: 3}
+    dialogue: "Nh\u1EEFng xi\u1EC1ng x\xEDch cu\u1ED1i c\xF9ng v\u1EE1 v\u1EE5n.
+      Linh h\u1ED3n Anna \u0111\u01B0\u1EE3c gi\u1EA3i tho\xE1t kh\u1ECFi l\u1EDDi
+      nguy\u1EC1n \u0111\xE3 giam c\u1EA7m c\xF4 su\u1ED1t bao n\u0103m."
     waitTime: 3.5
-    voiceClip: {fileID: 8300000, guid: c77f12909ffb1d14d8bd2720a672a01c, type: 3}
-  - image: {fileID: -1639924416, guid: 118b401e06f4d444b85db53f8feffdb6, type: 3}
-    dialogue: "Kh\xF4ng mu\u1ED1n b\u1EA5t k\u1EF3 ai ph\u1EA3i ch\u1EBFt, b\xE0
-      \u0111\xE3 b\u01B0\u1EDBc v\xE0o v\xF2ng tr\xF2n v\xE0 hi\u1EBFn d\xE2ng ch\xEDnh
-      m\xECnh."
+    voiceClip: {fileID: 0}
+  - image: {fileID: -919924343, guid: 9507581253dd78a4ba47aea8adaae955, type: 3}
+    dialogue: "V\xE0 khi \xE1nh s\xE1ng cu\u1ED1i c\xF9ng nu\u1ED1t l\u1EA5y b\xF3ng
+      t\u1ED1i\u2026 c\xF4 \u1EA5y \u0111\xE3 \u0111\u01B0\u1EE3c t\u1EF1 do. Kh\xF4ng
+      c\xF2n \u0111au \u0111\u1EDBn. Kh\xF4ng c\xF2n b\u1ECB r\xE0ng bu\u1ED9c."
     waitTime: 3
-    voiceClip: {fileID: 8300000, guid: 729516e06bf1b584c8e37cb8a4ff584c, type: 3}
+    voiceClip: {fileID: 0}
+  - image: {fileID: 811099651, guid: 8d124f4e264e08544a443fed07c3cf4a, type: 3}
+    dialogue: 
+    waitTime: 1
+    voiceClip: {fileID: 0}
+  - image: {fileID: -769530785, guid: 8d124f4e264e08544a443fed07c3cf4a, type: 3}
+    dialogue: 
+    waitTime: 1
+    voiceClip: {fileID: 0}
+  - image: {fileID: -921516819, guid: 8d124f4e264e08544a443fed07c3cf4a, type: 3}
+    dialogue: 
+    waitTime: 1
+    voiceClip: {fileID: 0}
+  - image: {fileID: 1800160654, guid: 8d124f4e264e08544a443fed07c3cf4a, type: 3}
+    dialogue: 
+    waitTime: 1
+    voiceClip: {fileID: 0}
+  - image: {fileID: 1088553491, guid: 8d124f4e264e08544a443fed07c3cf4a, type: 3}
+    dialogue: 
+    waitTime: 1
+    voiceClip: {fileID: 0}
   fadeDuration: 0.4
   typeSpeed: 0.035
   scriptsToDisable:
@@ -47765,7 +47783,6 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   objectsToHide:
-  - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
@@ -49905,7 +49922,7 @@ MonoBehaviour:
       m_Calls: []
   m_text: 
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 455b3df8214d98f45b78f3960e0482f6, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
@@ -49972,7 +49989,7 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
-  m_hasFontAssetChanged: 0
+  m_hasFontAssetChanged: 1
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
 --- !u!222 &331541190
@@ -78920,7 +78937,7 @@ MonoBehaviour:
       m_Calls: []
   m_text: 
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 455b3df8214d98f45b78f3960e0482f6, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
@@ -78987,7 +79004,7 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
-  m_hasFontAssetChanged: 0
+  m_hasFontAssetChanged: 1
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
 --- !u!1001 &537263822
@@ -98085,7 +98102,7 @@ MonoBehaviour:
       m_Calls: []
   m_text: 
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 455b3df8214d98f45b78f3960e0482f6, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
@@ -98152,7 +98169,7 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
-  m_hasFontAssetChanged: 0
+  m_hasFontAssetChanged: 1
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
 --- !u!1001 &667529939
@@ -251221,7 +251238,7 @@ MonoBehaviour:
       m_Calls: []
   m_text: 
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 455b3df8214d98f45b78f3960e0482f6, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
@@ -251288,7 +251305,7 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
-  m_hasFontAssetChanged: 0
+  m_hasFontAssetChanged: 1
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
 --- !u!1001 &1662744644
