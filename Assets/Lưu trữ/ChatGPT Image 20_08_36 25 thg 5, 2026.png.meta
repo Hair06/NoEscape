@@ -144,10 +144,10 @@ TextureImporter:
       name: ChatGPT Image 20_08_36 25 thg 5, 2026_2
       rect:
         serializedVersion: 2
-        x: 614
-        y: 810
+        x: 613
+        y: 820
         width: 307
-        height: 214
+        height: 204
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -166,7 +166,7 @@ TextureImporter:
       name: ChatGPT Image 20_08_36 25 thg 5, 2026_3
       rect:
         serializedVersion: 2
-        x: 921
+        x: 920
         y: 820
         width: 307
         height: 204
@@ -257,7 +257,7 @@ TextureImporter:
         x: 614
         y: 616
         width: 307
-        height: 204
+        height: 194
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
