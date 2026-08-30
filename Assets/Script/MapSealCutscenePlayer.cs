@@ -266,6 +266,18 @@ public class MapSealCutscenePlayer : MonoBehaviour
             cutsceneRoot.SetActive(false);
         }
 
+        // 1. Kiểm tra nếu đây là Cutscene chương cuối (không mở chương mới) -> Gọi End Game ngay
+        if (!startNextChapterOnEnd)
+        {
+            if (EndGameManager.Instance != null)
+            {
+                Debug.Log("🎬 Cutscene chương cuối kết thúc -> Gọi EndGameManager!");
+                EndGameManager.Instance.TriggerEndGame();
+                return; // Dừng lại tại đây, không làm các logic mở chương sau nữa
+            }
+        }
+
+        // 2. Logic dành cho các Chapter thông thường
         if (notifyChapterOneManagerOnEnd &&
             Chapter1Manager.Instance != null)
         {
