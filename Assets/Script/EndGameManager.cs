@@ -44,57 +44,44 @@ public class EndGameManager : MonoBehaviour
     }
 
     private IEnumerator EndGameSequence()
+{
+    // 1. Phủ màn hình đen
+    if (fadeImage != null)
     {
-        // 1. Tối màn hình (Fade to Black)
-        if (fadeImage != null)
+        fadeImage.gameObject.SetActive(true);
+        float alpha = 0f;
+        Color c = fadeImage.color;
+
+        while (alpha < 1f)
         {
-            fadeImage.gameObject.SetActive(true);
-            float alpha = 0f;
-            Color c = fadeImage.color;
-
-            while (alpha < 1f)
-            {
-                alpha += Time.deltaTime * fadeSpeed;
-                c.a = Mathf.Clamp01(alpha);
-                fadeImage.color = c;
-                yield return null;
-            }
-
-            c.a = 1f;
+            alpha += Time.deltaTime * fadeSpeed;
+            c.a = Mathf.Clamp01(alpha);
             fadeImage.color = c;
+            yield return null;
         }
-
-        yield return new WaitForSeconds(0.5f);
-
-        // 2. Bật hình ảnh THE END
-        if (endGameUI != null)
-        {
-            endGameUI.SetActive(true);
-        }
-
-        // 3. Mờ dần màn hình đen để hiện ảnh THE END
-        if (fadeImage != null)
-        {
-            float alpha = 1f;
-            Color c = fadeImage.color;
-
-            while (alpha > 0f)
-            {
-                alpha -= Time.deltaTime * fadeSpeed;
-                c.a = Mathf.Clamp01(alpha);
-                fadeImage.color = c;
-                yield return null;
-            }
-            fadeImage.gameObject.SetActive(false);
-        }
-
-        // 4. Mở khóa chuột và dừng thời gian Game
-        Time.timeScale = 0f;
-        Cursor.lockState = CursorLockMode.None;
-        Cursor.visible = true;
-
-        Debug.Log("== HOÀN THÀNH GAME (THE END) ==");
     }
+
+    yield return new WaitForSeconds(0.2f);
+
+    // 2. Bật UI THE END giữ nguyên trên màn hình (KHÔNG TẮT)
+    if (endGameUI != null)
+    {
+        endGameUI.SetActive(true);
+    }
+
+    // 3. Tắt lớp fadeImage cũ để nhường chỗ cho endGameUI (hoặc giữ nguyên nếu endGameUI nằm đè lên trên)
+    if (fadeImage != null)
+    {
+        fadeImage.gameObject.SetActive(false);
+    }
+
+    // 4. Khóa Game Loop và bật con trỏ chuột
+    Time.timeScale = 0f;
+    Cursor.lockState = CursorLockMode.None;
+    Cursor.visible = true;
+
+    Debug.Log("== THE END ==");
+}
 
     // Nút bấm chuyển về Main Menu (Nếu có tạo nút trên UI THE END)
     public void BackToMainMenu()

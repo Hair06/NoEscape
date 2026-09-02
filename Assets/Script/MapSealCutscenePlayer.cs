@@ -243,74 +243,78 @@ public class MapSealCutscenePlayer : MonoBehaviour
     }
 
     private void EndCutscene()
+{
+    isPlaying = false;
+
+    if (audioSource != null)
     {
-        isPlaying = false;
+        audioSource.Stop();
+    }
 
-        if (audioSource != null)
+    if (bgMusic != null)
+    {
+        bgMusic.UnPause();
+    }
+
+    // ===== KIỂM TRA NẾU LÀ CUTSCENE CHƯƠNG 4 (KẾT THÚC GAME) =====
+    if (!startNextChapterOnEnd)
+    {
+        if (EndGameManager.Instance != null)
         {
-            audioSource.Stop();
-        }
+            Debug.Log("🎬 Cutscene Chương 4 kết thúc -> Hiện THE END ngay lập tức!");
+            
+            // Gọi EndGameManager hiện ảnh THE END đè lên luôn
+            EndGameManager.Instance.TriggerEndGame();
 
-        if (bgMusic != null)
-        {
-            bgMusic.UnPause();
-        }
-
-        EnableGameplay();
-
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
-
-        if (cutsceneRoot != null)
-        {
-            cutsceneRoot.SetActive(false);
-        }
-
-        // 1. Kiểm tra nếu đây là Cutscene chương cuối (không mở chương mới) -> Gọi End Game ngay
-        if (!startNextChapterOnEnd)
-        {
-            if (EndGameManager.Instance != null)
+            // Tắt UI cutscene sau cùng để không bị hẫng màn hình 3D
+            if (cutsceneRoot != null)
             {
-                Debug.Log("🎬 Cutscene chương cuối kết thúc -> Gọi EndGameManager!");
-                EndGameManager.Instance.TriggerEndGame();
-                return; // Dừng lại tại đây, không làm các logic mở chương sau nữa
+                cutsceneRoot.SetActive(false);
             }
-        }
-
-        // 2. Logic dành cho các Chapter thông thường
-        if (notifyChapterOneManagerOnEnd &&
-            Chapter1Manager.Instance != null)
-        {
-            Chapter1Manager.Instance.OnCutsceneFinished();
-        }
-
-        QuestManager questManager = QuestManager.Instance;
-
-        if (questManager != null && completeQuestOnEnd)
-        {
-            questManager.CompleteCurrentSubQuest();
-            questManager.CompleteCurrentChapter();
-        }
-
-        if (afterCutsceneScare != null)
-        {
-            StartCoroutine(StartScareAfterDelay());
-            return;
-        }
-
-        if (questManager != null)
-        {
-            questManager.SetGameplayUiSuppressed(
-                false,
-                false
-            );
-
-            if (startNextChapterOnEnd)
-            {
-                questManager.RequestStartNextChapter();
-            }
+            return; // Dừng tại đây, không trả lại gameplay
         }
     }
+
+    // ===== LOGIC DÀNH CHO CÁC CHƯƠNG THƯỜNG (1, 2, 3) =====
+    EnableGameplay();
+
+    Cursor.lockState = CursorLockMode.Locked;
+    Cursor.visible = false;
+
+    if (cutsceneRoot != null)
+    {
+        cutsceneRoot.SetActive(false);
+    }
+
+    if (notifyChapterOneManagerOnEnd && Chapter1Manager.Instance != null)
+    {
+        Chapter1Manager.Instance.OnCutsceneFinished();
+    }
+
+    QuestManager questManager = QuestManager.Instance;
+
+    if (questManager != null && completeQuestOnEnd)
+    {
+        questManager.CompleteCurrentSubQuest();
+        questManager.CompleteCurrentChapter();
+    }
+
+    if (afterCutsceneScare != null)
+    {
+        StartCoroutine(StartScareAfterDelay());
+        return;
+    }
+
+    if (questManager != null)
+    {
+        questManager.SetGameplayUiSuppressed(false, false);
+
+        if (startNextChapterOnEnd)
+        {
+            questManager.RequestStartNextChapter();
+        }
+    }
+}
 
     private IEnumerator StartScareAfterDelay()
     {
