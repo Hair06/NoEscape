@@ -20657,7 +20657,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &136183716
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -179964,9 +179964,9 @@ MonoBehaviour:
   controller: {fileID: 1205354185}
   playerCamera: {fileID: 581401314}
   anim: {fileID: 1205354179}
-  speed: 6
-  runSpeed: 9
-  jumpHeight: 1.2
+  speed: 4
+  runSpeed: 6
+  jumpHeight: 0
   gravity: -25
   sensitivity: 0.1
   maxLookUpAngle: 40
