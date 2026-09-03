@@ -19,7 +19,7 @@ public class EndGameManager : MonoBehaviour
 
     [Header("Cấu Hình")]
     [SerializeField] private float fadeSpeed = 1.5f;
-    [SerializeField] private string menuSceneName = "SceneMenu"; // Tên Scene Menu chính xác để load khi nhấn nút Back to Menu
+    [SerializeField] private string menuSceneName = "SceneMenu"; // Đã đổi thành SceneMenu
 
     private void Awake()
     {
