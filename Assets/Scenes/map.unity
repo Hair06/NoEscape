@@ -12255,7 +12255,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &80740070
 RectTransform:
   m_ObjectHideFlags: 0
@@ -20707,7 +20707,7 @@ Canvas:
   m_GameObject: {fileID: 136183715}
   m_Enabled: 1
   serializedVersion: 3
-  m_RenderMode: 1
+  m_RenderMode: 0
   m_Camera: {fileID: 0}
   m_PlaneDistance: 100
   m_PixelPerfect: 0
@@ -20719,7 +20719,7 @@ Canvas:
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 51
+  m_SortingOrder: 100
   m_TargetDisplay: 0
 --- !u!224 &136183719
 RectTransform:
@@ -171794,10 +171794,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea2c0226ea078c64f83df254eb9d3c82, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  chapterIndex: 4
+  findStonesSubQuestIndex: 0
+  requiredStones: 2
   stoneType: 1
   pickupClip: {fileID: 0}
   bluePrompt: "Nh\u1EA5n [E] \u0111\u1EC3 nh\u1EB7t \u0110\xE1 Xanh"
   redPrompt: "Nh\u1EA5n [E] \u0111\u1EC3 nh\u1EB7t \u0110\xE1 \u0110\u1ECF"
+  promptText: {fileID: 0}
 --- !u!1001 &1149319232
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -183002,10 +183006,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea2c0226ea078c64f83df254eb9d3c82, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  chapterIndex: 4
+  findStonesSubQuestIndex: 0
+  requiredStones: 2
   stoneType: 0
   pickupClip: {fileID: 0}
   bluePrompt: "Nh\u1EA5n [E] \u0111\u1EC3 nh\u1EB7t \u0110\xE1 Xanh"
   redPrompt: "Nh\u1EA5n [E] \u0111\u1EC3 nh\u1EB7t \u0110\xE1 \u0110\u1ECF"
+  promptText: {fileID: 0}
 --- !u!1001 &1223172090
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -192532,7 +192540,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1286417227
 RectTransform:
   m_ObjectHideFlags: 0
