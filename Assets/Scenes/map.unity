@@ -146062,15 +146062,15 @@ MonoBehaviour:
         Nh\u1EA1c v\xE0 Ch\xECa V\u1EB7n v\xE0o \u0111\xFAng v\u1ECB tr\xED."
       hintShowDelay: 0
       hintHoldTime: -1
-      detailedHintDelay: 30
+      detailedHintDelay: 40
   - chapterTitle: "CH\u01AF\u01A0NG 3 - NGHI L\u1EC4 B\u1ECA CH\xD4N V\xD9I"
     characterThought: "Kh\xFAc nh\u1EA1c cu\u1ED1i c\xF9ng t\u1EEB h\u1ED9p nh\u1EA1c
       \u0111\xE3 d\u1EABn m\xECnh \u0111\u1EBFn khu nh\xE0 k\xEDnh c\u0169. C\xE1nh
       c\u1EEDa b\xEAn trong b\u1ECB \u0111\xF3ng k\xEDn... C\xF3 l\u1EBD m\u1EB9
       \u0111\xE3 c\u1ED1 ch\xF4n gi\u1EA5u m\u1ED9t b\xED m\u1EADt \u1EDF n\u01A1i
       n\xE0y."
-    characterThoughtDelay: 1.2
-    characterThoughtHoldTime: 6
+    characterThoughtDelay: 10
+    characterThoughtHoldTime: -1
     mainQuest: "M\u1EDF c\u0103n ph\xF2ng b\u1ECB ni\xEAm phong, t\xECm b\u1ED1n
       v\u1EADt ph\u1EA9m gi\xE1o ph\xE1i v\xE0 ho\xE0n th\xE0nh b\xE0n th\u1EDD nghi
       l\u1EC5."
@@ -146132,8 +146132,8 @@ MonoBehaviour:
       Hai h\u1ED1c b\u1EC7 mang m\xE0u xanh v\xE0 \u0111\u1ECF. Th\u1EE9 b\u1ECB
       gi\u1EA5u sau \u0111\xF3 c\xF3 l\u1EBD l\xE0 m\u1EA3nh k\xFD \u1EE9c cu\u1ED1i
       c\xF9ng c\u1EE7a m\u1EB9."
-    characterThoughtDelay: 0.8
-    characterThoughtHoldTime: 5
+    characterThoughtDelay: 10
+    characterThoughtHoldTime: -1
     mainQuest: "M\u1EDF c\xE1nh c\u1EEDa b\u1EC7 \u0111\xE1, l\u1EA5y B\xECnh Linh
       H\u1ED3n v\xE0 \u0111\u01B0a n\xF3 v\u1EC1 b\u1EC7 c\u1ED5 ngo\xE0i khu phong
       \u1EA5n."
@@ -178575,8 +178575,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.38868105, y: 1.4826081, z: 1.2390614}
-  m_Center: {x: -0.09945355, y: 0.36102322, z: 0.088591576}
+  m_Size: {x: 1.0502107, y: 1.4826081, z: 1.2390614}
+  m_Center: {x: -0.113185175, y: 0.36102322, z: 0.088591576}
 --- !u!65 &1195790915
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -178594,7 +178594,7 @@ BoxCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Size: {x: 0.21248718, y: 0.7725178, z: 0.033573158}
   m_Center: {x: -0.011353664, y: 0.0059777647, z: -0.0000000027939677}

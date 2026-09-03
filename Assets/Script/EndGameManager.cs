@@ -19,7 +19,7 @@ public class EndGameManager : MonoBehaviour
 
     [Header("Cấu Hình")]
     [SerializeField] private float fadeSpeed = 1.5f;
-    [SerializeField] private string menuSceneName = "MainMenu"; // Đặt đúng tên Scene Menu của bạn
+    [SerializeField] private string menuSceneName = "SceneMenu"; // Tên Scene Menu chính xác để load khi nhấn nút Back to Menu
 
     private void Awake()
     {
@@ -37,7 +37,6 @@ public class EndGameManager : MonoBehaviour
     {
         if (endGameUI != null) endGameUI.SetActive(false);
 
-        // Bắt sự kiện Click nút Back To Menu bằng code nếu có gán Button
         if (backToMenuButton != null)
         {
             backToMenuButton.onClick.RemoveAllListeners();
@@ -45,9 +44,6 @@ public class EndGameManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Gọi hàm này từ bất kỳ Chapter nào để kết thúc game
-    /// </summary>
     public void TriggerEndGame()
     {
         StartCoroutine(EndGameSequence());
@@ -55,7 +51,7 @@ public class EndGameManager : MonoBehaviour
 
     private IEnumerator EndGameSequence()
     {
-        // 1. Phủ màn hình đen (dùng unscaledDeltaTime phòng trường hợp TimeScale bị chỉnh)
+        // 1. Phủ màn hình đen (Dùng unscaledDeltaTime để không bị đứng do timeScale)
         if (fadeImage != null)
         {
             fadeImage.gameObject.SetActive(true);
@@ -69,56 +65,50 @@ public class EndGameManager : MonoBehaviour
                 fadeImage.color = c;
                 yield return null;
             }
+            
+            c.a = 1f;
+            fadeImage.color = c;
         }
 
-        yield return new WaitForSecondsRealtime(0.2f);
+        // Chờ 0.3 giây thực tế (Realtime)
+        yield return new WaitForSecondsRealtime(0.3f);
 
-        // 2. Bật UI THE END (bao gồm cả nút Back to Menu)
+        // 2. Bật UI THE END cố định
         if (endGameUI != null)
         {
             endGameUI.SetActive(true);
         }
 
-        // 3. Tắt lớp fadeImage cũ để nhường chỗ cho endGameUI
+        // 3. Tắt màn đen fadeImage đi ĐỂ LỘ ẢNH THE END BÊN DƯỚI
         if (fadeImage != null)
         {
             fadeImage.gameObject.SetActive(false);
         }
 
-        // 4. Dừng Game Loop & Bật con trỏ chuột tương tác UI
-        Time.timeScale = 0f;
+        // 4. Mở khóa chuột hoàn toàn và giữ vững màn hình
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
 
-        Debug.Log("== THE END ==");
+        // Tạm thời KHÔNG chỉnh Time.timeScale = 0f nếu game của bạn có script UI Update tự động ẩn Canvas khi Pause
+        // Time.timeScale = 0f; 
+
+        Debug.Log("== THE END ĐÃ HIỆN CỐ ĐỊNH ==");
     }
 
-    /// <summary>
-    /// Hàm gọi khi bấm nút Quay về Main Menu
-    /// </summary>
     public void BackToMainMenu()
     {
-        // 1. Phát tiếng click nút UI (nếu dự án dùng AudioManager Singleton)
         if (AudioManager.Instance != null)
         {
             AudioManager.Instance.PlayButtonClick();
         }
 
-        // 2. Khôi phục lại tốc độ thời gian bình thường
         Time.timeScale = 1f;
-
-        // 3. Mở con trỏ chuột cho Scene Menu
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
 
-        // 4. Load Scene Main Menu
         if (!string.IsNullOrEmpty(menuSceneName))
         {
             SceneManager.LoadScene(menuSceneName);
-        }
-        else
-        {
-            Debug.LogError("EndGameManager: Chưa gán tên Menu Scene trong Inspector!");
         }
     }
 }
