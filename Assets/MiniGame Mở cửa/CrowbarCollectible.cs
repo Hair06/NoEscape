@@ -17,15 +17,16 @@ public class CrowbarCollectible : MonoBehaviour, IInteractable
 
     [Header("Raycast Settings")]
     [SerializeField] private float pickupRange = 3.5f;
-    [SerializeField] private LayerMask ignoreLayers; // Chọn layer của Player để Raycast không bị đụng vào người
+    [SerializeField] private LayerMask ignoreLayers;
 
     [Header("UI & Âm thanh")]
-    [SerializeField] private TextMeshProUGUI promptText; // Kéo UI Text gợi ý vào đây
+    [SerializeField] private TextMeshProUGUI promptText;
     [SerializeField] private AudioClip collectSound;
 
     private Camera playerCamera;
     private bool isLookingAt = false;
-    private bool isPlayerNearby = false; // Nhận diện thêm bằng Trigger vùng đứng
+    private bool isPlayerNearby = false;
+    private bool isPickedUp = false; // Cờ chống nhặt trùng 2 lần
 
     private void Start()
     {
@@ -37,7 +38,8 @@ public class CrowbarCollectible : MonoBehaviour, IInteractable
 
     private void Update()
     {
-        // 1. Kiểm tra Chapter active
+        if (isPickedUp) return; // Nếu đã nhặt rồi thì bỏ qua mọi logic Update
+
         if (!MiniGameFlowManager.IsChapterActive(questChapterIndex))
         {
             isLookingAt = false;
@@ -47,7 +49,6 @@ public class CrowbarCollectible : MonoBehaviour, IInteractable
 
         CheckLookAt();
 
-        // 2. BẮT PHÍM [E] ĐỂ NHẶT (Đã bổ sung phần bị thiếu)
         if ((isLookingAt || isPlayerNearby) && GameInputBridge.GetKeyDown(KeyCode.E))
         {
             Interact();
@@ -61,10 +62,8 @@ public class CrowbarCollectible : MonoBehaviour, IInteractable
 
         Ray ray = playerCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
 
-        // Raycast xuyên qua layer bị ignore
         if (Physics.Raycast(ray, out RaycastHit hit, pickupRange, ~ignoreLayers))
         {
-            // Kiểm tra xem hit trúng chính nó HOẶC object con của nó
             isLookingAt = (hit.collider.gameObject == gameObject || hit.collider.transform.IsChildOf(transform));
         }
         else
@@ -72,7 +71,6 @@ public class CrowbarCollectible : MonoBehaviour, IInteractable
             isLookingAt = false;
         }
 
-        // Cập nhật dòng chữ UI gợi ý
         if (promptText != null)
         {
             if (isLookingAt || isPlayerNearby)
@@ -89,7 +87,7 @@ public class CrowbarCollectible : MonoBehaviour, IInteractable
 
     public string GetInteractPrompt()
     {
-        if (!MiniGameFlowManager.IsChapterActive(questChapterIndex))
+        if (isPickedUp || !MiniGameFlowManager.IsChapterActive(questChapterIndex))
             return "";
 
         return "Nhấn [E] để nhặt xà beng";
@@ -97,8 +95,11 @@ public class CrowbarCollectible : MonoBehaviour, IInteractable
 
     public void Interact()
     {
-        if (!MiniGameFlowManager.IsChapterActive(questChapterIndex))
+        // Kiểm tra chống nhặt trùng
+if (isPickedUp || !MiniGameFlowManager.IsChapterActive(questChapterIndex))
             return;
+
+        isPickedUp = true; // Đánh dấu đã nhặt thành công ngay lập tức
 
         PlayerInventory.Add(itemName);
 
@@ -136,10 +137,9 @@ public class CrowbarCollectible : MonoBehaviour, IInteractable
         );
     }
 
-    // Tự động nhận diện khi Player đi vào vùng Trigger của xà beng
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player"))
+        if (!isPickedUp && other.CompareTag("Player"))
         {
             isPlayerNearby = true;
         }
