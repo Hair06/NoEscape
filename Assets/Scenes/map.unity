@@ -257719,8 +257719,8 @@ MonoBehaviour:
   patrolSpeed: 1.8
   chaseSpeed: 6.5
   turnSpeed: 240
-  detectRadius: 8
-  loseRadius: 14
+  detectRadius: 4.5
+  loseRadius: 10
   attackRadius: 1.8
   maxChaseTime: 4
   chaseCooldown: 3
