@@ -186097,10 +186097,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   endGameUI: {fileID: 136183715}
-  fadeImage: {fileID: 80740071}
+  fadeImage: {fileID: 0}
   backToMenuButton: {fileID: 1286417228}
   fadeSpeed: 1.5
-  menuSceneName: MainMenu
 --- !u!4 &1244399219
 Transform:
   m_ObjectHideFlags: 0
@@ -243767,6 +243766,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pedestalType: 0
   puzzleManager: {fileID: 620172699}
+  promptText: {fileID: 0}
 --- !u!1001 &1607225061
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -288974,6 +288974,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pedestalType: 1
   puzzleManager: {fileID: 620172699}
+  promptText: {fileID: 0}
 --- !u!1001 &1916543924
 PrefabInstance:
   m_ObjectHideFlags: 0
