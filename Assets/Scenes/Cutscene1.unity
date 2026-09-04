@@ -615,22 +615,24 @@ MonoBehaviour:
     waitTime: 1.5
     voiceClip: {fileID: 8300000, guid: dfc98b751d91696418cb891e7f7a1672, type: 3}
   - image: {fileID: 1443869683, guid: 43f24e4e486986c4b947d72f2d228b5c, type: 3}
-    dialogue: "Trong \u0111\xF3 c\xF3 m\u1ED9t cu\u1ED1n b\u0103ng cassette... v\xE0
+    dialogue: "Trong \u0111\xF3 c\xF3 m\u1ED9t cu\u1ED1n b\u0103ng video... v\xE0
       l\u1EDDi d\u1EB7n cu\u1ED1i c\xF9ng."
     waitTime: 2.5
-    voiceClip: {fileID: 8300000, guid: f6f99908e8aacd1458fd005617ae6ed0, type: 3}
+    voiceClip: {fileID: 8300000, guid: a683014103ae9624b9672ec3cf879fa9, type: 3}
   - image: {fileID: -575623803, guid: 43f24e4e486986c4b947d72f2d228b5c, type: 3}
     dialogue: "\u0110\xEAm h\xF4m \u1EA5y, Alex mang cu\u1ED1n b\u0103ng tr\u1EDF
       v\u1EC1 nh\xE0. C\u1EADu kh\xF4ng h\u1EC1 bi\u1EBFt r\u1EB1ng m\xECnh s\u1EAFp
       b\u01B0\u1EDBc v\xE0o v\xF9ng \u0111\u1EA5t k\xFD \u1EE9c b\u1ECB nguy\u1EC1n
       r\u1EE7a..."
-    waitTime: 4
+    waitTime: 6
     voiceClip: {fileID: 8300000, guid: 9c6eae4f0b990bc4a8cc45b1f6287c2a, type: 3}
   - image: {fileID: -755513450, guid: 3c603c68ccce251418130fcd23784625, type: 3}
-    dialogue: "Alex ng\u1ED3i tr\u01B0\u1EDBc m\xE0n h\xECnh TV v\u1EDBi cu\u1ED1n
-      b\u0103ng \u0111ang \u0111\u01B0\u1EE3c ph\xE1t v\xE0 sau \u0111\xF3..."
-    waitTime: 2.2
-    voiceClip: {fileID: 8300000, guid: 05ed5e38c37433845856f96d2a78f435, type: 3}
+    dialogue: "Alex ng\u1ED3i tr\u01B0\u1EDBc m\xE0n h\xECnh TV xem cu\u1ED1n b\u0103ng,
+      b\u1ED7ng nhi\xEAn c\xF3 \xE2m thanh th\xEC th\u1EA7m b\xEAn tai c\u1EADu v\xE0
+      \u0111\u01B0a c\u1EADu v\xE0o tr\u1EA1ng th\xE1i m\xEA mang nh\u01B0 \u0111ang
+      b\u1ECB h\xFAt v\xE0o TV."
+    waitTime: 9
+    voiceClip: {fileID: 8300000, guid: f4fa6c49510630f428c02d0a5d4ca016, type: 3}
   - image: {fileID: 1257150700, guid: 3c603c68ccce251418130fcd23784625, type: 3}
     dialogue: 
     waitTime: 0.5
